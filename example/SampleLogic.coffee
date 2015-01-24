@@ -1,11 +1,18 @@
 e = require('../lib/EventManager')
+Game = require('./SampleGame')
 
 class SampleLogic
 
   constructor: (@messageRouter) ->
     @games = []
     @messageRouter.addTarget('listGames',   '<noargs>', @onListPlayerGames)
+    @messageRouter.addTarget('newGame',     '<noargs>', @onNewGame)
 
+
+  onNewGame: (msg) =>
+    new Game().then (game)=>
+      @games.push game
+      msg.replyFunc(e.event(e.general.SUCCESS, 'game "'+game.name+'" created'));
 
   onListPlayerGames: (msg) =>
     rv = []

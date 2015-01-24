@@ -85,18 +85,18 @@
 
             io.on('message', function(reply)
             {
-              var status = reply[0].e;
-              var message = reply[0].o;
+              var status = reply.data[0].e;
+              var message = reply.data[0].o;
               console.log("got reply of type "+message);
               console.dir(reply);
               //console.dir(this.subscribers);
                 var index = -1;
-                if(message.messageId)
+                if(reply.messageId)
                 {
                     for(var i = 0; i < this.outstandingMessages.length; i++)
                     {
                         var detail = this.outstandingMessages[i];
-                        if (detail.messageId == message.messageId)
+                        if (detail.messageId == reply.messageId)
                         {
                             detail.cb(message);
                             index = i;
@@ -110,13 +110,13 @@
                 }
                 else if(reply[1])
                 {
-                    var subscribers = this.subscribers[reply[1].e];
+                    var subscribers = this.subscribers[reply.data[1].e];
                     if(subscribers)
                     {
                         subscribers.forEach(function(listener)
                         {
                             //console.log("sending reply to listener");
-                            listener(reply[1].o)
+                            listener(reply.data[1].o)
                         });
                     }
                     else

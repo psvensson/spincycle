@@ -6,9 +6,15 @@
 
     <message-router io="{{socket}}"></message-router>
     <link rel="stylesheet" href="main-app.css">
-
+    <div>
+        <button on-click="{{newGame}}">New Game</button>
+    </div>
     Games:
-    <div id="gamelist"></div>
+    <ul id="gamelist">
+        <template repeat="{{game in games}}">
+                        <li>{{game.name}}</li>
+        </template>
+    </ul>
 
   </template>
   <script>
@@ -22,10 +28,24 @@
             this.asyncFire('core-signal', {name: "emit", data: {target:'listGames', cb: this.onListGames.bind(this) }});
         },
 
+        newGame: function()
+        {
+            console.log('new game clicked');
+            this.asyncFire('core-signal', {name: "emit", data: {target:'newGame', cb: this.onNewGame.bind(this) }});
+            this.asyncFire('core-signal', {name: "emit", data: {target:'listGames', cb: this.onListGames.bind(this) }});
+        },
+
+        onNewGame: function(reply)
+        {
+            console.log('onNewGame called. reply is');
+            console.dir(reply);
+        },
+
         onListGames: function(games)
         {
             console.log("onGamesList called with ");
             console.dir(games);
+            this.games = games;
         }
 
       });
