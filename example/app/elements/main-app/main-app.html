@@ -1,4 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/core-input/core-input.html">
+
 <link rel="import" href="../../elements/message-router/message-router.html">
 
 <polymer-element name="main-app" attributes="">
@@ -12,7 +14,9 @@
     Games:
     <ul id="gamelist">
         <template repeat="{{game in games}}">
-                        <li>{{game.name}}</li>
+            <li>
+                <input is="core-input" gameid="{{game.id}}" value="{{game.name}}" on-change="{{onGameNameChange}}"> </input> <paper-button on-click="selectGame({{game}})">Select</paper-button>
+            </li>
         </template>
     </ul>
 
@@ -46,7 +50,21 @@
             console.log("onGamesList called with ");
             console.dir(games);
             this.games = games;
-        }
+        },
+
+          onGameNameChange: function(e, err, el)
+          {
+              console.log("onGameNameChange called");
+              console.dir(arguments);
+              var name = el.value;
+              console.log("new name is "+name);
+          },
+
+          selectGame: function(game)
+          {
+              console.log("selectGame called");
+              console.dir(arguments);
+          }
 
       });
     })();
