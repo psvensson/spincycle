@@ -50,9 +50,7 @@ class MessageRouter
     console.log 'routeMessage called for "'+message.target+'"'
     if fn
       @authMgr.decorateMessageWithUser(message).then( (m)->
-        #console.log 'routing forward message to target with player '+m
-        #console.dir m
-        if not m.player then exit( -1)
+        if not m.user then exit( -1)
         fn(m) # With a player object that matches the session cookies or whatnot in the message
       )
     else

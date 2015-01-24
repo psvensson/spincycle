@@ -19,6 +19,7 @@
       user = AuthenticationManager.anonymousUsers[message.client] || {
         id: uuid.v4()
       };
+      message.user = user;
       q.resolve(user);
       AuthenticationManager.anonymousUsers[message.client] = user;
       return q;

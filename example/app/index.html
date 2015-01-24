@@ -15,11 +15,11 @@
 
   <!-- build:js bower_components/webcomponentsjs/webcomponents.min.js -->
   <script src="bower_components/webcomponentsjs/webcomponents.js"></script>
+    <script src="bower_components/uuid.js/dist/uuid.core.js/"></script>
   <!-- endbuild -->
 
   <!-- build:vulcanized elements/elements.vulcanized.html -->
   <link rel="import" href="elements/main-app/main-app.html">
-  <link rel="import" href="elements/info-bar/info-bar.html">
   <!-- endbuild-->
 </head>
 
@@ -29,12 +29,11 @@
   <div id='main'>
     <article><main-app></main-app></article>
     <nav>nav</nav>
-    <aside><info-bar></info-bar></aside>
+    <aside>sidebar</aside>
   </div>
   <footer>footer</footer>
 
   <!-- build:js scripts/app.js -->
-  <script src="scripts/app.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <!-- endbuild-->
 </body>

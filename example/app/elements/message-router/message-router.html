@@ -1,0 +1,133 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/core-signals/core-signals.html">
+
+<link rel="import" href="../../elements/message-router/message-router.html">
+
+<polymer-element name="message-router" attributes="io">
+  <template>
+    <core-signals on-core-signal-register="{{registerListener}}"></core-signals>
+    <core-signals on-core-signal-objectsubscribe="{{registerObjectSubscriber}}"></core-signals>
+    <core-signals on-core-signal-emit="{{emitMessage}}"></core-signals>
+  </template>
+  <script>
+    (function ()
+    {
+      Polymer(
+        {
+            subscribers: [],
+            objsubscribers: [],
+            outstandingMessages: [],
+
+          ready: function ()
+          {
+            console.log('message-router is ready');
+          },
+
+          registerListener: function(e, detail, sender)
+          {
+            //console.dir(arguments);
+            //console.log("message-router registering listener for message '"+detail.message+"'");
+            var subscribers = this.subscribers[detail.message] || [];
+            subscribers.push(detail.callback);
+            this.subscribers[detail.message] = subscribers;
+          },
+
+          registerObjectSubscriber: function(e, detail, sender)
+          {
+            //console.dir(arguments);
+            console.log("message-router registering subscriber for object '"+detail.obj.id+"' type "+detail.obj.type);
+            var subscribers = this.objsubscribers[detail.obj.id] || [];
+            subscribers.push(detail.callback);
+            this.objsubscribers[detail.obj.id] = subscribers;
+            this.io.emit('message', JSON.stringify({target:'registerForUpdatesOn', obj: detail.obj}))
+          },
+
+          emitMessage: function(e, detail, sender)
+          {
+            //.log("emitMessage called");
+            //console.dir(detail);
+              detail.messageId = UUID.generate();
+              this.outstandingMessages.push(detail)
+              this.io.emit('message', detail);
+          },
+
+          ioChanged: function()
+          {
+            if(this.io)
+            {
+              this.setupSockets(this.io)
+            }
+          },
+
+          setupSockets: function(io)
+          {
+            console.log("message-router setupSockets called");
+            console.dir(io);
+
+            this.subscribers['OBJECT_UPDATE'] =
+            [
+              function(obj)
+              {
+                console.log("+++++++++++ obj update message router got obj");
+                //console.dir(obj);
+                var subscribers = this.objsubscribers[obj.id] || [];
+                if(subscribers.length === 0)
+                {
+                  console.log("* OH NOES! * No subscribers for object update on object "+obj.id);
+                  console.dir(this.objsubscribers);
+                }
+                else
+                {
+                  subscribers.forEach(function(subscriber) { subscriber(obj) } );
+                }
+              }.bind(this)
+            ];
+
+            io.on('message', function(reply)
+            {
+              var status = reply[0].e;
+              var message = reply[1].e;
+              console.log("got reply of type "+message);
+              //console.dir(reply);
+              //console.dir(this.subscribers);
+                var index = -1;
+                if(message.messageId)
+                {
+                    for(var i = 0; i < this.outstandingMessages.length; i++)
+                    {
+                        var detail = this.outstandingMessages[i];
+                        if (detail.messageId == message.messageId)
+                        {
+                            detail.cb(message);
+                            index = i;
+                            break;
+                        }
+                    }
+                    if(index > 0)
+                    {
+                        this.outstandingMessages.splice(index, 1);
+                    }
+                }
+                else
+                {
+                    var subscribers = this.subscribers[reply[1].e];
+                    if(subscribers)
+                    {
+                        subscribers.forEach(function(listener)
+                        {
+                            //console.log("sending reply to listener");
+                            listener(reply[1].o)
+                        });
+                    }
+                    else
+                    {
+                        console.log("no subscribers for message "+message);
+                        console.dir(reply);
+                    }
+                }
+            }.bind(this));
+          }
+        });
+    })();
+  </script>
+</polymer-element>

@@ -1,0 +1,34 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../elements/message-router/message-router.html">
+
+<polymer-element name="main-app" attributes="">
+  <template>
+
+    <message-router io="{{socket}}"></message-router>
+    <link rel="stylesheet" href="main-app.css">
+
+    Games:
+    <div id="gamelist"></div>
+
+  </template>
+  <script>
+    (function () {
+
+      Polymer({
+        ready: function ()
+        {
+            console.log('main app starting up');
+            this.socket = io();
+            this.asyncFire('core-signal', {name: "emit", data: JSON.stringify({target:'listGames'}), cb: this.onListGames.bind(this) });
+        },
+
+        onListGames: function(games)
+        {
+            console.log("onGamesList called with ");
+            console.dir(games);
+        }
+
+      });
+    })();
+  </script>
+</polymer-element>

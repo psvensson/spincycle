@@ -24,6 +24,7 @@ class WsMethod
         data.messageId = data.messageId || uuid.v4()
         data.replyFunc = (reply) ->
           reply.messageId = data.messageId
+          reply.target = data.target
           socket.emit('message', reply)
         WsMethod.wsroutes[data.target]?(data)
 

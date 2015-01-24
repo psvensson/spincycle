@@ -17,6 +17,7 @@ class AuthenticationManager
     # Either we look up the user by client key or we create s super-simple user (containing only an 'id' property) and storing that in our hashtable
     user = @anonymousUsers[message.client] or
       id: uuid.v4()
+    message.user = user
     q.resolve(user)
     @anonymousUsers[message.client] = user
     return q

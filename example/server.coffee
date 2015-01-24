@@ -24,3 +24,4 @@ new HttpMethod(messageRouter, app, '/api/')
 #--------------------------------------------------> WS Routing
 new WsMethod(server, messageRouter)
 #<-------------------------------------------------- WS Routing
+# Adding sample logic
