@@ -29,4 +29,4 @@ class AuthenticationManager
   @canUserWriteToThisObject: (obj, user) =>
     true # same here
 
-modules.exports = AuthenticationManager
+module.exports = AuthenticationManager

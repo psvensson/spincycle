@@ -1,5 +1,5 @@
 ObjectManager   = require('./ObjectManager')
-error           = require('./../Error').error
+error           = require('./Error').error
 
 # The MessageRouter registers names on which messages can be sent.
 # The idea is to abstract away different messaging methods (WS, WebRTC, HTTP) from the logic

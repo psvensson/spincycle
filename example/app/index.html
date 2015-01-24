@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>SpinCycle Example</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+  <!-- build:css styles/main.css -->
+  <link rel="stylesheet" href="styles/main.css">
+  <!-- endbuild-->
+
+  <!-- build:js bower_components/webcomponentsjs/webcomponents.min.js -->
+  <script src="bower_components/webcomponentsjs/webcomponents.js"></script>
+  <!-- endbuild -->
+
+  <!-- build:vulcanized elements/elements.vulcanized.html -->
+  <link rel="import" href="elements/main-app/main-app.html">
+  <link rel="import" href="elements/info-bar/info-bar.html">
+  <!-- endbuild-->
+</head>
+
+<body unresolved>
+
+  <header>header</header>
+  <div id='main'>
+    <article><main-app></main-app></article>
+    <nav>nav</nav>
+    <aside><info-bar></info-bar></aside>
+  </div>
+  <footer>footer</footer>
+
+  <!-- build:js scripts/app.js -->
+  <script src="scripts/app.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <!-- endbuild-->
+</body>
+
+</html>

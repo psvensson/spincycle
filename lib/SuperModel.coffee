@@ -4,8 +4,7 @@ uuid            = require('node-uuid')
 
 OMgr            = require('./OStore')
 DB              = require('./DB')
-cfg             = require('../Config')
-error           = require('../Error').error
+error           = require('./Error').error
 
 class SuperModel
 

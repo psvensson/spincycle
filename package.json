@@ -29,6 +29,7 @@
   },
   "homepage": "https://github.com/psvensson/spincycle",
   "dependencies": {
+    "express": "^4.11.1",
     "lru-cache": "^2.5.0",
     "node-google-api": "^0.3.0",
     "node-promise": "^0.5.11",

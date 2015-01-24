@@ -36,7 +36,7 @@
 
   })();
 
-  modules.exports = AuthenticationManager;
+  module.exports = AuthenticationManager;
 
 }).call(this);
 

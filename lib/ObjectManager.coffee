@@ -1,12 +1,11 @@
 util            = require('util')
 defer           = require('node-promise').defer
 
-e               = require('./../EventManager')
+e               = require('./EventManager')
 DB              = require('./DB')
 ClientEndpoints = require('./ClientEndpoints')
-authMgr         = require('./../AuthenticationManager')
 objStore        = require('./OStore')
-error           = require('./../Error').error
+error           = require('./Error').error
 
 
 class ObjectManager
@@ -16,14 +15,14 @@ class ObjectManager
 
   setup: () =>
     @messageRouter.addTarget('registerForUpdatesOn',  'obj', @onRegisterForUpdatesOn)
-    @messageRouter.addTarget('updateObject',  'obj', @onUpdateObject)
+    @messageRouter.addTarget('updateObject',          'obj', @onUpdateObject)
 
 
   onUpdateObject: (msg) =>
     console.log 'onUpdateObject called for '+msg.obj.type+' - '+msg.obj.id
     objStore.getObj(msg.obj.id, msg.obj.type).then( (obj) =>
       if obj
-        if authMgr.canPlayerWriteToThisObject(obj, msg.player)
+        if @messageRouter.authMgr.canPlayerWriteToThisObject(obj, msg.player)
           objStore.updateObj(msg.obj)
           DB.set(obj.type, objStore.get(msg.obj.id))
           msg.replyFunc(e.event(e.general.SUCCESS, 0, e.gamemanager.UPDATE_OBJECT_SUCCESS, msg.obj.id))
@@ -41,7 +40,7 @@ class ObjectManager
 
     objStore.getObj(msg.obj.id, msg.obj.type).then( (obj) =>
       if obj
-        if authMgr.canPlayerReadFromThisObject(obj, msg.player)
+        if @messageRouter.authMgr.canPlayerReadFromThisObject(obj, msg.player)
           listenerId = objStore.addListenerFor(msg.obj.id, msg.obj.type, (uobj) ->
             console.log '--------------------- sending update of object '+msg.obj.id+' type '+msg.obj.type+' to client'
             if not uobj then console.dir uobj
