@@ -3,7 +3,7 @@ all             = require('node-promise').all
 uuid            = require('node-uuid')
 LRU             = require('lru-cache')
 
-DataStore       = require('./../gds')
+DataStore       = require('./gds')
 
 class DB
 

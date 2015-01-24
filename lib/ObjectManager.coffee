@@ -12,7 +12,6 @@ error           = require('./../Error').error
 class ObjectManager
 
   constructor: (@messageRouter) ->
-    console.log '********** new objectManager created ***********'
     @games = []
 
   setup: () =>
@@ -23,12 +22,10 @@ class ObjectManager
   onUpdateObject: (msg) =>
     console.log 'onUpdateObject called for '+msg.obj.type+' - '+msg.obj.id
     objStore.getObj(msg.obj.id, msg.obj.type).then( (obj) =>
-      console.log 'gameMgr::onUpdateObject DB found object'+obj.id
       if obj
-        newval = {}
         if authMgr.canPlayerWriteToThisObject(obj, msg.player)
           objStore.updateObj(msg.obj)
-          DB.set(obj.type, newval)
+          DB.set(obj.type, objStore.get(msg.obj.id))
           msg.replyFunc(e.event(e.general.SUCCESS, 0, e.gamemanager.UPDATE_OBJECT_SUCCESS, msg.obj.id))
         else
           msg.replyFunc(e.event(e.general.NOT_ALLOWED, 0, e.gamemanager.UPDATE_OBJECT_FAIL, msg.obj.id))
@@ -45,13 +42,11 @@ class ObjectManager
     objStore.getObj(msg.obj.id, msg.obj.type).then( (obj) =>
       if obj
         if authMgr.canPlayerReadFromThisObject(obj, msg.player)
-          # TODO: Make sure to detect when sockets fail and remove listeners associated with them
           listenerId = objStore.addListenerFor(msg.obj.id, msg.obj.type, (uobj) ->
             console.log '--------------------- sending update of object '+msg.obj.id+' type '+msg.obj.type+' to client'
             if not uobj then console.dir uobj
             ClientEndpoints.sendToEndpoint(msg.client, e.event(e.general.SUCCESS, 0, e.gamemanager.OBJECT_UPDATE, uobj.toClient()))
           )
-          console.log 'replying with listenerId '+listenerId
           msg.replyFunc(e.event(e.general.SUCCESS, 0, e.gamemanager.REGISTER_UPDATES, listenerId))
         else
           msg.replyFunc(e.event(e.general.NOT_ALLOWED, 0, e.gamemanager.UPDATE_REGISTER_FAIL, obj.name))

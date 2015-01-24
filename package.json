@@ -1,0 +1,38 @@
+{
+  "name": "spincycle",
+  "version": "1.0.0",
+  "description": "An opinionated message router and object manager that lets clients subscribe to object property changes on the server",
+  "main": "index.js",
+  "directories": {
+    "example": "example",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/psvensson/spincycle.git"
+  },
+  "keywords": [
+    "node",
+    "node.js",
+    "message",
+    "routing",
+    "object",
+    "subscriptions"
+  ],
+  "author": "Peter Svensson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/psvensson/spincycle/issues"
+  },
+  "homepage": "https://github.com/psvensson/spincycle",
+  "dependencies": {
+    "lru-cache": "^2.5.0",
+    "node-google-api": "^0.3.0",
+    "node-promise": "^0.5.11",
+    "node-uuid": "^1.4.2",
+    "socket.io": "^1.3.2"
+  }
+}
