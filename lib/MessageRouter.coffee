@@ -8,6 +8,7 @@ class MessageRouter
 
   constructor: (@authMgr) ->
     console.log 'messageRouter constructor'
+    console.dir @authMgr
     @targets  = []
     @args     = []
     @methods  = []

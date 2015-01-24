@@ -1,13 +1,13 @@
-e = reuire('../lib/EventManager')
+e = require('../lib/EventManager')
 
 class SampleLogic
 
   constructor: (@messageRouter) ->
     @games = []
-    @messageRouter.addTarget('listPlayerGames',   '<noargs>', @onListPlayerGames)
+    @messageRouter.addTarget('listGames',   '<noargs>', @onListPlayerGames)
 
-  onListPlayerGames: () =>
-    onListPlayerGames: (msg) =>
+
+  onListPlayerGames: (msg) =>
     rv = []
     console.log 'onListPlayerGames for player '+msg.user.id
     for name, game of @games

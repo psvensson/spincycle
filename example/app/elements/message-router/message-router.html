@@ -44,11 +44,11 @@
 
           emitMessage: function(e, detail, sender)
           {
-            //.log("emitMessage called");
-            //console.dir(detail);
+            console.log("emitMessage called");
+            console.dir(detail);
               detail.messageId = UUID.generate();
               this.outstandingMessages.push(detail)
-              this.io.emit('message', detail);
+              this.io.emit('message', JSON.stringify(detail));
           },
 
           ioChanged: function()
@@ -86,9 +86,9 @@
             io.on('message', function(reply)
             {
               var status = reply[0].e;
-              var message = reply[1].e;
+              var message = reply[0].o;
               console.log("got reply of type "+message);
-              //console.dir(reply);
+              console.dir(reply);
               //console.dir(this.subscribers);
                 var index = -1;
                 if(message.messageId)
@@ -108,7 +108,7 @@
                         this.outstandingMessages.splice(index, 1);
                     }
                 }
-                else
+                else if(reply[1])
                 {
                     var subscribers = this.subscribers[reply[1].e];
                     if(subscribers)

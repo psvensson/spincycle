@@ -1,6 +1,7 @@
 SpinCycle       = require('../lib/MessageRouter')
 
 AuthenticationManager = require('./AuthenticationManager')
+SampleLogic = require('./SampleLogic')
 
 express         = require("express")
 app             = express()
@@ -25,3 +26,4 @@ new HttpMethod(messageRouter, app, '/api/')
 new WsMethod(server, messageRouter)
 #<-------------------------------------------------- WS Routing
 # Adding sample logic
+logic = new SampleLogic(messageRouter)

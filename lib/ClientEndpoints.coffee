@@ -7,7 +7,7 @@ class ClientEndpoints
     @endpoints[address] = sendFunc
 
   @removeEndpoint: (address) ->
-    console.log 'deleting endpoint '+@endpoints[address]
+    console.log 'deleting endpoint '+address
     delete @endpoints[address]
 
   @sendToEndpoint: (address, msg) ->

@@ -7,27 +7,28 @@ uuid            = require('node-uuid')
 
 class AuthenticationManager
 
-  @constructor: ()->
+  constructor: ()->
     @anonymousUsers = []
+    console.log '** new AuthMgr created **'
 
   # The messagerouter will make sure the message contains a 'client' property which will be unique for each client (made up of its ip-address + port)
   # This can be used to recognize and map recurring users between messages
-  @decorateMessageWithUser: (message) =>
+  decorateMessageWithUser: (message) =>
     q = defer()
     # Either we look up the user by client key or we create s super-simple user (containing only an 'id' property) and storing that in our hashtable
     user = @anonymousUsers[message.client] or
       id: uuid.v4()
     message.user = user
-    q.resolve(user)
+    q.resolve(message)
     @anonymousUsers[message.client] = user
     return q
 
-  # When a user send a 'registerForUpdatesOn' message to SpinCycle, this method will be called once to allow or disallow the user to be apply to subscribe to project changes of an object
-  @canUserReadFromThisObject: (obj, user) =>
+  # When a user sends a 'registerForUpdatesOn' message to SpinCycle, this method will be called once to allow or disallow the user to be apply to subscribe to project changes of an object
+  canUserReadFromThisObject: (obj, user) =>
     true # not much checking, eh?
 
-  # When a user send a 'updateObject' message, this method gets called to allow or disallow updating of the object
-  @canUserWriteToThisObject: (obj, user) =>
+  # When a user sends a 'updateObject' message, this method gets called to allow or disallow updating of the object
+  canUserWriteToThisObject: (obj, user) =>
     true # same here
 
 module.exports = AuthenticationManager

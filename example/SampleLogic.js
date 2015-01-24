@@ -3,23 +3,18 @@
   var SampleLogic, e,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  e = reuire('../lib/EventManager');
+  e = require('../lib/EventManager');
 
   SampleLogic = (function() {
     function SampleLogic(messageRouter) {
       this.messageRouter = messageRouter;
       this.onListPlayerGames = __bind(this.onListPlayerGames, this);
       this.games = [];
-      this.messageRouter.addTarget('listPlayerGames', '<noargs>', this.onListPlayerGames);
+      this.messageRouter.addTarget('listGames', '<noargs>', this.onListPlayerGames);
     }
 
-    SampleLogic.prototype.onListPlayerGames = function() {
+    SampleLogic.prototype.onListPlayerGames = function(msg) {
       var game, name, rv, _ref;
-      ({
-        onListPlayerGames: (function(_this) {
-          return function(msg) {};
-        })(this)
-      });
       rv = [];
       console.log('onListPlayerGames for player ' + msg.user.id);
       _ref = this.games;

@@ -19,7 +19,7 @@
         {
             console.log('main app starting up');
             this.socket = io();
-            this.asyncFire('core-signal', {name: "emit", data: JSON.stringify({target:'listGames'}), cb: this.onListGames.bind(this) });
+            this.asyncFire('core-signal', {name: "emit", data: {target:'listGames', cb: this.onListGames.bind(this) }});
         },
 
         onListGames: function(games)
