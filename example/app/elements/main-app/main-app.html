@@ -23,6 +23,9 @@
             </li>
         </template>
     </ul>
+    <div>
+        Update from server:{{update}}
+    </div>
 
   </template>
   <script>
@@ -33,7 +36,7 @@
         {
             console.log('main app starting up');
             this.socket = io();
-            this.asyncFire('core-signal', {name: "emit", data: {target:'listGames', cb: this.onListGames.bind(this) }});
+            this.asyncFire('core-signal', {name: "emit", data: {target:'listGames', callback: this.onListGames.bind(this) }});
         },
 
           gameById: function(id)
@@ -44,8 +47,8 @@
         newGame: function()
         {
             console.log('new game clicked');
-            this.asyncFire('core-signal', {name: "emit", data: {target:'newGame', cb: this.onNewGame.bind(this) }});
-            this.asyncFire('core-signal', {name: "emit", data: {target:'listGames', cb: this.onListGames.bind(this) }});
+            this.asyncFire('core-signal', {name: "emit", data: {target:'newGame', callback: this.onNewGame.bind(this) }});
+            this.asyncFire('core-signal', {name: "emit", data: {target:'listGames', callback: this.onListGames.bind(this) }});
         },
 
         onNewGame: function(reply)
@@ -67,13 +70,12 @@
               var name = el.value;
               var gameid = el.attributes['gameid'].value;
               console.log("new name is "+name);
-              this.asyncFire('core-signal', {name: "emit", data: {target:'updateObject', obj: {id: gameid, type: 'game', name: name}} });
+              this.asyncFire('core-signal', {name: "emit", data: {target:'updateObject', obj: {id: gameid, type: 'game', name: name }, callback: function(msg) { console.log('updatedObject said:');console.dir(msg); }} });
           },
 
           selectGame: function(e, detail, el)
           {
               console.log("selectGame called");
-              console.dir(arguments);
               var gameid = el.attributes['gameid'].value;
               console.log("gameid = "+gameid);
               this.selectedgame = this.gameById(gameid);
@@ -85,6 +87,7 @@
               console.log("onGameUpdate called. game is "+game);
               console.dir(game);
               this.selectedgame = game;
+              this.update = JSON.stringify(game);
           }
 
       });

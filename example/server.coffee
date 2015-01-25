@@ -23,7 +23,7 @@ messageRouter   = new SpinCycle(authMgr)
 new HttpMethod(messageRouter, app, '/api/')
 #<-------------------------------------------------- Express Routing
 #--------------------------------------------------> WS Routing
-new WsMethod(server, messageRouter)
+new WsMethod(messageRouter, server)
 #<-------------------------------------------------- WS Routing
 # Adding sample logic
 logic = new SampleLogic(messageRouter)

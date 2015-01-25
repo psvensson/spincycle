@@ -22,9 +22,9 @@ class ObjectManager
     console.log 'onUpdateObject called for '+msg.obj.type+' - '+msg.obj.id
     objStore.getObj(msg.obj.id, msg.obj.type).then( (obj) =>
       if obj
-        if @messageRouter.authMgr.canPlayerWriteToThisObject(obj, msg.player)
+        if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.player)
           objStore.updateObj(msg.obj)
-          DB.set(obj.type, objStore.get(msg.obj.id))
+          DB.set(obj.type, objStore.getObj(msg.obj.id))
           msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
         else
           msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.UPDATE_OBJECT_FAIL, payload: msg.obj.id})
@@ -40,7 +40,7 @@ class ObjectManager
 
     objStore.getObj(msg.obj.id, msg.obj.type).then( (obj) =>
       if obj
-        if @messageRouter.authMgr.canPlayerReadFromThisObject(obj, msg.player)
+        if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.player)
           listenerId = objStore.addListenerFor(msg.obj.id, msg.obj.type, (uobj) ->
             console.log '--------------------- sending update of object '+msg.obj.id+' type '+msg.obj.type+' to client'
             if not uobj then console.dir uobj

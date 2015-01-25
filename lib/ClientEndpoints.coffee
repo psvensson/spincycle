@@ -11,8 +11,12 @@ class ClientEndpoints
     delete @endpoints[address]
 
   @sendToEndpoint: (address, msg) ->
-    console.log 'sendToEndpoint called. endpoints are..'
+    console.log 'sendToEndpoint "'+address+'" called. endpoints are..'
     console.dir @endpoints
-    @endpoints[address](msg)
+    func = @endpoints[address]
+    if func
+      func(msg)
+    else
+      console.log '** no endpoint found for address '+address
 
 module.exports = ClientEndpoints

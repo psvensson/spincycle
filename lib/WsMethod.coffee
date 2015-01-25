@@ -6,7 +6,7 @@ class WsMethod
 
   @wsroutes = []
 
-  constructor:(server, messageRouter)->
+  constructor:(messageRouter, server)->
     io = IO(server)
 
     io.on "connection", (socket) ->
@@ -24,12 +24,10 @@ class WsMethod
         data.client    = ip+':'+port
         data.messageId = data.messageId || uuid.v4()
         data.replyFunc = (replydata) ->
-          reply =
-            messageId: data.messageId
-            data: replydata
+          replydata.messageId = data.messageId
+          socket.emit('message', replydata)
 
-          socket.emit('message', reply)
-        WsMethod.wsroutes[data.target]?(data)
+        WsMethod.wsroutes[data.target](data)
 
       # when the user disconnects.. perform this
       socket.on "disconnect", ->

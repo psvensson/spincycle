@@ -32,7 +32,7 @@
 
   new HttpMethod(messageRouter, app, '/api/');
 
-  new WsMethod(server, messageRouter);
+  new WsMethod(messageRouter, server);
 
   logic = new SampleLogic(messageRouter);
 

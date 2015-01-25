@@ -33,9 +33,12 @@ class MessageRouter
   addMethod: (methodName, registrationFunc) =>
     console.log 'addMethod called for "'+methodName+'"'
     @methods[methodName] = registrationFunc
+    for targetName of @targets
+      console.log 'registering target '+targetName+' on method '+methodName
+      registrationFunc(targetName, @routeMessage)
 
   addTarget: (targetName, args, targetFunc) =>
-    #console.log 'addTarget called for "'+targetName+'"'
+    console.log 'addTarget called for "'+targetName+'"'
     @targets[targetName] = targetFunc
     @args[targetName] = args
     for method, registrationFunc of @methods

@@ -39,7 +39,7 @@
             var subscribers = this.objsubscribers[detail.obj.id] || [];
             subscribers.push(detail.callback);
             this.objsubscribers[detail.obj.id] = subscribers;
-            this.io.emit('message', JSON.stringify({target:'registerForUpdatesOn', obj: detail.obj}))
+            this.io.emit('message', JSON.stringify({target:'registerForUpdatesOn', messageId: UUID.generate(), obj: detail.obj}))
           },
 
           emitMessage: function(e, detail, sender)
@@ -47,7 +47,7 @@
             console.log("emitMessage called");
             console.dir(detail);
               detail.messageId = UUID.generate();
-              this.outstandingMessages.push(detail)
+              this.outstandingMessages.push(detail);
               this.io.emit('message', JSON.stringify(detail));
           },
 
@@ -85,11 +85,12 @@
 
             io.on('message', function(reply)
             {
-              var status = reply.data.status;
-              var message = reply.data.payload;
-              var info = reply.data.info;
-              console.log("got reply status"+status+", info "+info+" data "+message);
-              console.dir(reply);
+                var status    = reply.status;
+                var message   = reply.payload;
+                var info      = reply.info;
+
+                console.log("got reply id "+reply.messageId+" status "+status+", info "+info+" data "+message);
+                console.dir(reply);
 
                 var index = -1;
                 if(reply.messageId)
@@ -99,7 +100,7 @@
                         var detail = this.outstandingMessages[i];
                         if (detail.messageId == reply.messageId)
                         {
-                            detail.cb(message);
+                            detail.callback(message);
                             index = i;
                             break;
                         }
@@ -109,9 +110,9 @@
                         this.outstandingMessages.splice(index, 1);
                     }
                 }
-                else if(reply[1])
+                else
                 {
-                    var subscribers = this.subscribers[status];
+                    var subscribers = this.subscribers[info];
                     if(subscribers)
                     {
                         subscribers.forEach(function(listener)
