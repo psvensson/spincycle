@@ -21,7 +21,10 @@
       return new Game().then((function(_this) {
         return function(game) {
           _this.games.push(game);
-          return msg.replyFunc(e.event(e.general.SUCCESS, 'game "' + game.name + '" created'));
+          return msg.replyFunc({
+            status: e.general.SUCCESS,
+            info: 'game "' + game.name + '" created'
+          });
         };
       })(this));
     };
@@ -36,7 +39,11 @@
         console.log('   onListPlayerGames listing game "' + name + '"');
         rv.push(game.toClient());
       }
-      return msg.replyFunc(e.event(e.general.SUCCESS, rv));
+      return msg.replyFunc({
+        status: e.general.SUCCESS,
+        info: '',
+        payload: rv
+      });
     };
 
     return SampleLogic;

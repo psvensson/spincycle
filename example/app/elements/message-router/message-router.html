@@ -85,11 +85,12 @@
 
             io.on('message', function(reply)
             {
-              var status = reply.data[0].e;
-              var message = reply.data[0].o;
-              console.log("got reply of type "+message);
+              var status = reply.data.status;
+              var message = reply.data.payload;
+              var info = reply.data.info;
+              console.log("got reply status"+status+", info "+info+" data "+message);
               console.dir(reply);
-              //console.dir(this.subscribers);
+
                 var index = -1;
                 if(reply.messageId)
                 {
@@ -110,13 +111,13 @@
                 }
                 else if(reply[1])
                 {
-                    var subscribers = this.subscribers[reply.data[1].e];
+                    var subscribers = this.subscribers[status];
                     if(subscribers)
                     {
                         subscribers.forEach(function(listener)
                         {
                             //console.log("sending reply to listener");
-                            listener(reply.data[1].o)
+                            listener(message)
                         });
                     }
                     else

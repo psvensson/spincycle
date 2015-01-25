@@ -12,7 +12,7 @@ class SampleLogic
   onNewGame: (msg) =>
     new Game().then (game)=>
       @games.push game
-      msg.replyFunc(e.event(e.general.SUCCESS, 'game "'+game.name+'" created'));
+      msg.replyFunc({status: e.general.SUCCESS, info: 'game "'+game.name+'" created'});
 
   onListPlayerGames: (msg) =>
     rv = []
@@ -20,7 +20,7 @@ class SampleLogic
     for name, game of @games
       console.log '   onListPlayerGames listing game "'+name+'"'
       rv .push game.toClient()
-    msg.replyFunc(e.event(e.general.SUCCESS, rv))
+    msg.replyFunc({status: e.general.SUCCESS, info: '', payload: rv})
 
 
 module.exports = SampleLogic

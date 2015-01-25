@@ -25,11 +25,11 @@ class ObjectManager
         if @messageRouter.authMgr.canPlayerWriteToThisObject(obj, msg.player)
           objStore.updateObj(msg.obj)
           DB.set(obj.type, objStore.get(msg.obj.id))
-          msg.replyFunc(e.event(e.general.SUCCESS, 0, e.gamemanager.UPDATE_OBJECT_SUCCESS, msg.obj.id))
+          msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
         else
-          msg.replyFunc(e.event(e.general.NOT_ALLOWED, 0, e.gamemanager.UPDATE_OBJECT_FAIL, msg.obj.id))
+          msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.UPDATE_OBJECT_FAIL, payload: msg.obj.id})
       else
-        msg.replyFunc(e.event(e.general.NOT_ALLOWED, 0, e.gamemanager.NO_SUCH_OBJECT, msg.obj.id))
+        msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
     )
 
   # TODO: Add removeListener as well..
@@ -44,13 +44,13 @@ class ObjectManager
           listenerId = objStore.addListenerFor(msg.obj.id, msg.obj.type, (uobj) ->
             console.log '--------------------- sending update of object '+msg.obj.id+' type '+msg.obj.type+' to client'
             if not uobj then console.dir uobj
-            ClientEndpoints.sendToEndpoint(msg.client, e.event(e.general.SUCCESS, 0, e.gamemanager.OBJECT_UPDATE, uobj.toClient()))
+            ClientEndpoints.sendToEndpoint(msg.client, {status: e.general.SUCCESS, info: e.gamemanager.OBJECT_UPDATE, payload: uobj.toClient() })
           )
-          msg.replyFunc(e.event(e.general.SUCCESS, 0, e.gamemanager.REGISTER_UPDATES, listenerId))
+          msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.REGISTER_UPDATES, payload: listenerId})
         else
-          msg.replyFunc(e.event(e.general.NOT_ALLOWED, 0, e.gamemanager.UPDATE_REGISTER_FAIL, obj.name))
+          msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.UPDATE_REGISTER_FAIL, payload: obj.id })
       else
-        msg.replyFunc(e.event(e.general.NOT_ALLOWED, 0, e.gamemanager.NO_SUCH_OBJECT, msg.obj.id))
+        msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id })
     , error)
 
 
