@@ -8,6 +8,8 @@
   Game = require('./SampleGame');
 
   SampleLogic = (function() {
+    SampleLogic.gamecount = 0;
+
     function SampleLogic(messageRouter) {
       this.messageRouter = messageRouter;
       this.onListPlayerGames = __bind(this.onListPlayerGames, this);
@@ -18,7 +20,9 @@
     }
 
     SampleLogic.prototype.onNewGame = function(msg) {
-      return new Game().then((function(_this) {
+      return new Game({
+        name: 'New Game ' + (SampleLogic.gamecount++)
+      }).then((function(_this) {
         return function(game) {
           _this.games.push(game);
           return msg.replyFunc({

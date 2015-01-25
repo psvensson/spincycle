@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/core-input/core-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
 <link rel="import" href="../../elements/message-router/message-router.html">
 
@@ -9,13 +10,16 @@
     <message-router io="{{socket}}"></message-router>
     <link rel="stylesheet" href="main-app.css">
     <div>
-        <button on-click="{{newGame}}">New Game</button>
+        <paper-button raised fill on-click="{{newGame}}">New Game</paper-button>
     </div>
+      <div>
+          Selected Game: {{selectedgame.name}}
+      </div>
     Games:
     <ul id="gamelist">
         <template repeat="{{game in games}}">
             <li>
-                <input is="core-input" gameid="{{game.id}}" value="{{game.name}}" on-change="{{onGameNameChange}}"> </input> <paper-button on-click="selectGame({{game}})">Select</paper-button>
+                <input is="core-input" gameid="{{game.id}}" value="{{game.name}}" on-change="{{onGameNameChange}}"> </input> <paper-button raised on-click="{{selectGame}}" gameid="{{game.id}}">Select</paper-button>
             </li>
         </template>
     </ul>
@@ -31,6 +35,11 @@
             this.socket = io();
             this.asyncFire('core-signal', {name: "emit", data: {target:'listGames', cb: this.onListGames.bind(this) }});
         },
+
+          gameById: function(id)
+          {
+              return this.games.filter(function(g) { return g.id == id })[0];
+          },
 
         newGame: function()
         {
@@ -52,18 +61,30 @@
             this.games = games;
         },
 
-          onGameNameChange: function(e, err, el)
+          onGameNameChange: function(e, detail, el)
           {
               console.log("onGameNameChange called");
-              console.dir(arguments);
               var name = el.value;
+              var gameid = el.attributes['gameid'].value;
               console.log("new name is "+name);
+              this.asyncFire('core-signal', {name: "emit", data: {target:'updateObject', obj: {id: gameid, type: 'game', name: name}} });
           },
 
-          selectGame: function(game)
+          selectGame: function(e, detail, el)
           {
               console.log("selectGame called");
               console.dir(arguments);
+              var gameid = el.attributes['gameid'].value;
+              console.log("gameid = "+gameid);
+              this.selectedgame = this.gameById(gameid);
+              this.asyncFire('core-signal', {name: "objectsubscribe", data: {obj:{id: this.selectedgame.id, type: 'game'}, callback: this.onGameUpdate.bind(this) } });
+          },
+
+          onGameUpdate: function(game)
+          {
+              console.log("onGameUpdate called. game is "+game);
+              console.dir(game);
+              this.selectedgame = game;
           }
 
       });
