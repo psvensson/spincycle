@@ -1,5 +1,12 @@
 sys         = require("util")
-googleapis  = require('node-google-api')
+googleapis  = require('googleapis')
+
+###
+
+  The supreme overlords at the big G have decided to bork the code by changing APIs *without* updating the online docs as of just a week ago (Feb 2015).
+  So well, it's cockroach time, I guess :)
+
+###
 
 class GDS
 
@@ -49,7 +56,7 @@ class GDS
 
     @datastore.commit(
       mutation:
-        insertAutoId: [entity]
+        upsert: [entity]
       mode: "NON_TRANSACTIONAL"
     ).execute callback
 
