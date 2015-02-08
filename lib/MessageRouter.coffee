@@ -1,10 +1,15 @@
 ObjectManager   = require('./ObjectManager')
 error           = require('./Error').error
+HttpMethod      = require('lib/HttpMethod');
+WsMethod        = require('lib/WsMethod');
 
 # The MessageRouter registers names on which messages can be sent.
 # The idea is to abstract away different messaging methods (WS, WebRTC, HTTP) from the logic
 
 class MessageRouter
+
+  @HttpMethod = HttpMethod
+  @WsMethod = WsMethod
 
   constructor: (@authMgr) ->
     console.log 'messageRouter constructor'
