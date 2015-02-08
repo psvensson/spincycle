@@ -24,7 +24,7 @@ class CouchPersistence
     return db
 
   get: (type, id, cb) =>
-    console.log 'couchPersistence get called type = '+type+' id = 'id
+    console.log 'couchPersistence get called type = '+type+' id = '+id
     @getDbFor(type).get id, (err,res) =>
       if err then console.log '** Couch Get ERROR: '+err
       if cb then cb(res)
