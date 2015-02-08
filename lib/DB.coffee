@@ -5,7 +5,7 @@ LRU             = require('lru-cache')
 
 #GDS            = require('./gds')
 #Roach          = require('./cockroach')
-Couch           = require('/CouchPersistence')
+Couch           = require('./CouchPersistence')
 
 class DB
 
