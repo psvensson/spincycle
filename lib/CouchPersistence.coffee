@@ -10,6 +10,7 @@ class CouchPersistence
     @connection = new(cradle.Connection)
 
   getDbFor: (type) =>
+    console.log 'couchpersistence getDbFor called with type '+type
     db = @dbs[type]
     if not db
       db = @connection.database(type)
@@ -23,6 +24,7 @@ class CouchPersistence
     return db
 
   get: (type, id, cb) =>
+    console.log 'couchPersistence get called type = '+type+' id = 'id
     @getDbFor(type).get id, (err,res) =>
       if err then console.log '** Couch Get ERROR: '+err
       if cb then cb(res)
