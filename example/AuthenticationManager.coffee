@@ -15,7 +15,7 @@ class AuthenticationManager
   # This can be used to recognize and map recurring users between messages
   decorateMessageWithUser: (message) =>
     q = defer()
-    # Either we look up the user by client key or we create s super-simple user (containing only an 'id' property) and storing that in our hashtable
+    # Either we look up the user by client key or we create a super-simple user (containing only an 'id' property) and storing that in our hashtable
     user = @anonymousUsers[message.client] or
       id: uuid.v4()
     message.user = user
