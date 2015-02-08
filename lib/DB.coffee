@@ -31,7 +31,7 @@ class DB
       #console.log 'DB found in lru: '+rv
       if not rv
         #console.log ' attempting to use datastore'
-        @getDataStore().get type, id, (result) ->
+        @getDataStore().get type, id, (result) =>
           @lru.set(id, result)
           p.resolve(result)
       else
