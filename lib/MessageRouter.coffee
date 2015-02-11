@@ -4,6 +4,7 @@ HttpMethod      = require('./HttpMethod');
 WsMethod        = require('./WsMethod');
 DB              = require('./DB')
 EventManager    = require('./EventManager')
+SuperModel      = require('./SuperModel')
 
 # The MessageRouter registers names on which messages can be sent.
 # The idea is to abstract away different messaging methods (WS, WebRTC, HTTP) from the logic
