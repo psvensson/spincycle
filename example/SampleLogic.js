@@ -34,15 +34,13 @@
     };
 
     SampleLogic.prototype.onListPlayerGames = function(msg) {
-      var game, name, rv, _ref;
+      var rv;
       rv = [];
       console.log('onListPlayerGames for player ' + msg.user.id);
-      _ref = this.games;
-      for (name in _ref) {
-        game = _ref[name];
-        console.log('   onListPlayerGames listing game "' + name + '"');
-        rv.push(game.toClient());
-      }
+      this.games.forEach(function(game) {
+        console.log('   onListPlayerGames listing game "' + game.name + '"');
+        return rv.push(game.toClient());
+      });
       return msg.replyFunc({
         status: e.general.SUCCESS,
         info: '',

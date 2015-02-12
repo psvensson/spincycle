@@ -15,6 +15,8 @@ class MessageRouter
   @WsMethod = WsMethod
   @DB = DB
   @EventManager = EventManager
+  @SuperModel = SuperModel
+  @DB = DB
 
   constructor: (@authMgr) ->
     console.log 'messageRouter constructor'

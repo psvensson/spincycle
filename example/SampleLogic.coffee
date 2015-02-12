@@ -19,9 +19,9 @@ class SampleLogic
   onListPlayerGames: (msg) =>
     rv = []
     console.log 'onListPlayerGames for player '+msg.user.id
-    for name, game of @games
-      console.log '   onListPlayerGames listing game "'+name+'"'
-      rv .push game.toClient()
+    @games.forEach (game) ->
+      console.log '   onListPlayerGames listing game "'+game.name+'"'
+      rv.push game.toClient()
     msg.replyFunc({status: e.general.SUCCESS, info: '', payload: rv})
 
 

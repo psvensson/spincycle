@@ -2,7 +2,6 @@ SuperModel      = require('../lib/SuperModel')
 defer           = require('node-promise').defer
 uuid            = require('node-uuid')
 
-
 class SampleGame extends SuperModel
 
   constructor: (@record={}) ->
