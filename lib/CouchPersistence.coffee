@@ -8,7 +8,7 @@ class CouchPersistence
     @dbs = []
 
   connect: () =>
-    @client = couchdb.createClient(5984, 'localhost')
+    @client = couchdb.createClient(5984, 'localhost', auth: { username: 'admin', password: process.env["COUCH_ADMIN_PW"] })
 
   getDbFor: (_type) =>
     q = defer()
