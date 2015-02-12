@@ -1,6 +1,8 @@
 SuperModel      = require('../lib/SuperModel')
 defer           = require('node-promise').defer
+all             = require('node-promise').allOrNone
 uuid            = require('node-uuid')
+SamplePlayer    = require('./SamplePlayer')
 
 class SampleGame extends SuperModel
 
@@ -8,17 +10,37 @@ class SampleGame extends SuperModel
 
     q = defer()
 
-    @id         = @record.id
+    @id         = @record.id or uuid.v4()
+    @playerids  = @record.playerids
     @name       = @record.name or 'game_'+uuid.v4()
-    @type       = 'game'
+    @type       = 'SampleGame'
+    @players     = []
 
-    if not @id
-      @id = uuid.v4()
-      @serialize()
+    resolvearr =
+      [
+        {name: 'players',    type: 'SamplePlayer', ids: @playerids }
+      ]
 
-    q.resolve(@)
+    @loadFromIds(resolvearr).then () =>
+      console.log 'resolved game '+@.id+' ok'
+      if @players.length == 0
+        @createPlayers().then () =>
+          q.resolve(@)
+      else
+        q.resolve(@)
+
     return q
 
+  createPlayers: () =>
+    console.log 'creating sample players'
+    q = defer()
+    @players = []
+    all([new SamplePlayer(), new SamplePlayer()]).then (results) =>
+      console.log 'sample players created'
+      results.forEach (player) -> player.serialize()
+      @players = results
+      q.resolve()
+    return q
 
   toClient: () =>
     @getRecord()
@@ -28,6 +50,7 @@ class SampleGame extends SuperModel
       id:           @id
       name:         @name
       type:         @type
+      playerids:    @players.map (player) -> player.id
 
     return record
 

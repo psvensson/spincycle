@@ -1,4 +1,5 @@
-cradle = require('cradle');
+couchdb         = require('felix-couchdb');
+defer           = require('node-promise').defer
 
 
 class CouchPersistence
@@ -7,33 +8,64 @@ class CouchPersistence
     @dbs = []
 
   connect: () =>
-    @connection = new(cradle.Connection)
+    @client = couchdb.createClient(5984, 'localhost')
 
-  getDbFor: (type) =>
-    console.log 'couchpersistence getDbFor called with type '+type
+  getDbFor: (_type) =>
+    q = defer()
+    type = _type.toLowerCase()
     db = @dbs[type]
     if not db
-      db = @connection.database(type)
-      db.exists (err, exists) =>
-        if err then console.log('error', err)
-        else if exists then console.log('the force is with you.')
+      db = @client.db(type)
+      db.exists (er, exists) =>
+        if exists
+          q.resolve(db)
         else
-          console.log('database does not exists.');
-          db.create()
-    @dbs[type] = db
-    return db
+          console.log('database '+type+' does not exists. creating as we speak...')
+          db.create () =>
+            # --------------------------------------------- Create 'all' view
+            db.saveDesign type, views: 'all': map: (doc)->
+              if doc.id and doc.type.toLowerCase() == type
+                emit doc.id, doc
 
-  get: (type, id, cb) =>
-    console.log 'couchPersistence get called type = '+type+' id = '+id
-    @getDbFor(type).get id, (err,res) =>
-      if err then console.log '** Couch Get ERROR: '+err
-      if cb then cb(res)
+            @dbs[type] = db
+            q.resolve(db)
 
-  set: (type, obj, cb) =>
-    db = @getDbFor(type)
-    onSave = (err, res, cb) =>
-      if err then console.log '** Couch Set ERROR: '+err
-      if cb then cb(res)
-    if obj.id then db.save(obj.id, obj, onSave) else db.save(obj, onSave)
+    return q
+
+  all: (_type, cb) =>
+    rv = []
+    type = _type.toLowerCase()
+    @getDbFor(type).then (db) =>
+      db.allDocs (err, res) ->
+        if (err)
+          console.log 'CouchPersistence fetch all ERROR: '+err
+          console.dir err
+          cb []
+        else
+          #console.log 'couchpersistence fetch all '+type+" got back.."
+          #console.dir(res)
+          count = res.rows.length
+          res.rows.forEach (row) ->
+            db.getDoc row.id, (verr, value) ->
+              rv.push value if row.id.indexOf('_') == -1
+              if --count == 0 then cb rv
+
+  get: (_type, id, cb) =>
+    type = _type.toLowerCase()
+    @getDbFor(type).then (db) =>
+      db.getDoc id, (err,res) =>
+        if err then console.log '** Couch Get ERROR: '+err
+        if cb then cb(res)
+
+  set: (_type, obj, cb) =>
+    type = _type.toLowerCase()
+    @getDbFor(type).then (db) =>
+      onSave = (err, res, cb) =>
+        if err
+          console.log '** Couch Set ERROR: '+err
+          console.dir err
+        if cb then cb(res)
+        db.saveDoc(obj.id, obj, onSave)
+
 
 module.exports = CouchPersistence

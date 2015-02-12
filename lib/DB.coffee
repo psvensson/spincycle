@@ -22,6 +22,14 @@ class DB
 
     @DataStore
 
+  @all: (type, cb) =>
+    store = @getDataStore()
+    if store.all
+      store.all(type, cb)
+    else
+      console.log 'DB.all: All not implemented in underlying persistence logic'
+      cb []
+
   @get: (type, ids) =>
     console.log 'DB.get called for type "'+type+'" and ids "'+ids+'"'
     q = new promise()
@@ -47,7 +55,6 @@ class DB
   @set: (type, obj) =>
     #console.log 'DB.set called for type "'+type+'" and obj "'+obj.id+'"'
     @lru.set(obj.id, obj)
-    # TODO: Actually store stuff in the DB
     @getDataStore().set(type, obj, (res) -> )
 
 module.exports = DB
