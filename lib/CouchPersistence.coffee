@@ -21,7 +21,8 @@ class CouchPersistence
           q.resolve(db)
         else
           console.log('database '+type+' does not exists. creating as we speak...')
-          db.create () =>
+          db.create (er) =>
+            if (er) then console.log 'DB create error: '+JSON.stringify(er)
             # --------------------------------------------- Create 'all' view
             db.saveDesign type, views: 'all': map: (doc)->
               if doc.id and doc.type.toLowerCase() == type
