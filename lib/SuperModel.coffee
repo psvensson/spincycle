@@ -34,7 +34,7 @@ class SuperModel
           if not resolveobj.ids
             @[resolveobj.name] = []
             resolveobj.ids = []
-            #console.log '============================== 1'
+            console.log '============================== null resolveobj.ids'
             r.resolve({})
           else
             if typeof resolveobj.ids is 'string' then resolveobj.ids = [resolveobj.ids]
@@ -58,8 +58,8 @@ class SuperModel
 
   createObjectFrom: (record) =>
     q = defer()
-    #console.log 'createObjectFrom got record'
-    #console.dir record[0]
+    console.log 'createObjectFrom got record'
+    console.dir record[0]
     resolver.resolve record[0].type, (filename) ->
       module = require(filename.replace('.js', ''))
       o = Object.create(module.prototype)
