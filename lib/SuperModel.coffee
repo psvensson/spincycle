@@ -21,7 +21,7 @@ class SuperModel
   loadFromIds:(resolvearr) =>
     alldone = defer()
     allpromises = []
-
+    console.log 'loadfromids called resolvearr is '+resolvearr.length
     if(not resolvearr)
       console.log ' ++++++++++++++++ NO RESOVLEARR ++++++++++++++'
       q = defer()
