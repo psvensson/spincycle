@@ -23,11 +23,13 @@ class SuperModel
     allpromises = []
 
     if(not resolvearr)
+      console.log ' ++++++++++++++++ NO RESOVLEARR ++++++++++++++'
       q = defer()
       allpromises.push(q)
       q.resolve()
     else
       resolvearr.forEach (resolveobj) =>
+
         (() =>
           r = defer()
           allpromises.push(rd)
