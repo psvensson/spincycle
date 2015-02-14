@@ -19,9 +19,10 @@ class ResolveModule
       if file.indexOf(name+'.js') > -1
 
         #console.log 'happily adding file '+file
-        rv = file
-        finder.stop()
-        cb(rv)
+        if not file.indexOf '.map' and not file.indexOf '.coffee'
+          rv = file
+          finder.stop()
+          cb(rv)
 
     finder.on 'end', () ->
 
