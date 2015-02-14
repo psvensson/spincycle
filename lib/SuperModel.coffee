@@ -7,7 +7,7 @@ DB              = require('./DB')
 error           = require('./Error').error
 ResolveModule   = require('./ResolveModule')
 
-resolver = new ResolveModule('../../..')
+resolver = new ResolveModule('../..')
 
 class SuperModel
 
