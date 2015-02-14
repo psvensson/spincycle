@@ -44,7 +44,7 @@ class SuperModel
           else
             if typeof resolveobj.ids is 'string' then resolveobj.ids = [resolveobj.ids]
             if resolveobj.ids.length > 1 then  @[resolveobj.name] = []
-            console.log ' resolveobjds ('+(typeof resolveobj.ids)+') is are.. '+resolveobj.ids.length
+            console.log ' resolveobjds ('+(typeof resolveobj.ids)+') ids length are.. '+resolveobj.ids.length
             #console.dir(resolveobj.ids)
             count = resolveobj.ids.length
             resolveobj.ids.forEach (id) =>
@@ -64,9 +64,10 @@ class SuperModel
 
   createObjectFrom: (record) =>
     q = defer()
-    #console.log 'createObjectFrom got record'
+    console.log 'createObjectFrom got record '+record[0].id
     #console.dir record[0]
     resolver.resolve record[0].type, (filename) ->
+      console.log 'resolved module '+record[0].type+" as "+filename
       module = require(filename.replace('.js', ''))
       o = Object.create(module.prototype)
       o.constructor(record[0])
