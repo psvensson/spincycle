@@ -46,13 +46,14 @@ class SuperModel
             if resolveobj.ids.length > 1 then  @[resolveobj.name] = []
             #console.log ' resolveobjds ('+(typeof resolveobj.ids)+') is are.. '+resolveobj.ids
             #console.dir(resolveobj.ids)
+            count = resolveobj.ids.length
             resolveobj.ids.forEach (id) =>
               DB.get(resolveobj.type, [id]).then (record) =>
                 @createObjectFrom(record).then (obj) =>
                   console.log 'object created: '+obj.id
                   @insertObj(resolveobj, obj)
                   #console.log '============================== 2'
-                  r.resolve(obj)
+                  if --count == 0 then r.resolve(obj)
         )(robj)
 
     all(allpromises, error).then( (results) ->
