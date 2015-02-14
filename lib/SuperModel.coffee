@@ -21,16 +21,15 @@ class SuperModel
   loadFromIds:(resolvearr) =>
     alldone = defer()
     allpromises = []
-    console.log 'loadfromids called resolvearr is '+resolvearr.length
     if(not resolvearr)
       console.log ' ++++++++++++++++ NO RESOVLEARR ++++++++++++++'
       q = defer()
       allpromises.push(q)
       q.resolve()
     else
-      resolvearr.forEach (resolveobj) =>
+      resolvearr.forEach (robj) =>
 
-        (() =>
+        ((resolveobj) =>
           r = defer()
           allpromises.push(rd)
           if not resolveobj.ids
@@ -50,7 +49,7 @@ class SuperModel
                   @insertObj(resolveobj, obj)
                   #console.log '============================== 2'
                   r.resolve(obj)
-        )
+        )(robj)
 
     all(allpromises, error).then( (results) ->
       #console.log 'allpromises resolved'
