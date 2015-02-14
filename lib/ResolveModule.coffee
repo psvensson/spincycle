@@ -9,8 +9,10 @@ class ResolveModule
   resolve: (name, cb) =>
     rv = ResolveModule.modulecache[name]
     if rv
+      console.log 'resolving modeule '+name+' from cache'
       cb(rv)
     else
+      console.log '.. looking up module '+name
       finder = require('findit')(@basepath)
       #This listens for directories found
       finder.on 'directory', (dir) ->
