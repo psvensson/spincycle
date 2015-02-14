@@ -14,9 +14,6 @@ class ResolveModule
     else
       console.log '.. looking up module '+name
       finder = require('findit')(@basepath)
-      #This listens for directories found
-      finder.on 'directory', (dir) ->
-        #console.log('Directory: ' + dir + '/')
 
       #This listens for files found
       finder.on 'file', (file) ->
@@ -24,7 +21,7 @@ class ResolveModule
         if file.indexOf(name+'.js') > -1
 
           #console.log 'happily adding file '+file
-          if not file.indexOf '.map' and not file.indexOf '.coffee'
+          if file.indexOf('.map') == -1 and file.indexOf('.coffee') == -1
             rv = file
             ResolveModule.modulecache[name] = file
             finder.stop()
