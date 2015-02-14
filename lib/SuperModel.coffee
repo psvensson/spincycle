@@ -9,7 +9,7 @@ ResolveModule   = require('./ResolveModule')
 
 console.log 'supermodel dirname is '+dirname
 console.log(__dirname)
-dirname = __dirname.substring(0, indexOf('/node_modules'))
+dirname = __dirname.substring(0, __dirname.indexOf('/node_modules'))
 console.log 'starting module rsolveing from path '+dirname
 resolver = new ResolveModule(dirname)
 
