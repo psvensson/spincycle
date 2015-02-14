@@ -55,7 +55,9 @@ class CouchPersistence
     type = _type.toLowerCase()
     @getDbFor(type).then (db) =>
       db.getDoc id, (err,res) =>
-        if err then console.log '** Couch Get ERROR: '+err
+        if err
+          console.log '** Couch Get ERROR: '+err
+          console.dir err
         if cb then cb(res)
 
   set: (_type, obj, cb) =>
