@@ -31,7 +31,7 @@ class SuperModel
 
         ((resolveobj) =>
           r = defer()
-          allpromises.push(rd)
+          allpromises.push(r)
           if not resolveobj.ids
             @[resolveobj.name] = []
             resolveobj.ids = []
