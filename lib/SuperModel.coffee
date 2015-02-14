@@ -9,7 +9,7 @@ ResolveModule   = require('./ResolveModule')
 
 console.log 'supermodel dirname is '+dirname
 console.log(__dirname)
-dirname = __dirname.substring(0, __dirname.indexOf('/node_modules'))
+dirname = __dirname.substring(0, __dirname.indexOf('/node_modules'))+'/..'
 console.log 'starting module rsolveing from path '+dirname
 resolver = new ResolveModule(dirname)
 
@@ -64,7 +64,7 @@ class SuperModel
 
   createObjectFrom: (record) =>
     q = defer()
-    console.log 'createObjectFrom got record '+record[0].id
+    console.log 'createObjectFrom got record '+record[0].id+' type '+record[0].type
     #console.dir record[0]
     resolver.resolve record[0].type, (filename) ->
       console.log 'resolved module '+record[0].type+" as "+filename
