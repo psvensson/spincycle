@@ -7,6 +7,8 @@ DB              = require('./DB')
 error           = require('./Error').error
 ResolveModule   = require('./ResolveModule')
 
+console.log 'supermodel dirname is..'
+console.log(__dirname)
 resolver = new ResolveModule('../..')
 
 class SuperModel
@@ -59,8 +61,8 @@ class SuperModel
 
   createObjectFrom: (record) =>
     q = defer()
-    console.log 'createObjectFrom got record'
-    console.dir record[0]
+    #console.log 'createObjectFrom got record'
+    #console.dir record[0]
     resolver.resolve record[0].type, (filename) ->
       module = require(filename.replace('.js', ''))
       o = Object.create(module.prototype)
