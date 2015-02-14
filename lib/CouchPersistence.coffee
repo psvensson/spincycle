@@ -56,7 +56,7 @@ class CouchPersistence
     @getDbFor(type).then (db) =>
       db.getDoc id, (err,res) =>
         if err
-          console.log '** Couch Get ERROR: '+err
+          console.log '** Couch Get ERROR for type '+type+' id '+id+': '+err
           console.dir err
         if cb then cb(res)
 
