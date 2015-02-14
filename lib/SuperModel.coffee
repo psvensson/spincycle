@@ -44,7 +44,7 @@ class SuperModel
           else
             if typeof resolveobj.ids is 'string' then resolveobj.ids = [resolveobj.ids]
             if resolveobj.ids.length > 1 then  @[resolveobj.name] = []
-            #console.log ' resolveobjds ('+(typeof resolveobj.ids)+') is are.. '+resolveobj.ids
+            console.log ' resolveobjds ('+(typeof resolveobj.ids)+') is are.. '+resolveobj.ids.length
             #console.dir(resolveobj.ids)
             count = resolveobj.ids.length
             resolveobj.ids.forEach (id) =>
