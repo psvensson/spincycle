@@ -15,7 +15,7 @@ class SuperModel
     record = @getRecord()
     OMgr.storeRecord(@)
     DB.set(@type, record)
-    console.log ' * serializing '+@type+" id "+@id
+    #console.log ' * serializing '+@type+" id "+@id
 
   # [ {name: 'zones', type: 'zone', ids: [x, y, z, q] }, .. ]
   loadFromIds:(resolvearr) =>
@@ -34,7 +34,7 @@ class SuperModel
           if not resolveobj.ids
             @[resolveobj.name] = []
             resolveobj.ids = []
-            console.log '============================== 1'
+            #console.log '============================== 1'
             r.resolve({})
           else
             if typeof resolveobj.ids is 'string' then resolveobj.ids = [resolveobj.ids]
@@ -46,12 +46,12 @@ class SuperModel
                 @createObjectFrom(record).then (obj) =>
                   console.log 'object created: '+obj.id
                   @insertObj(resolveobj, obj)
-                  console.log '============================== 2'
+                  #console.log '============================== 2'
                   r.resolve(obj)
         )
 
     all(allpromises, error).then( (results) ->
-      console.log 'allpromises resolved'
+      #console.log 'allpromises resolved'
       alldone.resolve(results)
     ,error)
     return alldone

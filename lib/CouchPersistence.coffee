@@ -66,7 +66,7 @@ class CouchPersistence
           console.log '** Couch Set ERROR: '+err
           console.dir err
         if cb then cb(res)
-        db.saveDoc(obj.id, obj, onSave)
+      db.saveDoc(obj.id, obj, onSave)
 
 
 module.exports = CouchPersistence
