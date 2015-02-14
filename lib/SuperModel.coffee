@@ -7,9 +7,11 @@ DB              = require('./DB')
 error           = require('./Error').error
 ResolveModule   = require('./ResolveModule')
 
-console.log 'supermodel dirname is..'
+console.log 'supermodel dirname is '+dirname
 console.log(__dirname)
-resolver = new ResolveModule('../..')
+dirname = __dirname.substring(0, indexOf('/node_modules'))
+console.log 'starting module rsolveing from path '+dirname
+resolver = new ResolveModule(dirname)
 
 class SuperModel
 
@@ -42,8 +44,8 @@ class SuperModel
           else
             if typeof resolveobj.ids is 'string' then resolveobj.ids = [resolveobj.ids]
             if resolveobj.ids.length > 1 then  @[resolveobj.name] = []
-            console.log ' resolveobjds ('+(typeof resolveobj.ids)+') is are.. '+resolveobj.ids
-            console.dir(resolveobj.ids)
+            #console.log ' resolveobjds ('+(typeof resolveobj.ids)+') is are.. '+resolveobj.ids
+            #console.dir(resolveobj.ids)
             resolveobj.ids.forEach (id) =>
               DB.get(resolveobj.type, [id]).then (record) =>
                 @createObjectFrom(record).then (obj) =>
