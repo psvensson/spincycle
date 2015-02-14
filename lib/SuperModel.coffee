@@ -64,6 +64,8 @@ class SuperModel
 
   createObjectFrom: (record) =>
     q = defer()
+    console.log 'record is '
+    console.dir record
     console.log 'createObjectFrom got record '+record[0].id+' type '+record[0].type
     #console.dir record[0]
     resolver.resolve record[0].type, (filename) ->
