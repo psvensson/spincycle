@@ -68,12 +68,13 @@ class SuperModel
 
   createObjectFrom: (record) =>
     q = defer()
+    console.dir record[0]
     if not record
       console.log 'createObjectFrom got null record...'
       q.resolve(null)
     else
       console.log 'createObjectFrom got record '+record[0].id+' type '+record[0].type
-      #console.dir record[0]
+      #
       resolver.resolve record[0].type, (filename) ->
         #console.log 'resolved module '+record[0].type+" as "+filename
         module = require(filename.replace('.js', ''))
