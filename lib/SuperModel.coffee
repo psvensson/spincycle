@@ -68,11 +68,13 @@ class SuperModel
 
   createObjectFrom: (record) =>
     q = defer()
-    console.dir record[0]
     if not record
       console.log 'createObjectFrom got null record...'
       q.resolve(null)
     else
+      if not record[0]
+        console.log ' no first element in record array'
+        console.dir record
       console.log 'createObjectFrom got record '+record[0].id+' type '+record[0].type
       #
       resolver.resolve record[0].type, (filename) ->
