@@ -42,8 +42,8 @@ class SuperModel
           if not resolveobj.ids
             @[resolveobj.name] = []
             resolveobj.ids = []
-            console.log '============================== null resolveobj.ids'
-            r.resolve({})
+            console.log '============================== null resolveobj.ids for '+resolveobj.type+' ['+resolveobj.name+']'
+            r.resolve(null)
           else
             if typeof resolveobj.ids is 'string' then resolveobj.ids = [resolveobj.ids]
             if resolveobj.ids.length > 1 then  @[resolveobj.name] = []
@@ -68,15 +68,11 @@ class SuperModel
 
   createObjectFrom: (record) =>
     q = defer()
-    if not record
+    if not record or not record[0]
       console.log 'createObjectFrom got null record...'
       q.resolve(null)
     else
-      if not record[0]
-        console.log ' no first element in record array'
-        console.dir record
       console.log 'createObjectFrom got record '+record[0].id+' type '+record[0].type
-      #
       resolver.resolve record[0].type, (filename) ->
         #console.log 'resolved module '+record[0].type+" as "+filename
         module = require(filename.replace('.js', ''))
