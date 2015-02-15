@@ -47,13 +47,14 @@ class SuperModel
           else
             if typeof resolveobj.ids is 'string' then resolveobj.ids = [resolveobj.ids]
             if resolveobj.ids.length > 1 then  @[resolveobj.name] = []
-            console.log ' resolveobjds ('+(typeof resolveobj.ids)+') ids length are.. '+resolveobj.ids.length
+            #console.log ' resolveobjds ('+(typeof resolveobj.ids)+') ids length are.. '+resolveobj.ids.length
             #console.dir(resolveobj.ids)
             count = resolveobj.ids.length
             resolveobj.ids.forEach (id) =>
+              console.log 'trying to get '+resolveobj.type+' with id '+resolveobj.id
               DB.get(resolveobj.type, [id]).then (record) =>
                 @createObjectFrom(record).then (obj) =>
-                  console.log 'object created: '+obj.id
+                  #console.log 'object created: '+obj.id
                   @insertObj(resolveobj, obj)
                   #console.log '============================== 2'
                   if --count == 0 then r.resolve(obj)
@@ -67,14 +68,18 @@ class SuperModel
 
   createObjectFrom: (record) =>
     q = defer()
-    console.log 'createObjectFrom got record '+record[0].id+' type '+record[0].type
-    #console.dir record[0]
-    resolver.resolve record[0].type, (filename) ->
-      #console.log 'resolved module '+record[0].type+" as "+filename
-      module = require(filename.replace('.js', ''))
-      o = Object.create(module.prototype)
-      o.constructor(record[0])
-      q.resolve(o)
+    if not record
+      console.log 'createObjectFrom got null record...'
+      q.resolve(null)
+    else
+      console.log 'createObjectFrom got record '+record[0].id+' type '+record[0].type
+      #console.dir record[0]
+      resolver.resolve record[0].type, (filename) ->
+        #console.log 'resolved module '+record[0].type+" as "+filename
+        module = require(filename.replace('.js', ''))
+        o = Object.create(module.prototype)
+        o.constructor(record[0])
+        q.resolve(o)
     return q
 
   insertObj: (ro, o) =>
