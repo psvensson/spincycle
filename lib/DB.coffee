@@ -19,12 +19,17 @@ class DB
       #@DataStore = new Roach()
       @DataStore = new Couch()
       @DataStore.connect()
-
-    @DataStore
+    return @DataStore
 
   @createDatabases:(dblist) =>
+    q = new promise()
+    promises = []
     dblist.forEach (dbname) =>
-      @DataStore.getDbFor(dbname)
+      promises.push @DataStore.getDbFor(dbname)
+    all(promises).then (results) =>
+      q.resolve(results)
+
+    return q
 
   @all: (type, cb) =>
     store = @getDataStore()
