@@ -52,9 +52,11 @@ class DB
     )
     return q
 
-  @set: (type, obj) =>
+  @set: (type, obj, cb) =>
     #console.log 'DB.set called for type "'+type+'" and obj "'+obj.id+'"'
     @lru.set(obj.id, obj)
-    @getDataStore().set(type, obj, (res) -> )
+    @getDataStore().set type, obj, (res) ->
+      if cb then cb()
+
 
 module.exports = DB

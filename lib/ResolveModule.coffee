@@ -9,7 +9,7 @@ class ResolveModule
   resolve: (name, cb) =>
     rv = ResolveModule.modulecache[name]
     if rv
-      console.log 'resolving modeule '+name+' from cache'
+      #console.log 'resolving module '+name+' from cache'
       cb(rv)
     else
       console.log '.. looking up module '+name

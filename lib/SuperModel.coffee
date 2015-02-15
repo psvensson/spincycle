@@ -16,10 +16,13 @@ resolver = new ResolveModule(dirname)
 class SuperModel
 
   serialize: () =>
-    record = @getRecord()
-    OMgr.storeRecord(@)
-    DB.set(@type, record)
-    #console.log ' * serializing '+@type+" id "+@id
+    if not @_serializing
+      @_serializing = true
+      record = @getRecord()
+      OMgr.storeRecord(@)
+      DB.set(@type, record).then () =>
+        @_serializing = false
+      #console.log ' * serializing '+@type+" id "+@id
 
   # [ {name: 'zones', type: 'zone', ids: [x, y, z, q] }, .. ]
   loadFromIds:(resolvearr) =>
@@ -67,7 +70,7 @@ class SuperModel
     console.log 'createObjectFrom got record '+record[0].id+' type '+record[0].type
     #console.dir record[0]
     resolver.resolve record[0].type, (filename) ->
-      console.log 'resolved module '+record[0].type+" as "+filename
+      #console.log 'resolved module '+record[0].type+" as "+filename
       module = require(filename.replace('.js', ''))
       o = Object.create(module.prototype)
       o.constructor(record[0])
