@@ -53,7 +53,7 @@ class SuperModel
             #console.dir(resolveobj.ids)
             count = resolveobj.ids.length
             resolveobj.ids.forEach (id) =>
-              console.log 'trying to get '+resolveobj.type+' with id '+resolveobj.id
+              #console.log 'trying to get '+resolveobj.type+' with id '+id
               DB.get(resolveobj.type, [id]).then (record) =>
                 @createObjectFrom(record).then (obj) =>
                   #console.log 'object created: '+obj.id
