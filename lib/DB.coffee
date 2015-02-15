@@ -22,6 +22,10 @@ class DB
 
     @DataStore
 
+  @createDatabases:(dblist) =>
+    dblist.forEach (dbname) =>
+      @DataStore.getDbFor(dbname)
+
   @all: (type, cb) =>
     store = @getDataStore()
     if store.all
