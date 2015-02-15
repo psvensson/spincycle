@@ -22,10 +22,11 @@ class DB
     return @DataStore
 
   @createDatabases:(dblist) =>
+    store = @getDataStore()
     q = new promise()
     promises = []
     dblist.forEach (dbname) =>
-      promises.push @DataStore.getDbFor(dbname)
+      promises.push store.getDbFor(dbname)
     all(promises).then (results) =>
       q.resolve(results)
 
