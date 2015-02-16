@@ -86,7 +86,7 @@ class SuperModel
     return q
 
   insertObj: (ro, o) =>
-    if ro.ids.length > 1
+    if ro.name.slice(-1) == 's'
       @[ro.name].push(o)
     else
       @[ro.name] = o
