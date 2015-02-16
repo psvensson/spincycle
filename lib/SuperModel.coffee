@@ -48,8 +48,7 @@ class SuperModel
           else
             if typeof resolveobj.ids is 'string'
               resolveobj.ids = [resolveobj.ids]
-            else
-              @[resolveobj.name] = []
+            @[resolveobj.name] = [] if resolveobj.name.slice(-1) == 's'
             #console.log ' resolveobjds ('+(typeof resolveobj.ids)+') ids length are.. '+resolveobj.ids.length
             #console.dir(resolveobj.ids)
             count = resolveobj.ids.length
