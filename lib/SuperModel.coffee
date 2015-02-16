@@ -75,7 +75,7 @@ class SuperModel
       console.log 'createObjectFrom got null record...'
       q.resolve(null)
     else
-      console.log 'createObjectFrom got record '+record[0].id+' type '+record[0].type
+      #console.log 'createObjectFrom got record '+record[0].id+' type '+record[0].type
       resolver.resolve record[0].type, (filename) ->
         #console.log 'resolved module '+record[0].type+" as "+filename
         module = modulecache[record[0].type] or require(filename.replace('.js', ''))
