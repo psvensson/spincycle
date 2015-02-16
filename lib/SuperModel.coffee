@@ -48,7 +48,7 @@ class SuperModel
           else
             if typeof resolveobj.ids is 'string'
               resolveobj.ids = [resolveobj.ids]
-            @[resolveobj.name] = [] if resolveobj.type = 'array'
+            @[resolveobj.name] = [] if resolveobj.array = true
             #console.log ' resolveobjds ('+(typeof resolveobj.ids)+') ids length are.. '+resolveobj.ids.length
             #console.dir(resolveobj.ids)
             count = resolveobj.ids.length
@@ -85,7 +85,7 @@ class SuperModel
     return q
 
   insertObj: (ro, o) =>
-    if ro.type = 'array'
+    if ro.array = true
       @[ro.name].push(o)
     else
       @[ro.name] = o
