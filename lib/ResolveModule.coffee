@@ -20,8 +20,8 @@ class ResolveModule
         #console.log('File: ' + file)
         if file.indexOf('/') > -1
           file = file.substring(file.lastIndexOf('/')+1, file.length)
-        console.log('File: ' + file)
-        if file.indexOf(name+'.js') > -1
+        #console.log('File: ' + file)
+        if file[0] == name[0] and file.indexOf(name+'.js') > -1
 
           #console.log 'happily adding file '+file
           if file.indexOf('.map') == -1 and file.indexOf('.coffee') == -1
