@@ -86,7 +86,9 @@ class SuperModel
 
   insertObj: (ro, o) =>
     if ro.array == true
-      @[ro.name].push(o)
+      [ro.name].push(o)
+    else if ro.hashtable == true
+      [ro.name][o.name] = o
     else
       @[ro.name] = o
 
