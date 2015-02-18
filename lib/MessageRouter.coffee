@@ -5,6 +5,7 @@ WsMethod        = require('./WsMethod');
 DB              = require('./DB')
 EventManager    = require('./EventManager')
 SuperModel      = require('./SuperModel')
+ClientEndpoints = require('./ClientEndpoints')
 
 # The MessageRouter registers names on which messages can be sent.
 # The idea is to abstract away different messaging methods (WS, WebRTC, HTTP) from the logic
@@ -18,6 +19,7 @@ class MessageRouter
   @SuperModel = SuperModel
   @DB = DB
   @ObjectManager = ObjectManager
+  @ClientEndpoints = ClientEndpoints
 
   constructor: (@authMgr) ->
     console.log 'messageRouter constructor'
