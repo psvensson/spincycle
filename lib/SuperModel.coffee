@@ -17,14 +17,18 @@ modulecache = []
 class SuperModel
 
   serialize: () =>
+    q = defer()
     if not @_serializing
       @_serializing = true
       record = @getRecord()
       OMgr.storeRecord(@)
       DB.set(@type, record).then () =>
         @_serializing = false
+        q.resolve(@)
       #console.log ' * serializing '+@type+" id "+@id
-
+    else
+      q.resolve(@)
+    return q
   # [ {name: 'zones', type: 'zone', ids: [x, y, z, q] }, .. ]
   loadFromIds:(resolvearr) =>
     alldone = defer()
