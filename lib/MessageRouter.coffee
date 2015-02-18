@@ -17,6 +17,7 @@ class MessageRouter
   @EventManager = EventManager
   @SuperModel = SuperModel
   @DB = DB
+  @ObjectManager = ObjectManager
 
   constructor: (@authMgr) ->
     console.log 'messageRouter constructor'
