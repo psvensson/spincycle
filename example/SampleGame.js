@@ -18,15 +18,15 @@
   SampleGame = (function(_super) {
     __extends(SampleGame, _super);
 
-    function SampleGame(record) {
+    function SampleGame(record, noload) {
       var q, resolvearr;
-      this.record = record != null ? record : {};
+      this.record = record;
       this.getRecord = __bind(this.getRecord, this);
       this.toClient = __bind(this.toClient, this);
       this.createPlayers = __bind(this.createPlayers, this);
       q = defer();
       this.id = this.record.id || uuid.v4();
-      this.playerids = this.record.playerids;
+      this.playerids = this.record.playerids || [];
       this.name = this.record.name || 'game_' + uuid.v4();
       this.type = 'SampleGame';
       this.players = {};
@@ -38,20 +38,32 @@
           ids: this.playerids
         }
       ];
-      this.loadFromIds(resolvearr).then((function(_this) {
-        return function() {
-          console.log('resolved game ' + _this.id + ' ok');
-          if (_this.players.length === 0) {
-            return _this.createPlayers().then(function() {
+      if (noload) {
+        if (this.playerids.length === 0) {
+          this.createPlayers().then((function(_this) {
+            return function() {
+              console.log('Saplegame::consrtuctor playerids are..');
+              console.dir(_this.playerids);
               return q.resolve(_this);
-            });
-          } else {
-            console.log('game loaded from db...');
-            console.dir(_this);
-            return q.resolve(_this);
-          }
-        };
-      })(this));
+            };
+          })(this));
+        }
+      } else {
+        this.loadFromIds(resolvearr).then((function(_this) {
+          return function() {
+            console.log('resolved game ' + _this.id + ' ok');
+            if (_this.playerids.length === 0) {
+              return _this.createPlayers().then(function() {
+                return q.resolve(_this);
+              });
+            } else {
+              console.log('game loaded from db...');
+              console.dir(_this);
+              return q.resolve(_this);
+            }
+          };
+        })(this));
+      }
       return q;
     }
 
@@ -66,7 +78,8 @@
           results.forEach(function(player) {
             _this.playerids.push(player.id);
             _this.players[player.name] = player;
-            return player.serialize();
+            player.serialize();
+            return console.log('  serializing player ' + player.name);
           });
           return q.resolve();
         };

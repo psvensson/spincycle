@@ -6,12 +6,12 @@ SamplePlayer    = require('./SamplePlayer')
 
 class SampleGame extends SuperModel
 
-  constructor: (@record={}) ->
+  constructor: (@record, noload) ->
 
     q = defer()
 
     @id         = @record.id or uuid.v4()
-    @playerids  = @record.playerids
+    @playerids  = @record.playerids or []
     @name       = @record.name or 'game_'+uuid.v4()
     @type       = 'SampleGame'
     @players     = {}
@@ -21,15 +21,22 @@ class SampleGame extends SuperModel
         {name: 'players', hashtable: true,   type: 'SamplePlayer', ids: @playerids }
       ]
 
-    @loadFromIds(resolvearr).then () =>
-      console.log 'resolved game '+@.id+' ok'
-      if @players.length == 0
+    if noload
+      if @playerids.length == 0
         @createPlayers().then () =>
+          console.log 'Saplegame::consrtuctor playerids are..'
+          console.dir @playerids
           q.resolve(@)
-      else
-        console.log 'game loaded from db...'
-        console.dir(@)
-        q.resolve(@)
+    else
+      @loadFromIds(resolvearr).then () =>
+        console.log 'resolved game '+@.id+' ok'
+        if @playerids.length == 0
+          @createPlayers().then () =>
+            q.resolve(@)
+        else
+          console.log 'game loaded from db...'
+          console.dir(@)
+          q.resolve(@)
 
     return q
 
@@ -43,8 +50,10 @@ class SampleGame extends SuperModel
         @playerids.push player.id
         @players[player.name] = player
         player.serialize()
+        console.log '  serializing player '+player.name
 
       q.resolve()
+
     return q
 
   toClient: () =>

@@ -35,7 +35,7 @@ class SuperModel
   loadFromIds:(resolvearr) =>
     alldone = defer()
     allpromises = []
-    if(not resolvearr)
+    if(not resolvearr or resolvearr.length == 0)
       console.log ' ++++++++++++++++ NO RESOVLEARR ++++++++++++++'
       q = defer()
       allpromises.push(q)

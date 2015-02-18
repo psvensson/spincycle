@@ -49,13 +49,13 @@
         {
             console.log('new game clicked');
             this.asyncFire('core-signal', {name: "emit", data: {target:'newGame', callback: this.onNewGame.bind(this) }});
-            this.asyncFire('core-signal', {name: "emit", data: {target:'listGames', callback: this.onListGames.bind(this) }});
         },
 
         onNewGame: function(reply)
         {
             console.log('onNewGame called. reply is');
             console.dir(reply);
+            this.asyncFire('core-signal', {name: "emit", data: {target:'listGames', callback: this.onListGames.bind(this) }});
         },
 
         onListGames: function(games)
@@ -65,31 +65,31 @@
             this.games = games;
         },
 
-          onGameNameChange: function(e, detail, el)
-          {
-              console.log("onGameNameChange called");
-              var name = el.value;
-              var gameid = el.attributes['gameid'].value;
-              console.log("new name is "+name);
-              this.asyncFire('core-signal', {name: "emit", data: {target:'updateObject', obj: {id: gameid, type: 'samplegame', name: name }, callback: function(msg) { console.log('updatedObject said:');console.dir(msg); }} });
-          },
+        onGameNameChange: function(e, detail, el)
+        {
+          console.log("onGameNameChange called");
+          var name = el.value;
+          var gameid = el.attributes['gameid'].value;
+          console.log("new name is "+name);
+          this.asyncFire('core-signal', {name: "emit", data: {target:'updateObject', obj: {id: gameid, type: 'samplegame', name: name }, callback: function(msg) { console.log('updatedObject said:');console.dir(msg); }} });
+        },
 
-          selectGame: function(e, detail, el)
-          {
-              console.log("selectGame called");
-              var gameid = el.attributes['gameid'].value;
-              console.log("gameid = "+gameid);
-              this.selectedgame = this.gameById(gameid);
-              this.asyncFire('core-signal', {name: "objectsubscribe", data: {obj:{id: this.selectedgame.id, type: 'samplegame'}, callback: this.onGameUpdate.bind(this) } });
-          },
+        selectGame: function(e, detail, el)
+        {
+          console.log("selectGame called");
+          var gameid = el.attributes['gameid'].value;
+          console.log("gameid = "+gameid);
+          this.selectedgame = this.gameById(gameid);
+          this.asyncFire('core-signal', {name: "objectsubscribe", data: {obj:{id: this.selectedgame.id, type: 'samplegame'}, callback: this.onGameUpdate.bind(this) } });
+        },
 
-          onGameUpdate: function(game)
-          {
-              console.log("onGameUpdate called. game is "+game);
-              console.dir(game);
-              this.selectedgame = game;
-              this.update = JSON.stringify(game);
-          }
+        onGameUpdate: function(game)
+        {
+          console.log("onGameUpdate called. game is "+game);
+          console.dir(game);
+          this.selectedgame = game;
+          this.update = JSON.stringify(game);
+        }
 
       });
     })();

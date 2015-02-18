@@ -20,6 +20,7 @@ class ResolveModule
         #console.log('File: ' + file)
         if file.indexOf('/') > -1
           file = file.substring(file.lastIndexOf('/')+1, file.length)
+        console.log('File: ' + file)
         if file.indexOf(name+'.js') > -1
 
           #console.log 'happily adding file '+file

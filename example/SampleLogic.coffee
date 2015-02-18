@@ -25,9 +25,9 @@ class SampleLogic
 
 
   onNewGame: (msg) =>
-    console.log 'New Game called'
-    new Game({name: 'New Game '+(SampleLogic.gamecount++)}).then (game)=>
-      console.log '-- new game '+game.name+' created --'
+    console.log 'SampleLogic: New Game called'
+    new Game({name: 'New Game '+(SampleLogic.gamecount++)}, true).then (game)=>
+      console.log 'SampleLogic: -- new game '+game.name+' created --'
       game.serialize()
       @games.push game
       msg.replyFunc({status: e.general.SUCCESS, info: 'game "'+game.name+'" created'});

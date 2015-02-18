@@ -38,12 +38,12 @@
     }
 
     SampleLogic.prototype.onNewGame = function(msg) {
-      console.log('New Game called');
+      console.log('SampleLogic: New Game called');
       return new Game({
         name: 'New Game ' + (SampleLogic.gamecount++)
-      }).then((function(_this) {
+      }, true).then((function(_this) {
         return function(game) {
-          console.log('-- new game ' + game.name + ' created --');
+          console.log('SampleLogic: -- new game ' + game.name + ' created --');
           game.serialize();
           _this.games.push(game);
           return msg.replyFunc({
