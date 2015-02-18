@@ -62,7 +62,7 @@ class SuperModel
             resolveobj.ids.forEach (id) =>
               #console.log 'trying to get '+resolveobj.type+' with id '+id
               DB.get(resolveobj.type,[id]).then (record) =>
-                @createObjectFrom(record).then (obj) =>
+                @createObjectFrom(record).then (obj) => 
                   #console.log 'object created: '+obj.id
                   @insertObj(resolveobj, obj)
                   #console.log '============================== 2'
