@@ -18,6 +18,8 @@ class ResolveModule
       #This listens for files found
       finder.on 'file', (file) ->
         #console.log('File: ' + file)
+        if file.indexOf('/') > -1
+          file = file.substring(file.lastIndexOf('/')+1, file.length)
         if file.indexOf(name+'.js') > -1
 
           #console.log 'happily adding file '+file
