@@ -22,7 +22,7 @@ class ResolveModule
           file = file.substring(file.lastIndexOf('/')+1, file.length)
 
         if file.indexOf('.') > -1
-          file = file.substring(0, file.indexOf('.')-1)
+          file = file.substring(0, file.indexOf('.'))
         console.log('File: ' + file)
         if file == name and file.indexOf(name+'.js') > -1
           #console.log 'happily adding file '+file
