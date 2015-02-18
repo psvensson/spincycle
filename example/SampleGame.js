@@ -29,10 +29,11 @@
       this.playerids = this.record.playerids;
       this.name = this.record.name || 'game_' + uuid.v4();
       this.type = 'SampleGame';
-      this.players = [];
+      this.players = {};
       resolvearr = [
         {
           name: 'players',
+          hashtable: true,
           type: 'SamplePlayer',
           ids: this.playerids
         }
@@ -45,6 +46,8 @@
               return q.resolve(_this);
             });
           } else {
+            console.log('game loaded from db...');
+            console.dir(_this);
             return q.resolve(_this);
           }
         };
@@ -61,9 +64,10 @@
         return function(results) {
           console.log('sample players created');
           results.forEach(function(player) {
+            _this.playerids.push(player.id);
+            _this.players[player.name] = player;
             return player.serialize();
           });
-          _this.players = results;
           return q.resolve();
         };
       })(this));
@@ -75,15 +79,18 @@
     };
 
     SampleGame.prototype.getRecord = function() {
-      var record;
+      var k, record, v, _i, _len, _ref;
       record = {
         id: this.id,
         name: this.name,
         type: this.type,
-        playerids: this.players.map(function(player) {
-          return player.id;
-        })
+        playerids: []
       };
+      _ref = this.players;
+      for (v = _i = 0, _len = _ref.length; _i < _len; v = ++_i) {
+        k = _ref[v];
+        record.playerids.push(v.id);
+      }
       return record;
     };
 

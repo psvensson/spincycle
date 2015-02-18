@@ -14,11 +14,11 @@ class SampleGame extends SuperModel
     @playerids  = @record.playerids
     @name       = @record.name or 'game_'+uuid.v4()
     @type       = 'SampleGame'
-    @players     = []
+    @players     = {}
 
     resolvearr =
       [
-        {name: 'players',    type: 'SamplePlayer', ids: @playerids }
+        {name: 'players', hashtable: true,   type: 'SamplePlayer', ids: @playerids }
       ]
 
     @loadFromIds(resolvearr).then () =>
@@ -27,6 +27,8 @@ class SampleGame extends SuperModel
         @createPlayers().then () =>
           q.resolve(@)
       else
+        console.log 'game loaded from db...'
+        console.dir(@)
         q.resolve(@)
 
     return q
@@ -37,8 +39,11 @@ class SampleGame extends SuperModel
     @players = []
     all([new SamplePlayer(), new SamplePlayer()]).then (results) =>
       console.log 'sample players created'
-      results.forEach (player) -> player.serialize()
-      @players = results
+      results.forEach (player) =>
+        @playerids.push player.id
+        @players[player.name] = player
+        player.serialize()
+
       q.resolve()
     return q
 
@@ -50,7 +55,9 @@ class SampleGame extends SuperModel
       id:           @id
       name:         @name
       type:         @type
-      playerids:    @players.map (player) -> player.id
+      playerids:    []
+    for k,v in @players
+      record.playerids.push v.id
 
     return record
 

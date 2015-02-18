@@ -7,10 +7,12 @@ DB              = require('./DB')
 error           = require('./Error').error
 ResolveModule   = require('./ResolveModule')
 
-console.log 'supermodel dirname is '+dirname
+console.log 'supermodel dirname is '+__dirname
 console.log(__dirname)
 dirname = __dirname.substring(0, __dirname.indexOf('/node_modules'))+'/..'
-console.log 'starting module rsolveing from path '+dirname
+if dirname[0] == '/'  then dirname = '../..'
+
+console.log 'starting module resolving from path '+dirname
 resolver = new ResolveModule(dirname)
 modulecache = []
 
@@ -52,7 +54,8 @@ class SuperModel
           else
             if typeof resolveobj.ids is 'string'
               resolveobj.ids = [resolveobj.ids]
-            @[resolveobj.name] = [] if resolveobj.array == true or resolveobj.hashtable == true
+            @[resolveobj.name] = [] if resolveobj.array == true
+            @[resolveobj.name] = {} if resolveobj.hashtable == true
             #console.log ' resolveobjds ('+(typeof resolveobj.ids)+') ids length are.. '+resolveobj.ids.length
             #console.dir(resolveobj.ids)
             count = resolveobj.ids.length
