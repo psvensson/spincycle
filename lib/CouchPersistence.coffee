@@ -46,10 +46,13 @@ class CouchPersistence
           #console.log 'couchpersistence fetch all '+type+" got back.."
           #console.dir(res)
           count = res.rows.length
-          res.rows.forEach (row) ->
-            db.getDoc row.id, (verr, value) ->
-              rv.push value if row.id.indexOf('_') == -1
-              if --count == 0 then cb rv
+          if count == 0
+            cb rv
+          else
+            res.rows.forEach (row) ->
+              db.getDoc row.id, (verr, value) ->
+                rv.push value if row.id.indexOf('_') == -1
+                if --count == 0 then cb rv
 
   get: (_type, id, cb) =>
     type = _type.toLowerCase()
