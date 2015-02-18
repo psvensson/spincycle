@@ -58,7 +58,7 @@ class SuperModel
             count = resolveobj.ids.length
             resolveobj.ids.forEach (id) =>
               #console.log 'trying to get '+resolveobj.type+' with id '+id
-              DB.get(resolveobj.type, [id]).then (record) =>
+              DB.get(resolveobj.type,[id]).then (record) =>
                 @createObjectFrom(record).then (obj) =>
                   #console.log 'object created: '+obj.id
                   @insertObj(resolveobj, obj)
@@ -90,9 +90,9 @@ class SuperModel
 
   insertObj: (ro, o) =>
     if ro.array == true
-      [ro.name].push(o)
+      @[ro.name].push(o)
     else if ro.hashtable == true
-      [ro.name][o.name] = o
+      @[ro.name][o.name] = o
     else
       @[ro.name] = o
 
