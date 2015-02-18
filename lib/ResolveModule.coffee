@@ -25,7 +25,7 @@ class ResolveModule
         if file.indexOf('.') > -1
           file = file.substring(0, file.indexOf('.'))
         console.log('File: ' + file)
-        if file == name
+        if file == name and origfile.indexOf('.js' > -1)
             rv = origfile
             ResolveModule.modulecache[name] = file
             finder.stop()
