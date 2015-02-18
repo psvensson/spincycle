@@ -10,7 +10,7 @@ ResolveModule   = require('./ResolveModule')
 console.log 'supermodel dirname is '+__dirname
 console.log(__dirname)
 dirname = __dirname.substring(0, __dirname.indexOf('/node_modules'))+'/..'
-if dirname[0] == '/'  then dirname = '../..'
+if __dirname.indexOf('node_modules') == -1  then dirname = '../..'
 
 console.log 'starting module resolving from path '+dirname
 resolver = new ResolveModule(dirname)
@@ -62,7 +62,7 @@ class SuperModel
             resolveobj.ids.forEach (id) =>
               #console.log 'trying to get '+resolveobj.type+' with id '+id
               DB.get(resolveobj.type,[id]).then (record) =>
-                @createObjectFrom(record).then (obj) => 
+                @createObjectFrom(record).then (obj) =>
                   #console.log 'object created: '+obj.id
                   @insertObj(resolveobj, obj)
                   #console.log '============================== 2'
