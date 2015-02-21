@@ -13,6 +13,9 @@ dirname = __dirname.substring(0, __dirname.indexOf('/node_modules'))
 if __dirname.indexOf('node_modules') == -1  then dirname = '../..'
 
 console.log 'starting module resolving from path '+dirname
+##
+## TODO: Make it possible to seed the resolver with path to our reqquirements if we know them beforehand. *might* speed things up eh?
+##
 resolver = new ResolveModule(dirname)
 modulecache = []
 
@@ -36,7 +39,7 @@ class SuperModel
     alldone = defer()
     allpromises = []
     if(not resolvearr or resolvearr.length == 0)
-      console.log ' ++++++++++++++++ NO RESOVLEARR ++++++++++++++'
+      console.log ' ++++++++++++++++ NO RESOLVEARR ++++++++++++++'
       q = defer()
       allpromises.push(q)
       q.resolve()
@@ -61,12 +64,18 @@ class SuperModel
             count = resolveobj.ids.length
             resolveobj.ids.forEach (id) =>
               #console.log 'trying to get '+resolveobj.type+' with id '+id
-              DB.get(resolveobj.type,[id]).then (record) =>
-                @createObjectFrom(record).then (obj) =>
-                  #console.log 'object created: '+obj.id
-                  @insertObj(resolveobj, obj)
+              OMgr.getRecord(id).then (oo) =>
+                if oo
+                  @insertObj(resolveobj, oo)
                   #console.log '============================== 2'
                   if --count == 0 then r.resolve(obj)
+                else
+                  DB.get(resolveobj.type,[id]).then (record) =>
+                    @createObjectFrom(record).then (obj) =>
+                      #console.log 'object created: '+obj.id
+                      @insertObj(resolveobj, obj)
+                      #console.log '============================== 2'
+                      if --count == 0 then r.resolve(obj)
         )(robj)
 
     all(allpromises, error).then( (results) ->

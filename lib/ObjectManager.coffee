@@ -36,7 +36,7 @@ class ObjectManager
 
   onRegisterForUpdatesOn: (msg) =>
     console.log 'onRegisterForUpdatesOn called for '+msg.obj.type+' '+msg.obj.id
-    console.dir msg
+    #console.dir msg
 
     objStore.getRecord(msg.obj.id, msg.obj.type).then( (record) =>
       if record
