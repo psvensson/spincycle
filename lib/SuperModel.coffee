@@ -68,7 +68,7 @@ class SuperModel
                 if oo
                   @insertObj(resolveobj, oo)
                   #console.log '============================== 2'
-                  if --count == 0 then r.resolve(obj)
+                  if --count == 0 then r.resolve(o)
                 else
                   DB.get(resolveobj.type,[id]).then (record) =>
                     @createObjectFrom(record).then (obj) =>
