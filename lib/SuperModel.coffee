@@ -25,7 +25,7 @@ class SuperModel
     q = defer()
     if not @_serializing
       @_serializing = true
-      record = @getObject()
+      record = @getRecord()
       OMgr.storeObject(@)
       DB.set(@type, record).then () =>
         @_serializing = false
@@ -64,7 +64,7 @@ class SuperModel
             count = resolveobj.ids.length
             resolveobj.ids.forEach (id) =>
               #console.log 'trying to get '+resolveobj.type+' with id '+id
-              OMgr.getRecord(id).then (oo) =>
+              OMgr.getObject(id, resolveobj.type).then (oo) =>
                 if oo
                   @insertObj(resolveobj, oo)
                   #console.log '============================== 2'
