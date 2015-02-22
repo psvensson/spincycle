@@ -20,11 +20,11 @@ class ObjectManager
 
   onUpdateObject: (msg) =>
     console.log 'onUpdateObject called for '+msg.obj.type+' - '+msg.obj.id
-    objStore.getRecord(msg.obj.id, msg.obj.type).then( (record) =>
+    objStore.getObject(msg.obj.id, msg.obj.type).then( (record) =>
       if record
         if @messageRouter.authMgr.canUserWriteToThisObject(record, msg.user)
           objStore.updateObj(msg.obj)
-          DB.set(record.type, objStore.getRecord(msg.obj.id))
+          DB.set(record.type, objStore.getObject(msg.obj.id))
           msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
         else
           msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.UPDATE_OBJECT_FAIL, payload: msg.obj.id})
