@@ -48,7 +48,7 @@ class OStore
     listenerId = uuid.v4()
     list[listenerId] = cb
     OStore.listeners[id] = list
-    @getRecord(id, type).then((result) ->
+    @getObject(id, type).then((result) ->
       cb(result)
     , error)
     return listenerId
