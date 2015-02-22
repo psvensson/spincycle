@@ -25,7 +25,7 @@ class SuperModel
     q = defer()
     if not @_serializing
       @_serializing = true
-      record = @getRecord()
+      record = @getObject()
       OMgr.storeObject(@)
       DB.set(@type, record).then () =>
         @_serializing = false
