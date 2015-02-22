@@ -9,14 +9,14 @@ class OStore
   @objects: []
   @listeners: []
 
-  @storeRecord: (obj) =>
+  @storeObject: (obj) =>
     OStore.objects[obj.id] = obj
 
     list = OStore.listeners[obj.id] or []
     for lid, listener of list
       listener(obj.toClient())
 
-  @getRecord: (id, type) =>
+  @getObject: (id, type) =>
     q = defer()
     q.resolve(OStore.objects[id])
     return q
