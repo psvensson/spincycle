@@ -14,19 +14,17 @@ class OStore
 
     list = OStore.listeners[obj.id] or []
     for lid, listener of list
-      listener(obj.toClient())
+      listener(obj)
 
   @getObject: (id, type) =>
     q = defer()
     q.resolve(OStore.objects[id])
     return q
 
-  @updateObj = (record) ->
-    console.log 'oStore.updateObj called for obj '+record
-    obj = OStore.objects[record.id]
-    console.log 'updateObj '+record
-    console.dir record
-
+  @updateObj = (obj) ->
+    console.log 'oStore.updateObj called for obj '+obj.id
+    #console.log 'updateObj '+record
+    #console.dir record
     whitelist = obj.getRecord()
     for p of whitelist
       #console.log 'checking whitelist property '+p
@@ -36,12 +34,11 @@ class OStore
           #console.log '    match!'
           obj[pp] = record[pp]
     OStore.objects[record.id] = obj
-    list = OStore.listeners[obj.id] or []
-    for lid of list
-      listener = list[lid]
-      listener(obj)
-    return
+    listeners = OStore.listeners[obj.id] or []
+    for lid of listeners
+      listeners[lid](obj)
 
+    return
 
   @addListenerFor:(id, type, cb) =>
     list = OStore.listeners[id] or []
