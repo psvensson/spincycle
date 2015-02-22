@@ -38,7 +38,7 @@ class ObjectManager
     console.log 'onRegisterForUpdatesOn called for '+msg.obj.type+' '+msg.obj.id
     #console.dir msg
 
-    objStore.getRecord(msg.obj.id, msg.obj.type).then( (record) =>
+    objStore.getObject(msg.obj.id, msg.obj.type).then( (record) =>
       if record
         if @messageRouter.authMgr.canUserReadFromThisObject(record, msg.user)
           listenerId = objStore.addListenerFor(msg.obj.id, msg.obj.type, (uobj) ->
