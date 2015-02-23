@@ -49,16 +49,17 @@ class SuperModel
         ((resolveobj) =>
           r = defer()
           allpromises.push(r)
+          @[resolveobj.name] = [] if resolveobj.array == true
+          @[resolveobj.name] = {} if resolveobj.hashtable == true
           if not resolveobj.ids
-            @[resolveobj.name] = []
+            #@[resolveobj.name] = []
             resolveobj.ids = []
             console.log '============================== null resolveobj.ids for '+resolveobj.type+' ['+resolveobj.name+']'
             r.resolve(null)
           else
             if typeof resolveobj.ids is 'string'
               resolveobj.ids = [resolveobj.ids]
-            @[resolveobj.name] = [] if resolveobj.array == true
-            @[resolveobj.name] = {} if resolveobj.hashtable == true
+
             #console.log ' resolveobjds ('+(typeof resolveobj.ids)+') ids length are.. '+resolveobj.ids.length
             #console.dir(resolveobj.ids)
             count = resolveobj.ids.length
