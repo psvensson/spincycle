@@ -54,7 +54,7 @@ class SuperModel
           if not resolveobj.ids
             #@[resolveobj.name] = []
             resolveobj.ids = []
-            console.log '============================== null resolveobj.ids for '+resolveobj.type+' ['+resolveobj.name+']'
+            #console.log '============================== null resolveobj.ids for '+resolveobj.type+' ['+resolveobj.name+']'
             r.resolve(null)
           else
             if typeof resolveobj.ids is 'string'
