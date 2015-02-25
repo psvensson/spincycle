@@ -63,20 +63,23 @@ class SuperModel
             #console.log ' resolveobjds ('+(typeof resolveobj.ids)+') ids length are.. '+resolveobj.ids.length
             #console.dir(resolveobj.ids)
             count = resolveobj.ids.length
-            resolveobj.ids.forEach (id) =>
-              #console.log 'trying to get '+resolveobj.type+' with id '+id
-              OMgr.getObject(id, resolveobj.type).then (oo) =>
-                if oo
-                  @insertObj(resolveobj, oo)
-                  #console.log '============================== 2'
-                  if --count == 0 then r.resolve(oo)
-                else
-                  DB.get(resolveobj.type,[id]).then (record) =>
-                    @createObjectFrom(record).then (obj) =>
-                      #console.log 'object created: '+obj.id
-                      @insertObj(resolveobj, obj)
-                      #console.log '============================== 2'
-                      if --count == 0 then r.resolve(obj)
+            if count == 0
+              r.resolve(null)
+            else
+              resolveobj.ids.forEach (id) =>
+                #console.log 'trying to get '+resolveobj.type+' with id '+id
+                OMgr.getObject(id, resolveobj.type).then (oo) =>
+                  if oo
+                    @insertObj(resolveobj, oo)
+                    #console.log '============================== 2'
+                    if --count == 0 then r.resolve(oo)
+                  else
+                    DB.get(resolveobj.type,[id]).then (record) =>
+                      @createObjectFrom(record).then (obj) =>
+                        #console.log 'object created: '+obj.id
+                        @insertObj(resolveobj, obj)
+                        #console.log '============================== 2'
+                        if --count == 0 then r.resolve(obj)
         )(robj)
 
     all(allpromises, error).then( (results) ->
