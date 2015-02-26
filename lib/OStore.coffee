@@ -38,8 +38,6 @@ class OStore
     for lid of listeners
       listeners[lid](obj)
 
-    return
-
   @addListenerFor:(id, type, cb) =>
     list = OStore.listeners[id] or []
     listenerId = uuid.v4()
