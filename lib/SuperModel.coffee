@@ -21,6 +21,8 @@ modulecache = []
 
 class SuperModel
 
+  @resolver = resolver
+
   constructor:(@record)->
 
     if @record._rev then @_rev = @record._rev
