@@ -1,6 +1,6 @@
 couchdb         = require('felix-couchdb');
 defer           = require('node-promise').defer
-
+OStore          = require('./OStore')
 
 class CouchPersistence
 
@@ -72,7 +72,8 @@ class CouchPersistence
           console.dir err
           console.dir obj
         else
-          obj._rev = res._rev
+          oo = OStore.objects[obj.id]
+          oo._rev = res._rev
         if cb then cb(res)
       db.saveDoc(obj.id, obj, onSave)
 
