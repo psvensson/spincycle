@@ -22,14 +22,15 @@ modulecache = []
 class SuperModel
 
   constructor:(record)->
-    @_rev = record._rev
+
+    @_rev = record._rev if record._rev
 
   serialize: () =>
     q = defer()
     if not @_serializing
       @_serializing = true
       record = @getRecord()
-      record._rev = @_rev
+      record._rev = @_rev if @_rev
       OMgr.storeObject(@)
       DB.set(@type, record).then () =>
         @_serializing = false
@@ -101,6 +102,7 @@ class SuperModel
         module = modulecache[record[0].type] or require(filename.replace('.js', ''))
         modulecache[record[0].type] = module
         o = Object.create(module.prototype)
+        o._rev = record._rev
         o.constructor(record[0])
         q.resolve(o)
     return q
