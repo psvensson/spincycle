@@ -23,7 +23,7 @@ class MessageRouter
   @ObjectManager = ObjectManager
   @ClientEndpoints = ClientEndpoints
   @OStore = OStore
-  @ResolveModules = ResolveModule
+  @ResolveModule = ResolveModule
 
   constructor: (@authMgr) ->
     console.log 'messageRouter constructor'
