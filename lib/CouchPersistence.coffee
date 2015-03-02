@@ -70,6 +70,8 @@ class CouchPersistence
         if err
           console.log '** Couch Set ERROR: '+err
           console.dir err
+        else
+          obj._rev = res._rev
         if cb then cb(res)
       db.saveDoc(obj.id, obj, onSave)
 

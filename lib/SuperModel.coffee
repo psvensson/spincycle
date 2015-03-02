@@ -34,6 +34,7 @@ class SuperModel
     else
       q.resolve(@)
     return q
+
   # [ {name: 'zones', type: 'zone', ids: [x, y, z, q] }, .. ]
   loadFromIds:(resolvearr) =>
     alldone = defer()
@@ -45,7 +46,6 @@ class SuperModel
       q.resolve()
     else
       resolvearr.forEach (robj) =>
-
         ((resolveobj) =>
           r = defer()
           allpromises.push(r)
@@ -71,19 +71,16 @@ class SuperModel
                 OMgr.getObject(id, resolveobj.type).then (oo) =>
                   if oo
                     @insertObj(resolveobj, oo)
-                    #console.log '============================== 2'
                     if --count == 0 then r.resolve(oo)
                   else
                     DB.get(resolveobj.type,[id]).then (record) =>
                       @createObjectFrom(record).then (obj) =>
                         #console.log 'object created: '+obj.id
                         @insertObj(resolveobj, obj)
-                        #console.log '============================== 2'
                         if --count == 0 then r.resolve(obj)
         )(robj)
 
     all(allpromises, error).then( (results) ->
-      #console.log 'allpromises resolved'
       alldone.resolve(results)
     ,error)
     return alldone
