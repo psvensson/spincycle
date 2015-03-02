@@ -73,9 +73,9 @@ class CouchPersistence
           console.dir obj
         else
           oo = OStore.objects[obj.id]
-          console.log 'couchpersistence.set setting _rev to '+res._rev+' on '+type+' '+obj.id
-          if not res._rev then console.dir res
-          oo._rev = res._rev
+          console.log 'couchpersistence.set setting _rev to '+res.rev+' on '+type+' '+obj.id
+          if not res.rev then console.dir res
+          oo._rev = res.rev
         if cb then cb(res)
       db.saveDoc(obj.id, obj, onSave)
 
