@@ -11,20 +11,23 @@ class OStore
 
   @storeObject: (obj) =>
     OStore.objects[obj.id] = obj
-
+    #console.log 'storeObject storing '+obj.id+' with rev '+obj.rev+" and _rev "+obj._rev
     list = OStore.listeners[obj.id] or []
     for lid, listener of list
       listener(obj)
 
   @getObject: (id, type) =>
     q = defer()
-    q.resolve(OStore.objects[id])
+    obj = OStore.objects[id]
+    #console.log 'getObject getting '+obj.id+' with rev '+obj.rev+" and _rev "+obj._rev
+    q.resolve(obj)
     return q
 
-  @updateObj = (obj) ->
-    console.log 'oStore.updateObj called for obj '+obj.id
+  @updateObj = (record) ->
+    console.log 'oStore.updateObj called for obj '+record.id
     #console.log 'updateObj '+record
     #console.dir record
+    obj = OStore.objects[record.id]
     whitelist = obj.getRecord()
     for p of whitelist
       #console.log 'checking whitelist property '+p

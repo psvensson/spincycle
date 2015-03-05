@@ -68,6 +68,7 @@ class SampleGame extends SuperModel
     for k,v in @players
       record.playerids.push v.id
 
+
     return record
 
 module.exports = SampleGame

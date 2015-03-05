@@ -21,7 +21,12 @@ modulecache = []
 
 class SuperModel
 
-  @resolver = resolver
+  SuperModel.resolver = resolver
+
+  _getRecord:() =>
+   rv = @getRecord()
+   rv._rev = @._rev
+   return rv;
 
   constructor:(@record)->
 
@@ -31,7 +36,7 @@ class SuperModel
     q = defer()
     if not @_serializing
       @_serializing = true
-      record = @getRecord()
+      record = @_getRecord()
       if @_rev then record._rev = @_rev
       OMgr.storeObject(@)
       DB.set(@type, record).then () =>
