@@ -24,7 +24,7 @@ class ObjectManager
       if obj
         if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
           objStore.updateObj(msg.obj)
-          #console.log 'persisiting '+obj.id+' rev '+obj._rev+' in db'
+          console.log 'persisiting '+obj.id+' rev '+obj._rev+' in db'
           DB.set(obj.type, obj._getRecord())
           msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
         else

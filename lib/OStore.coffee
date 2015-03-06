@@ -19,7 +19,7 @@ class OStore
   @getObject: (id, type) =>
     q = defer()
     obj = OStore.objects[id]
-    #console.log 'getObject getting '+obj.id+' with rev '+obj.rev+" and _rev "+obj._rev
+    console.log 'getObject getting '+obj.id+' with rev '+obj.rev+" and _rev "+obj._rev
     q.resolve(obj)
     return q
 

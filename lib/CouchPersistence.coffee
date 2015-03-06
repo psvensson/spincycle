@@ -73,7 +73,7 @@ class CouchPersistence
           console.dir obj
         else
           oo = OStore.objects[obj.id]
-          #console.log '--------------------------------------------------------------------------------------------- couchpersistence.set setting _rev to '+res.rev+' on '+type+' '+obj.id
+          console.log '--------------------------------------------------------------------------------------------- couchpersistence.set setting _rev to '+res.rev+' on '+type+' '+obj.id
           if not res.rev then console.dir res
           oo._rev = res.rev
         if cb then cb(res)
