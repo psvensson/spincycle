@@ -29,7 +29,7 @@ class SuperModel
    return rv;
 
   constructor:(@record)->
-    @OMgr.storeObject(@)
+    OMgr.storeObject(@)
     if @record._rev then @_rev = @record._rev
 
   serialize: () =>
