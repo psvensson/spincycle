@@ -22,7 +22,7 @@ class OStore
     if obj
       console.log 'getObject getting '+obj.id+' with rev '+obj.rev+" and _rev "+obj._rev
     else
-      console.log '-- * -- getObject could not find object type '+type+' with id '+id
+      #console.log '-- * -- getObject could not find object type '+type+' with id '+id
     q.resolve(obj)
     return q
 
@@ -39,6 +39,7 @@ class OStore
         if pp is p
           #console.log '    match!'
           obj[pp] = record[pp]
+          console.log 'updating property "'+pp+'" on '+record.type+' id '+record.id
     OStore.objects[record.id] = obj
     listeners = OStore.listeners[obj.id] or []
     for lid of listeners
