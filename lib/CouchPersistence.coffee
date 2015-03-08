@@ -79,5 +79,16 @@ class CouchPersistence
         if cb then cb(res)
       db.saveDoc(obj.id, obj, onSave)
 
+  remove: (_type, obj, cb) =>
+    type = _type.toLowerCase()
+    @getDbFor(type).then (db) =>
+      db.removeDoc obj.id, obj._rev, (err, res) =>
+        if err
+          console.log '** Couch Remove ERROR: '+err
+          console.dir err
+          console.dir obj
+        else
+          if (cb) then cb(res)
+
 
 module.exports = CouchPersistence

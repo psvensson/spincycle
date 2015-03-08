@@ -32,8 +32,8 @@ class MessageRouter
     @args     = []
     @methods  = []
     #@authMgr  = AuthenticationManager
-    objectManager = new ObjectManager(@)
-    objectManager.setup()
+    @objectManager = new ObjectManager(@)
+    @objectManager.setup()
 
     @setup()
 

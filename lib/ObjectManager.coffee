@@ -11,12 +11,14 @@ error           = require('./Error').error
 class ObjectManager
 
   constructor: (@messageRouter) ->
-    @games = []
+   @updateObjectHooks = []
 
   setup: () =>
     @messageRouter.addTarget('registerForUpdatesOn',  'obj', @onRegisterForUpdatesOn)
     @messageRouter.addTarget('updateObject',          'obj', @onUpdateObject)
 
+  registerUpdateObjectHook: (hook) =>
+    @updateObjectHooks.push hook
 
   onUpdateObject: (msg) =>
     console.log 'onUpdateObject called for '+msg.obj.type+' - '+msg.obj.id
@@ -25,7 +27,9 @@ class ObjectManager
         if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
           objStore.updateObj(msg.obj)
           console.log 'persisiting '+obj.id+' rev '+obj._rev+' in db'
-          DB.set(obj.type, obj._getRecord())
+          record = obj._getRecord()
+          DB.set(obj.type, record)
+          @updateObjectHooks.forEach (hook) => hook(record)
           msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
         else
           msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.UPDATE_OBJECT_FAIL, payload: msg.obj.id})
@@ -39,8 +43,6 @@ class ObjectManager
 
   onRegisterForUpdatesOn: (msg) =>
     console.log 'onRegisterForUpdatesOn called for '+msg.obj.type+' '+msg.obj.id
-    #console.dir msg
-
     objStore.getObject(msg.obj.id, msg.obj.type).then( (record) =>
       if record
         if @messageRouter.authMgr.canUserReadFromThisObject(record, msg.user)

@@ -20,7 +20,7 @@ class OStore
     q = defer()
     obj = OStore.objects[id]
     if obj
-      console.log 'getObject getting '+obj.id+' with rev '+obj.rev+" and _rev "+obj._rev
+      #console.log 'getObject getting '+obj.id+' with rev '+obj.rev+" and _rev "+obj._rev
     else
       #console.log '-- * -- getObject could not find object type '+type+' with id '+id
     q.resolve(obj)

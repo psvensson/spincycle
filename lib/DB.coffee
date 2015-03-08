@@ -68,5 +68,10 @@ class DB
     @getDataStore().set type, obj, (res) ->
       if cb then cb()
 
+  @remove: (obj, cb) =>
+    @lru.del obj.id()
+    @getDataStore().remove obj.type, obj, (res) ->
+      if cb then cb(res)
+
 
 module.exports = DB
