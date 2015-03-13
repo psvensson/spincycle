@@ -32,18 +32,24 @@ class OStore
     #console.dir record
     obj = OStore.objects[record.id]
     whitelist = obj.getRecord()
+    diff = {}
+    changed = false;
     for p of whitelist
       #console.log 'checking whitelist property '+p
       for pp of record
         #console.log '  comparing to incoming property '+pp
         if pp is p
           #console.log '    match!'
+          if obj[pp] != record[pp]
+            diff[pp] = record[pp]
+            changed = true
           obj[pp] = record[pp]
           console.log 'updating property "'+pp+'" on '+record.type+' id '+record.id
     OStore.objects[record.id] = obj
     listeners = OStore.listeners[obj.id] or []
-    for lid of listeners
-      listeners[lid](obj)
+    if changed
+      for lid of listeners
+        listeners[lid](obj)
 
   @addListenerFor:(id, type, cb) =>
     list = OStore.listeners[id] or []
