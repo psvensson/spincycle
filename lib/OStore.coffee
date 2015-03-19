@@ -26,6 +26,9 @@ class OStore
     q.resolve(obj)
     return q
 
+  @removeObject: (obj) =>
+    delete OStore.objects[obj.id]
+
   @updateObj = (record) ->
     console.log 'oStore.updateObj called for obj '+record.id
     #console.log 'updateObj '+record
