@@ -7,12 +7,12 @@ class ClientEndpoints
   @registerEndpoint: (address, sendFunc) ->
     console.log 'registerEndpoint called for address '+address
     @endpoints[address] = sendFunc
-    @onconnectcbs.forEach (cb) => cb(adr)
+    @onconnectcbs.forEach (cb) => cb(address)
 
   @removeEndpoint: (address) ->
     console.log 'deleting endpoint '+address
     delete @endpoints[address]
-    @ondisconnectcbs.forEach (cb) => cb(adr)
+    @ondisconnectcbs.forEach (cb) => cb(address)
 
   @sendToEndpoint: (address, msg) ->
     #console.log 'sendToEndpoint "'+address+'" called. endpoints are..'
