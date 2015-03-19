@@ -12,8 +12,9 @@ class WsMethod
     io.on "connection", (socket) ->
       ip    = socket.request.connection.remoteAddress
       port  = socket.request.connection.remotePort
-      console.log 'new ws connection from '+ip+':'+port
-      ClientEndpoints.registerEndpoint ip+':'+port, (msg) ->
+      adr = ip+':'+port
+      console.log 'new ws connection from '+adr
+      ClientEndpoints.registerEndpoint adr, (msg) ->
         socket.emit('message', msg)
 
       # when the client emits 'message', this listens and executes
