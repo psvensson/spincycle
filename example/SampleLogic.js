@@ -35,6 +35,7 @@
       this.messageRouter.addTarget('listGames', '<noargs>', this.onListPlayerGames);
       this.messageRouter.addTarget('listGamePlayers', 'gameId', this.onListGamePlayers);
       this.messageRouter.addTarget('newGame', '<noargs>', this.onNewGame);
+      this.messageRouter.objectManager.expose('SampleGame');
     }
 
     SampleLogic.prototype.onNewGame = function(msg) {

@@ -44,7 +44,7 @@ class MessageRouter
       for name, target of @targets
         console.log 'adding target '+name
         rv[name] = @args[name]
-      msg.replyFunc(rv)
+      msg.replyFunc({status: EventManager.general.SUCCESS, info: 'list of available targets', payload: rv})
 
   # All messaging method adds their function for registering new paths or whatnot here
   # So for example for express you could add a method which makes sure the target name

@@ -1,6 +1,6 @@
 {
   "name": "spincycle",
-  "version": "1.1.31",
+  "version": "1.1.32",
   "description": "An opinionated message router and object manager that lets clients subscribe to object property changes on the server",
   "main": "index.js",
   "directories": {
@@ -29,6 +29,7 @@
   },
   "homepage": "https://github.com/psvensson/spincycle",
   "dependencies": {
+    "cors": "^2.5.3",
     "cradle": "^0.6.9",
     "express": "^4.11.1",
     "felix-couchdb": "^1.0.7",

@@ -1,6 +1,6 @@
 util            = require('util')
 defer           = require('node-promise').defer
-
+SuperModel      = require('./SuperModel')
 e               = require('./EventManager')
 DB              = require('./DB')
 ClientEndpoints = require('./ClientEndpoints')
@@ -19,6 +19,40 @@ class ObjectManager
 
   registerUpdateObjectHook: (hook) =>
     @updateObjectHooks.push hook
+
+  expose: (type) =>
+    @messageRouter.addTarget '_create'+type, 'obj', (msg) =>
+      if msg.odata.type == type and @messageRouter.authMgr.canUserCreateThisObject(msg.odata, msg.user)
+        SuperModel.resolver.createObjectFrom(msg.odata).then (o) =>
+          msg.replyFunc({status: e.general.SUCCESS, info: 'new '+type, payload: o.id})
+
+    # TODO: delete object hierarchy as well? Maybe also check for other objects referencing this, disallowing if so
+    @messageRouter.addTarget '_delete'+type, 'obj', (msg) =>
+      objStore.getObject msg.obj.id, msg.obj.type.then (obj) =>
+        if obj
+          if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
+            DB.remove obj, (removestatus) =>
+              console.log 'exposed object removed through _delete'+type
+              objStore.removeObject(obj)
+              msg.replyFunc({status: e.general.SUCCESS, info: 'delete object', payload: obj.id})
+          else
+            msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to delete object', payload: msg.obj.id})
+        else
+          console.log 'No object found with id '+msg.obj.id
+          console.dir objStore.objects.map (o) -> o.type == msg.obj.type
+          msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
+
+    @messageRouter.addTarget '_update'+type, 'obj', (msg) =>
+      @onUpdateObject(msg)
+
+    @messageRouter.addTarget '_get'+type, 'obj', (msg) =>
+      objStore.getObject msg.obj.id, msg.obj.type.then (obj) =>
+        if obj
+          msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: obj.toClient()})
+        else
+          console.log 'No object found with id '+msg.obj.id
+          console.dir objStore.objects.map (o) -> o.type == msg.obj.type
+          msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
 
   onUpdateObject: (msg) =>
     console.log 'onUpdateObject called for '+msg.obj.type+' - '+msg.obj.id

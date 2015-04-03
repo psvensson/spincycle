@@ -4,6 +4,7 @@ AuthenticationManager = require('./AuthenticationManager')
 SampleLogic = require('./SampleLogic')
 
 express         = require("express")
+cors            = require('cors')
 app             = express()
 server          = require("http").createServer(app)
 
@@ -13,6 +14,9 @@ server.listen port, ->
   return
 
 app.use express.static("app")
+app.use(cors)
+app.options('*', cors())
+
 #--------------------------------------------------> Set up Message Router
 authMgr         = new AuthenticationManager()
 messageRouter   = new SpinCycle(authMgr)

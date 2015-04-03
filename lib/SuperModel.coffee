@@ -17,7 +17,6 @@ console.log 'starting module resolving from path '+dirname
 ## TODO: Make it possible to seed the resolver with path to our reqquirements if we know them beforehand. *might* speed things up eh?
 ##
 resolver = new ResolveModule(dirname)
-modulecache = []
 
 class SuperModel
 
@@ -86,7 +85,7 @@ class SuperModel
                     if --count == 0 then r.resolve(oo)
                   else
                     DB.get(resolveobj.type,[id]).then (record) =>
-                      @createObjectFrom(record).then (obj) =>
+                      resolver.createObjectFrom(record).then (obj) =>
                         #console.log 'object created: '+obj.id
                         @insertObj(resolveobj, obj)
                         if --count == 0 then r.resolve(obj)
@@ -96,23 +95,6 @@ class SuperModel
       alldone.resolve(results)
     ,error)
     return alldone
-
-  createObjectFrom: (record) =>
-    q = defer()
-    if not record or not record[0]
-      console.log 'createObjectFrom got null record...'
-      q.resolve(null)
-    else
-      #console.log 'createObjectFrom got record '+record[0].id+' type '+record[0].type
-      resolver.resolve record[0].type, (filename) ->
-        #console.log 'resolved module '+record[0].type+" as "+filename
-        module = modulecache[record[0].type] or require(filename.replace('.js', ''))
-        modulecache[record[0].type] = module
-        o = Object.create(module.prototype)
-        o._rev = record._rev
-        o.constructor(record[0])
-        q.resolve(o)
-    return q
 
   insertObj: (ro, o) =>
     if ro.array == true

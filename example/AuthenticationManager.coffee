@@ -31,4 +31,8 @@ class AuthenticationManager
   canUserWriteToThisObject: (obj, user) =>
     true # same here
 
+  # When a user sends a '_create'+<object_type> message, this method gets called to allow or disallow creating of the object
+  canUserCreateThisObject: (obj, user) =>
+    true # same here
+
 module.exports = AuthenticationManager

@@ -23,6 +23,8 @@ class SampleLogic
     @messageRouter.addTarget('listGamePlayers',   'gameId', @onListGamePlayers)
     @messageRouter.addTarget('newGame',           '<noargs>', @onNewGame)
 
+    @messageRouter.objectManager.expose('SampleGame')
+
 
   onNewGame: (msg) =>
     console.log 'SampleLogic: New Game called'

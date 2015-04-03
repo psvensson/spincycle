@@ -9,6 +9,7 @@
 
   AuthenticationManager = (function() {
     function AuthenticationManager() {
+      this.canUserCreateThisObject = __bind(this.canUserCreateThisObject, this);
       this.canUserWriteToThisObject = __bind(this.canUserWriteToThisObject, this);
       this.canUserReadFromThisObject = __bind(this.canUserReadFromThisObject, this);
       this.decorateMessageWithUser = __bind(this.decorateMessageWithUser, this);
@@ -33,6 +34,10 @@
     };
 
     AuthenticationManager.prototype.canUserWriteToThisObject = function(obj, user) {
+      return true;
+    };
+
+    AuthenticationManager.prototype.canUserCreateThisObject = function(obj, user) {
       return true;
     };
 

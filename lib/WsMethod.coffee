@@ -8,6 +8,7 @@ class WsMethod
 
   constructor:(messageRouter, server)->
     io = IO(server)
+    io.set( 'origins', '*:*' )
 
     io.on "connection", (socket) ->
       ip    = socket.request.connection.remoteAddress
