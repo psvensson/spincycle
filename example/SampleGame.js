@@ -42,7 +42,7 @@
         if (this.playerids.length === 0) {
           this.createPlayers().then((function(_this) {
             return function() {
-              console.log('Saplegame::consrtuctor playerids are..');
+              console.log('Samplegame::constructor. playerids are..');
               console.dir(_this.playerids);
               return q.resolve(_this);
             };
@@ -76,6 +76,7 @@
         return function(results) {
           console.log('sample players created');
           results.forEach(function(player) {
+            console.dir(player);
             _this.playerids.push(player.id);
             _this.players[player.name] = player;
             player.serialize();

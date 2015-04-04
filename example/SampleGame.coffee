@@ -24,7 +24,7 @@ class SampleGame extends SuperModel
     if noload
       if @playerids.length == 0
         @createPlayers().then () =>
-          console.log 'Saplegame::consrtuctor playerids are..'
+          console.log 'Samplegame::constructor. playerids are..'
           console.dir @playerids
           q.resolve(@)
     else
@@ -47,6 +47,7 @@ class SampleGame extends SuperModel
     all([new SamplePlayer(), new SamplePlayer()]).then (results) =>
       console.log 'sample players created'
       results.forEach (player) =>
+        console.dir player
         @playerids.push player.id
         @players[player.name] = player
         player.serialize()

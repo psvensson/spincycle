@@ -6,11 +6,28 @@ error           = require('./Error').error
 
 class OStore
 
-  @objects: []
-  @listeners: []
+  @objects:       []
+  @types:         []
+  @listeners:     []
+  @objectsByType: []
+
+  @listObjectsByType: (type) =>
+    @objectsByType[type] or []
+
+  @listTypes: () =>
+    rv = []
+    console.log 'listTypes called'
+    console.dir @types
+    for k,v of @types
+      rv.push v
+    return rv
 
   @storeObject: (obj) =>
     OStore.objects[obj.id] = obj
+    OStore.types[obj.type] = obj.type
+    objs = OStore.objectsByType[obj.type] or []
+    objs[obj.id] = obj
+    OStore.objectsByType[obj.type] = objs
     #console.log 'storeObject storing '+obj.id+' with rev '+obj.rev+" and _rev "+obj._rev
     list = OStore.listeners[obj.id] or []
     for lid, listener of list
@@ -28,6 +45,9 @@ class OStore
 
   @removeObject: (obj) =>
     delete OStore.objects[obj.id]
+    objs = @objectsByType[obj.type] or []
+    if objs[id] then delete objs[id]
+    OStore.objectsByType[obj.type] = obj
 
   @updateObj = (record) ->
     console.log 'oStore.updateObj called for obj '+record.id

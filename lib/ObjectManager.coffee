@@ -16,12 +16,19 @@ class ObjectManager
   setup: () =>
     @messageRouter.addTarget('registerForUpdatesOn',  'obj', @onRegisterForUpdatesOn)
     @messageRouter.addTarget('updateObject',          'obj', @onUpdateObject)
+    @messageRouter.addTarget('listTypes',             '<noargs>', @onListTypes)
 
   registerUpdateObjectHook: (hook) =>
     @updateObjectHooks.push hook
 
+  onListTypes: (msg) =>
+    msg.replyFunc({status: e.general.SUCCESS, info: 'list types', payload: objStore.listTypes()})
+
+  #---------------------------------------------------------------------------------------------------------------------
   expose: (type) =>
+    objStore.types[type] = type
     @messageRouter.addTarget '_create'+type, 'obj', (msg) =>
+      console.dir msg
       if msg.odata.type == type and @messageRouter.authMgr.canUserCreateThisObject(msg.odata, msg.user)
         SuperModel.resolver.createObjectFrom(msg.odata).then (o) =>
           msg.replyFunc({status: e.general.SUCCESS, info: 'new '+type, payload: o.id})
@@ -43,7 +50,7 @@ class ObjectManager
           msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
 
     @messageRouter.addTarget '_update'+type, 'obj', (msg) =>
-      @onUpdateObject(msg)
+        @onUpdateObject(msg)
 
     @messageRouter.addTarget '_get'+type, 'obj', (msg) =>
       objStore.getObject msg.obj.id, msg.obj.type.then (obj) =>
@@ -53,6 +60,13 @@ class ObjectManager
           console.log 'No object found with id '+msg.obj.id
           console.dir objStore.objects.map (o) -> o.type == msg.obj.type
           msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
+
+    @messageRouter.addTarget '_list'+type+'s', '<noargs>', (msg) =>
+      if not @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user)
+        msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to list objects of type '+msg.type, payload: msg.type})
+      else
+        rv = objStore.listObjectsByType(msg.type)
+        msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
 
   onUpdateObject: (msg) =>
     console.log 'onUpdateObject called for '+msg.obj.type+' - '+msg.obj.id
@@ -72,7 +86,7 @@ class ObjectManager
         console.dir objStore.objects.map (o) -> o.type == msg.obj.type
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
     )
-
+  #---------------------------------------------------------------------------------------------------------------------
   # TODO: Add removeListener as well..
 
   onRegisterForUpdatesOn: (msg) =>
