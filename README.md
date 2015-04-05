@@ -14,9 +14,9 @@ SpinCycle tries to remove as much boilerplate as possible between client and ser
   5. The models are created and persisted using records that are separated from the DB used (currently CouchDB is the only working DB adapter, but more soon to come)
   6. A web client can subscribe to changes to object properties (if using the WebSockets transport method) as well as update objects, both using any custom AuthenticationManager for control.
 
-So you really only need to create your model classes and expose functions giving access to them and all client updates will occur automatically. In theory :) This is way-out bleeding alpha, after all.
+So you really only need to create your model classes and expose functions giving access to them and all client updates will occur automatically.
 
-If you want to skip all the hoo-haa below, just clone the repo, change to the examples folder, don't forget to do **npm install** and also **bower install** and then run the sample server using **node server.js**. Perhaps also have a look around at the code.
+If you want to skip all the details, just clone the repo, change to the examples folder, don't forget to do **npm install** and also **bower install** and then run the sample server using **node server.js**. Perhaps also have a look around at the code.
 
 # Client-side
 
