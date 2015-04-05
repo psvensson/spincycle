@@ -4,7 +4,7 @@
 Opinionated message router that let front-end clients subscribe to object property changes on the node.js server.
 SpinCycle uses Node.js and Express and is written in CoffeeScript.
 
-## Donut-munching level of information:
+## Overview
 SpinCycle tries to remove as much boilerplate as possible between client and server communication.
 
   1. It lets the web client easily call exposed functions on the server using Ajax or WebSockets
