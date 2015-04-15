@@ -25,6 +25,7 @@ class WsMethod
         if typeof datastring == "string"
           data = datastring # TODO: Guard against hax0r dataz
         else
+          console.dir datastring
           data = JSON.parse(datastring)
           console.dir datastring
 
