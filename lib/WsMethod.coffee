@@ -21,10 +21,12 @@ class WsMethod
       # when the client emits 'message', this listens and executes
       socket.on "message", (datastring) ->
         console.log 'got new message "'+datastring+'"'
+
         if typeof datastring == "string"
-          data = JSON.parse(datastring)
-        else
           data = datastring # TODO: Guard against hax0r dataz
+        else
+          data = JSON.parse(datastring)
+          console.dir datastring
 
         data.client    = ip+':'+port
         data.messageId = data.messageId || uuid.v4()
