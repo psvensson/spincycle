@@ -20,7 +20,7 @@ class WsMethod
 
       # when the client emits 'message', this listens and executes
       socket.on "message", (datastring) ->
-        console.log 'got new message "'+datastring+'"'
+        console.log 'got new message "'+datastring+'" ['+(typeof datastring)+']'
 
         if typeof datastring == "string"
           data = datastring # TODO: Guard against hax0r dataz
