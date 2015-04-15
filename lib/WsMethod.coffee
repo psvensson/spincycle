@@ -23,11 +23,12 @@ class WsMethod
         console.log 'got new message "'+datastring+'" ['+(typeof datastring)+']'
 
         if typeof datastring == "string"
-          data = datastring # TODO: Guard against hax0r dataz
+          data = JSON.parse(datastring)
+
         else
           console.dir datastring
-          data = JSON.parse(datastring)
-          console.dir datastring
+          data = datastring # TODO: Guard against hax0r dataz
+
 
         data.client    = ip+':'+port
         data.messageId = data.messageId || uuid.v4()
