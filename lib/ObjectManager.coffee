@@ -15,6 +15,7 @@ class ObjectManager
 
   setup: () =>
     @messageRouter.addTarget('registerForUpdatesOn',  'obj', @onRegisterForUpdatesOn)
+    @messageRouter.addTarget('deRegisterForUpdatesOn',  'id,listenerid', @onRegisterForUpdatesOn)
     @messageRouter.addTarget('updateObject',          'obj', @onUpdateObject)
     @messageRouter.addTarget('listTypes',             '<noargs>', @onListTypes)
 
@@ -105,6 +106,11 @@ class ObjectManager
       else
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id })
     , error)
+
+  onDeregisterForUpdatesOn: (msg) =>
+    console.log 'onDeregisterForUpdatesOn called for id '+msg.id+' and listener id '+msg.listenerid
+    objStore.removeListenerFor(msg.id, msg.obj.listenerid)
+    msg.replyFunc({status: e.general.SUCCESS, info: 'deregistered listener for obejct', payload: msg.id })
 
 
 module.exports = ObjectManager

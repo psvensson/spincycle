@@ -98,7 +98,9 @@
         id: this.id,
         name: this.name,
         type: this.type,
-        playerids: []
+        playerids: this.players.map(function(player) {
+          return player.id;
+        })
       };
       _ref = this.players;
       for (v = _i = 0, _len = _ref.length; _i < _len; v = ++_i) {

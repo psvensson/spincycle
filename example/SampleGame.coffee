@@ -65,7 +65,7 @@ class SampleGame extends SuperModel
       id:           @id
       name:         @name
       type:         @type
-      playerids:    []
+      playerids:    @players.map (player) -> player.id
     for k,v in @players
       record.playerids.push v.id
 
