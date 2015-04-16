@@ -44,10 +44,11 @@ class OStore
     return q
 
   @removeObject: (obj) =>
-    delete OStore.objects[obj.id]
-    objs = @objectsByType[obj.type] or []
-    if objs[id] then delete objs[id]
-    OStore.objectsByType[obj.type] = obj
+    if obj and obj.id
+      delete OStore.objects[obj.id]
+      objs = @objectsByType[obj.type] or []
+      if objs[id] then delete objs[id]
+      OStore.objectsByType[obj.type] = obj
 
   @updateObj = (record) ->
     console.log 'oStore.updateObj called for obj '+record.id

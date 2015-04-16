@@ -26,7 +26,7 @@ class WsMethod
           data = JSON.parse(datastring)
 
         else
-          console.dir datastring
+          #console.dir datastring
           data = datastring # TODO: Guard against hax0r dataz
 
 
