@@ -29,8 +29,6 @@ class ResolveModule
         #console.log('File: ' + file)
         if file == name and origfile.indexOf('.js') > -1 and origfile.indexOf('.map') == -1
             rv = origfile
-            ResolveModule.modulecache[name] = file
-            console.log 'saving module '+name+' in module cache'
             finder.stop()
             cb(rv)
 
