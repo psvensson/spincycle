@@ -30,6 +30,7 @@ class ResolveModule
         if file == name and origfile.indexOf('.js') > -1 and origfile.indexOf('.map') == -1
             rv = origfile
             ResolveModule.modulecache[name] = file
+            console.log 'saving module '+name+' in module cache'
             finder.stop()
             cb(rv)
 
@@ -45,6 +46,8 @@ class ResolveModule
       @resolve record[0].type, (filename) ->
         console.log 'resolved module '+record[0].type+" as "+filename
         module = ResolveModule.modulecache[record[0].type] or require(filename.replace('.js', ''))
+        console.log 'module is '+module
+        console.dir module
         ResolveModule.modulecache[record[0].type] = module
         o = Object.create(module.prototype)
         o._rev = record._rev
