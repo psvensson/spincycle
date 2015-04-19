@@ -103,6 +103,7 @@ class SuperModel
       @[ro.name][o.name] = o
     else
       @[ro.name] = o
+    OMgr.storeObject(o)
 
 
 module.exports = SuperModel;
