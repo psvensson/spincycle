@@ -45,7 +45,7 @@ class ResolveModule
       @resolve record[0].type, (filename) ->
         #console.log 'resolved module '+record[0].type+" as "+filename
         module = ResolveModule.modulecache[record[0].type] or require(filename.replace('.js', ''))
-        @modulecache[record[0].type] = module
+        ResolveModule.modulecache[record[0].type] = module
         o = Object.create(module.prototype)
         o._rev = record._rev
         o.constructor(record[0])
