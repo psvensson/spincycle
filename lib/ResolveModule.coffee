@@ -43,8 +43,8 @@ class ResolveModule
     else
       #console.log 'createObjectFrom got record '+record[0].id+' type '+record[0].type
       @resolve record[0].type, (filename) ->
-        console.log 'resolved module '+record[0]+" as "+filename
-        module = @modulecache[record[0].type] or require(filename.replace('.js', ''))
+        #console.log 'resolved module '+record[0].type+" as "+filename
+        module = ResolveModule.modulecache[record[0].type] or require(filename.replace('.js', ''))
         @modulecache[record[0].type] = module
         o = Object.create(module.prototype)
         o._rev = record._rev
