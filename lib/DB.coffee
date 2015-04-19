@@ -42,6 +42,7 @@ class DB
 
   @get: (type, ids) =>
     #console.log 'DB.get called for type "'+type+'" and ids "'+ids+'"'
+    if not ids.length then ids = [ids]
     q = new promise()
     all(ids.map((id) =>
       rv = @lru.get id
