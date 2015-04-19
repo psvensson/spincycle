@@ -1,3 +1,5 @@
+defer           = require('node-promise').defer
+
 class ResolveModule
 
   @modulecache = []
