@@ -23,15 +23,16 @@ class OStore
     return rv
 
   @storeObject: (obj) =>
-    OStore.objects[obj.id] = obj
-    OStore.types[obj.type] = obj.type
-    objs = OStore.objectsByType[obj.type] or []
-    objs[obj.id] = obj
-    OStore.objectsByType[obj.type] = objs
-    #console.log 'storeObject storing '+obj.id+' with rev '+obj.rev+" and _rev "+obj._rev
-    list = OStore.listeners[obj.id] or []
-    for lid, listener of list
-      listener(obj)
+    if obj
+      OStore.objects[obj.id] = obj
+      OStore.types[obj.type] = obj.type
+      objs = OStore.objectsByType[obj.type] or []
+      objs[obj.id] = obj
+      OStore.objectsByType[obj.type] = objs
+      #console.log 'storeObject storing '+obj.id+' with rev '+obj.rev+" and _rev "+obj._rev
+      list = OStore.listeners[obj.id] or []
+      for lid, listener of list
+        listener(obj)
 
   @getObject: (id, type) =>
     q = defer()
@@ -47,7 +48,7 @@ class OStore
     if obj and obj.id
       delete OStore.objects[obj.id]
       objs = @objectsByType[obj.type] or []
-      if objs[id] then delete objs[id]
+      if objs[obj.id] then delete objs[obj.id]
       OStore.objectsByType[obj.type] = obj
 
   @updateObj = (record) ->
