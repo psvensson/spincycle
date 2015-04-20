@@ -88,13 +88,12 @@ class ObjectManager
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
     )
   #---------------------------------------------------------------------------------------------------------------------
-  # TODO: Add removeListener as well..
 
   onRegisterForUpdatesOn: (msg) =>
     console.log 'onRegisterForUpdatesOn called for '+msg.obj.type+' '+msg.obj.id
-    objStore.getObject(msg.obj.id, msg.obj.type).then( (record) =>
-      if record
-        if @messageRouter.authMgr.canUserReadFromThisObject(record, msg.user)
+    objStore.getObject(msg.obj.id, msg.obj.type).then( (obj) =>
+      if obj && obj.id
+        if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
           listenerId = objStore.addListenerFor(msg.obj.id, msg.obj.type, (uobj) ->
             console.log '--------------------- sending update of object '+msg.obj.id+' type '+msg.obj.type+' to client'
             #console.dir uobj
@@ -104,6 +103,7 @@ class ObjectManager
         else
           msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.UPDATE_REGISTER_FAIL, payload: msg.obj.id })
       else
+        console.dir obj
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id })
     , error)
 
