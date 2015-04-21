@@ -24,10 +24,13 @@ class MessageRouter
   @ClientEndpoints = ClientEndpoints
   @OStore = OStore
   @ResolveModule = ResolveModule
+  @debug = no
 
-  constructor: (@authMgr) ->
+  constructor: (@authMgr, debug) ->
     console.log 'messageRouter constructor'
     console.dir @authMgr
+    MessageRouter.debug = debug
+
     @targets  = []
     @args     = []
     @methods  = []

@@ -1,7 +1,7 @@
 defer           = require('node-promise').defer
 all             = require('node-promise').allOrNone
 uuid            = require('node-uuid')
-
+M               = require('./MessageRouter')
 OMgr            = require('./OStore')
 DB              = require('./DB')
 error           = require('./Error').error
@@ -41,7 +41,7 @@ class SuperModel
       DB.set(@type, record).then () =>
         @_serializing = false
         q.resolve(@)
-      #console.log ' * serializing '+@type+" id "+@id
+      if M.debug then console.log ' * serializing '+@type+" id "+@id
     else
       q.resolve(@)
     return q
@@ -65,20 +65,20 @@ class SuperModel
           if not resolveobj.ids
             #@[resolveobj.name] = []
             resolveobj.ids = []
-            #console.log '============================== null resolveobj.ids for '+resolveobj.type+' ['+resolveobj.name+']'
+            if M.debug then console.log '============================== null resolveobj.ids for '+resolveobj.type+' ['+resolveobj.name+']'
             r.resolve(null)
           else
             if typeof resolveobj.ids is 'string'
               resolveobj.ids = [resolveobj.ids]
 
-            #console.log ' resolveobjds ('+(typeof resolveobj.ids)+') ids length are.. '+resolveobj.ids.length
-            #console.dir(resolveobj.ids)
+            if M.debug then console.log ' resolveobjds ('+(typeof resolveobj.ids)+') ids length are.. '+resolveobj.ids.length
+            if M.debug then console.dir(resolveobj.ids)
             count = resolveobj.ids.length
             if count == 0
               r.resolve(null)
             else
               resolveobj.ids.forEach (id) =>
-                #console.log 'trying to get '+resolveobj.type+' with id '+id
+                if M.debug then console.log 'trying to get '+resolveobj.type+' with id '+id
                 OMgr.getObject(id, resolveobj.type).then (oo) =>
                   if oo
                     @insertObj(resolveobj, oo)
@@ -86,7 +86,7 @@ class SuperModel
                   else
                     DB.get(resolveobj.type,[id]).then (record) =>
                       resolver.createObjectFrom(record).then (obj) =>
-                        #console.log 'object created: '+obj.id
+                        if M.debug then console.log 'object created: '+obj.id
                         @insertObj(resolveobj, obj)
                         if --count == 0 then r.resolve(obj)
         )(robj)
