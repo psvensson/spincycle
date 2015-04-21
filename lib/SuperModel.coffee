@@ -66,7 +66,7 @@ class SuperModel
           allpromises.push(r)
           @[resolveobj.name] = [] if resolveobj.array == true
           @[resolveobj.name] = {} if resolveobj.hashtable == true
-          if not resolveobj.ids
+          if not resolveobj.ids or typeof resolveobj.ids == 'undefined' or resolveobj.ids == 'undefined'
             #@[resolveobj.name] = []
             resolveobj.ids = []
             if debug then console.log '============================== null resolveobj.ids for '+resolveobj.type+' ['+resolveobj.name+']'
