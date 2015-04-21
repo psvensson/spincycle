@@ -20,14 +20,11 @@ class ResolveModule
 
       #This listens for files found
       finder.on 'file', (origfile) ->
-        if debug then console.log('File: ' + file)
         file = ""+origfile
         if file.indexOf('/') > -1
           file = file.substring(file.lastIndexOf('/')+1, file.length)
-
         if file.indexOf('.') > -1
           file = file.substring(0, file.indexOf('.'))
-        if debug then console.log('File: ' + file)
         if file == name and origfile.indexOf('.js') > -1 and origfile.indexOf('.map') == -1
             rv = origfile
             finder.stop()
