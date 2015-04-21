@@ -103,7 +103,7 @@ class SuperModel
                 , error)
         )(robj)
 
-    all(allpromises, error).then( (results) ->
+    all(allpromises, error).then( (results) =>
       if debug then console.log '<------------------------------------------------ loadfromIds done for '+@type+' '+@id+' '+resolvearr.length+' properties'
       alldone.resolve(results)
     ,error)
