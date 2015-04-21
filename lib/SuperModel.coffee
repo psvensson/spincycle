@@ -1,7 +1,7 @@
 defer           = require('node-promise').defer
 all             = require('node-promise').allOrNone
 uuid            = require('node-uuid')
-M               = require('./MessageRouter')
+
 OMgr            = require('./OStore')
 DB              = require('./DB')
 error           = require('./Error').error
@@ -17,6 +17,7 @@ console.log 'starting module resolving from path '+dirname+' debug '+M.debug
 ## TODO: Make it possible to seed the resolver with path to our reqquirements if we know them beforehand. *might* speed things up eh?
 ##
 resolver = new ResolveModule(dirname)
+M = null
 
 class SuperModel
 
@@ -28,6 +29,7 @@ class SuperModel
    return rv;
 
   constructor:(@record)->
+    M               = require('./MessageRouter')
     OMgr.storeObject(@)
     if @record._rev then @_rev = @record._rev
 
