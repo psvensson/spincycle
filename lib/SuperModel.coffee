@@ -71,20 +71,25 @@ class SuperModel
             r.resolve(null)
           else
             if typeof resolveobj.ids is 'string'
+              if debug then console.log 'upcasting string id to array of ids for '+resolveobj.name
               resolveobj.ids = [resolveobj.ids]
 
-            if debug then console.log ' resolveobjds ('+(typeof resolveobj.ids)+') ids length are.. '+resolveobj.ids.length
+            if debug then console.log ' resolveobjds '+resolveobj.type+' ('+(typeof resolveobj.ids)+') ids length are.. '+resolveobj.ids.length
             if debug then console.dir(resolveobj.ids)
             count = resolveobj.ids.length
             if count == 0
+              if debug then console.log 'no ids for '+resolveobj.type+' so resolving null'
               r.resolve(null)
             else
               resolveobj.ids.forEach (id) =>
                 if debug then console.log 'trying to get '+resolveobj.type+' with id '+id
                 OMgr.getObject(id, resolveobj.type).then (oo) =>
                   if oo
+                    if debug then console.log 'found existing instance of '+resolveobj.type+' in OStore'
                     @insertObj(resolveobj, oo)
-                    if --count == 0 then r.resolve(oo)
+                    if --count == 0
+                      if debug then console.log 'resolving '+resolveobj.name+' immediately'
+                      r.resolve(oo)
                   else
                     DB.get(resolveobj.type,[id]).then (record) =>
                       resolver.createObjectFrom(record).then (obj) =>
@@ -100,10 +105,13 @@ class SuperModel
 
   insertObj: (ro, o) =>
     if ro.array == true
+      if debug then console.log 'inserting obj '+ro.type+' as array'
       @[ro.name].push(o)
     else if ro.hashtable == true
+      if debug then console.log 'inserting obj '+ro.type+' as hashtable'
       @[ro.name][o.name] = o
     else
+      if debug then console.log 'inserting obj '+ro.type+' as scalar'
       @[ro.name] = o
     OMgr.storeObject(o)
 
