@@ -30,6 +30,7 @@ class MessageRouter
     console.log 'messageRouter constructor'
     console.dir @authMgr
     MessageRouter.debug = debug
+    console.log 'debug = '+MessageRouter.debug
 
     @targets  = []
     @args     = []
