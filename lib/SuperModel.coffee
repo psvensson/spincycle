@@ -50,7 +50,7 @@ class SuperModel
 
   # [ {name: 'zones', type: 'zone', ids: [x, y, z, q] }, .. ]
   loadFromIds:(resolvearr) =>
-    if debug then console.log '------------------------------------------------> loadfromIds called for '+resolvearr.length+' properties'
+    if debug then console.log '------------------------------------------------> loadfromIds called for '+@type+' '+@id+' '+resolvearr.length+' properties'
     if debug then console.dir(resolvearr)
     alldone = defer()
     allpromises = []
@@ -104,7 +104,7 @@ class SuperModel
         )(robj)
 
     all(allpromises, error).then( (results) ->
-      if debug then console.log '<------------------------------------------------ loadfromIds done for '+resolvearr.length+' properties'
+      if debug then console.log '<------------------------------------------------ loadfromIds done for '+@type+' '+@id+' '+resolvearr.length+' properties'
       alldone.resolve(results)
     ,error)
     return alldone
