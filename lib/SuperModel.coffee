@@ -17,7 +17,7 @@ console.log 'starting module resolving from path '+dirname
 ## TODO: Make it possible to seed the resolver with path to our reqquirements if we know them beforehand. *might* speed things up eh?
 ##
 resolver = new ResolveModule(dirname)
-M = null
+debug = process.env["DEBUG"]
 
 class SuperModel
 
@@ -43,7 +43,7 @@ class SuperModel
       DB.set(@type, record).then () =>
         @_serializing = false
         q.resolve(@)
-      if M.debug then console.log ' * serializing '+@type+" id "+@id
+      if debug then console.log ' * serializing '+@type+" id "+@id
     else
       q.resolve(@)
     return q
@@ -67,20 +67,20 @@ class SuperModel
           if not resolveobj.ids
             #@[resolveobj.name] = []
             resolveobj.ids = []
-            if M.debug then console.log '============================== null resolveobj.ids for '+resolveobj.type+' ['+resolveobj.name+']'
+            if debug then console.log '============================== null resolveobj.ids for '+resolveobj.type+' ['+resolveobj.name+']'
             r.resolve(null)
           else
             if typeof resolveobj.ids is 'string'
               resolveobj.ids = [resolveobj.ids]
 
-            if M.debug then console.log ' resolveobjds ('+(typeof resolveobj.ids)+') ids length are.. '+resolveobj.ids.length
-            if M.debug then console.dir(resolveobj.ids)
+            if debug then console.log ' resolveobjds ('+(typeof resolveobj.ids)+') ids length are.. '+resolveobj.ids.length
+            if debug then console.dir(resolveobj.ids)
             count = resolveobj.ids.length
             if count == 0
               r.resolve(null)
             else
               resolveobj.ids.forEach (id) =>
-                if M.debug then console.log 'trying to get '+resolveobj.type+' with id '+id
+                if debug then console.log 'trying to get '+resolveobj.type+' with id '+id
                 OMgr.getObject(id, resolveobj.type).then (oo) =>
                   if oo
                     @insertObj(resolveobj, oo)
@@ -88,7 +88,7 @@ class SuperModel
                   else
                     DB.get(resolveobj.type,[id]).then (record) =>
                       resolver.createObjectFrom(record).then (obj) =>
-                        if M.debug then console.log 'object created: '+obj.id
+                        if debug then console.log 'object created: '+obj.id
                         @insertObj(resolveobj, obj)
                         if --count == 0 then r.resolve(obj)
         )(robj)
