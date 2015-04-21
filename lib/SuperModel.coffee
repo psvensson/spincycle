@@ -29,9 +29,10 @@ class SuperModel
    return rv;
 
   constructor:(@record)->
-    M               = require('./MessageRouter')
     OMgr.storeObject(@)
-    if @record._rev then @_rev = @record._rev
+    if @record._rev
+      if debug then console.log 'setting _rev to '+@record._rev+' for '+@type+' '+@id
+      @_rev = @record._rev
 
   serialize: () =>
     q = defer()
@@ -43,7 +44,7 @@ class SuperModel
       DB.set(@type, record).then () =>
         @_serializing = false
         q.resolve(@)
-      if debug then console.log ' * serializing '+@type+" id "+@id
+      #if debug then console.log ' * serializing '+@type+" id "+@id
     else
       q.resolve(@)
     return q
