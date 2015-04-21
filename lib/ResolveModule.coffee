@@ -1,4 +1,5 @@
 defer           = require('node-promise').defer
+debug = process.env["DEBUG"]
 
 class ResolveModule
 
@@ -14,19 +15,19 @@ class ResolveModule
       #console.log 'resolving module '+name+' from cache'
       cb(rv)
     else
-      console.log '.. looking up module '+name
+      if debug then console.log '.. looking up module '+name
       finder = require('findit')(@basepath)
 
       #This listens for files found
       finder.on 'file', (origfile) ->
-        #console.log('File: ' + file)
+        if debug then console.log('File: ' + file)
         file = ""+origfile
         if file.indexOf('/') > -1
           file = file.substring(file.lastIndexOf('/')+1, file.length)
 
         if file.indexOf('.') > -1
           file = file.substring(0, file.indexOf('.'))
-        #console.log('File: ' + file)
+        if debug then console.log('File: ' + file)
         if file == name and origfile.indexOf('.js') > -1 and origfile.indexOf('.map') == -1
             rv = origfile
             finder.stop()
@@ -40,9 +41,9 @@ class ResolveModule
       console.log 'createObjectFrom got null record...'
       q.resolve(null)
     else
-      #console.log 'createObjectFrom got record '+record[0].id+' type '+record[0].type
+      if debug then console.log 'createObjectFrom got record '+record[0].id+' type '+record[0].type
       @resolve record[0].type, (filename) ->
-        #console.log 'resolved module '+record[0].type+" as "+filename
+        if debug then console.log 'resolved module '+record[0].type+" as "+filename
         module = ResolveModule.modulecache[record[0].type] or require(filename.replace('.js', ''))
         ResolveModule.modulecache[record[0].type] = module
         o = Object.create(module.prototype)

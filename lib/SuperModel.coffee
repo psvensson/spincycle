@@ -50,7 +50,7 @@ class SuperModel
 
   # [ {name: 'zones', type: 'zone', ids: [x, y, z, q] }, .. ]
   loadFromIds:(resolvearr) =>
-    if debug then console.log '------------------------------------------------ loadfromIds called'
+    if debug then console.log '------------------------------------------------> loadfromIds called for '+resolvearr.length+' properties'
     if debug then console.dir(resolvearr)
     alldone = defer()
     allpromises = []
@@ -73,10 +73,10 @@ class SuperModel
             r.resolve(null)
           else
             if typeof resolveobj.ids is 'string'
-              if debug then console.log 'upcasting string id to array of ids for '+resolveobj.name
+              #if debug then console.log 'upcasting string id to array of ids for '+resolveobj.name
               resolveobj.ids = [resolveobj.ids]
 
-            if debug then console.log ' resolveobjds '+resolveobj.name+' ('+(typeof resolveobj.ids)+') ids length are.. '+resolveobj.ids.length
+            if debug then console.log 'resolveobjds '+resolveobj.name+' ('+(typeof resolveobj.ids)+') ids length are.. '+resolveobj.ids.length
             count = resolveobj.ids.length
             if count == 0
               if debug then console.log 'no ids for '+resolveobj.name+' so resolving null'
@@ -84,7 +84,7 @@ class SuperModel
             else
               resolveobj.ids.forEach (id) =>
                 if debug then console.log 'trying to get '+resolveobj.name+' with id '+id
-                OMgr.getObject(id, resolveobj.type).then (oo) =>
+                OMgr.getObject(id, resolveobj.type).then( (oo) =>
                   if oo
                     if debug then console.log 'found existing instance of '+resolveobj.name+' type '+resolveobj.type+' in OStore'
                     @insertObj(resolveobj, oo)
@@ -93,14 +93,18 @@ class SuperModel
                       r.resolve(oo)
                   else
                     if debug then console.log 'did not find obj '+resolveobj.name+' of type '+resolveobj.type+' in OStore. Getting from DB...'
-                    DB.get(resolveobj.type,[id]).then (record) =>
-                      resolver.createObjectFrom(record).then (obj) =>
+                    DB.get(resolveobj.type,[id]).then( (record) =>
+                      resolver.createObjectFrom(record).then( (obj) =>
                         if debug then console.log 'object '+resolveobj.name+' type '+resolveobj.type+' created: '+obj.id
                         @insertObj(resolveobj, obj)
                         if --count == 0 then r.resolve(obj)
+                      , error)
+                    , error)
+                , error)
         )(robj)
 
     all(allpromises, error).then( (results) ->
+      if debug then console.log '<------------------------------------------------ loadfromIds done for '+resolvearr.length+' properties'
       alldone.resolve(results)
     ,error)
     return alldone
