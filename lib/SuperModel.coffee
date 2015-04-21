@@ -12,7 +12,7 @@ console.log(__dirname)
 dirname = __dirname.substring(0, __dirname.indexOf('/node_modules'))
 if __dirname.indexOf('node_modules') == -1  then dirname = '../..'
 
-console.log 'starting module resolving from path '+dirname+' debug '+M.debug
+console.log 'starting module resolving from path '+dirname
 ##
 ## TODO: Make it possible to seed the resolver with path to our reqquirements if we know them beforehand. *might* speed things up eh?
 ##
