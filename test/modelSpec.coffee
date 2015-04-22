@@ -22,7 +22,9 @@ describe 'SuperModel', ->
       [
         {name: 'name', value: 'yohoo'}
         {name: 'theFoo', ids: [17] }
+        {name: 'foos', array: true, ids:[]}
       ]
+
       return super
 
   it 'should retain _rev property from record', ()->
@@ -45,3 +47,14 @@ describe 'SuperModel', ->
       new Bar().then (bar) ->
         rv = bar.getRecord()
         expect(rv.theFoo).to.equal(17)
+
+  it 'should get back array of ids from array reference when creating record', ()->
+    new Bar(record).then (bar) ->
+      c = 10
+      for i in [1..10]
+        new Foo().then (foo) ->
+          bar.foos.push(foo)
+          if --c == 0
+            rv = bar.getRecord()
+            #console.dir rv
+            expect(rv.foos.length).to.be(10)
