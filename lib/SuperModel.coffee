@@ -101,6 +101,7 @@ class SuperModel
         ((resolveobj) =>
           r = defer()
           allpromises.push(r)
+          @[resolveobj.name] = resolveobj.value if resolveobj.value
           @[resolveobj.name] = [] if resolveobj.array == true
           @[resolveobj.name] = {} if resolveobj.hashtable == true
           if not resolveobj.ids or typeof resolveobj.ids == 'undefined' or resolveobj.ids == 'undefined'
