@@ -58,7 +58,7 @@ class SuperModel
       if v.value then rv[k] = v.value or record[k]
       else if v.hashtable
         varr = []
-        for hk, hv in me[v.name]
+        for hk, hv of me[v.name]
           varr.push hv.id
         rv[k] = varr
       else if v.array
@@ -68,6 +68,15 @@ class SuperModel
       else
         rv[k] = me[k].id
 
+    return rv
+
+  toClient: () =>
+    r = @getRecord()
+    ra = @resolvearr
+    rv = {}
+    for k,v of r
+      ra.forEach (el) ->
+        if el.name == k and el.public then rv[k] = v
     return rv
 
   serialize: () =>

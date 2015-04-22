@@ -15,6 +15,8 @@ class SampleGame extends SuperModel
       {name: 'name',    public: true,   value: @record.name or uuid.v4() }
     ]
 
+    return super
+
   postCreate: (q) =>
     if @playerids.length == 0
       @createPlayers().then () =>
@@ -39,19 +41,5 @@ class SampleGame extends SuperModel
 
     return q
 
-  toClient: () =>
-    @getRecord()
-
-  getRecord: () =>
-    record =
-      id:           @id
-      name:         @name
-      type:         @type
-      playerids:    @players.map (player) -> player.id
-    for k,v in @players
-      record.playerids.push v.id
-
-
-    return record
 
 module.exports = SampleGame

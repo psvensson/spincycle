@@ -1,6 +1,6 @@
 expect = require('chai').expect
 SuperModel = require('../lib/SuperModel')
-describe 'SuperModel', ->
+describe 'SuperModel Tests', ->
   record =
     _rev: 10101020202030303404
     id: 17
@@ -21,6 +21,7 @@ describe 'SuperModel', ->
         {name: 'name', value: @record.name or 'foo'}
       ]
       return super
+
 
   class Bar extends SuperModel
     constructor: (@record={}) ->
@@ -72,3 +73,10 @@ describe 'SuperModel', ->
               rv = bar.getRecord()
               #console.dir rv
               expect(rv.foos.length).to.be(10)
+
+  it 'should filter record properties to only show those that are public when calling toClient', ()->
+    new Bar().then (bar) ->
+      rv = bar.toClient()
+      #console.dir rv
+      expect(rv.footable).to.not.exist
+      expect(rv.name).to.exist

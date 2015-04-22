@@ -20,8 +20,6 @@
 
     function SampleGame(record, noload) {
       this.record = record;
-      this.getRecord = __bind(this.getRecord, this);
-      this.toClient = __bind(this.toClient, this);
       this.createPlayers = __bind(this.createPlayers, this);
       this.postCreate = __bind(this.postCreate, this);
       this.type = 'SampleGame';
@@ -38,6 +36,7 @@
           value: this.record.name || uuid.v4()
         }
       ];
+      return SampleGame.__super__.constructor.apply(this, arguments);
     }
 
     SampleGame.prototype.postCreate = function(q) {
@@ -71,28 +70,6 @@
         };
       })(this));
       return q;
-    };
-
-    SampleGame.prototype.toClient = function() {
-      return this.getRecord();
-    };
-
-    SampleGame.prototype.getRecord = function() {
-      var k, record, v, _i, _len, _ref;
-      record = {
-        id: this.id,
-        name: this.name,
-        type: this.type,
-        playerids: this.players.map(function(player) {
-          return player.id;
-        })
-      };
-      _ref = this.players;
-      for (v = _i = 0, _len = _ref.length; _i < _len; v = ++_i) {
-        k = _ref[v];
-        record.playerids.push(v.id);
-      }
-      return record;
     };
 
     return SampleGame;
