@@ -19,53 +19,38 @@
     __extends(SampleGame, _super);
 
     function SampleGame(record, noload) {
-      var q, resolvearr;
       this.record = record;
       this.getRecord = __bind(this.getRecord, this);
       this.toClient = __bind(this.toClient, this);
       this.createPlayers = __bind(this.createPlayers, this);
-      q = defer();
-      this.id = this.record.id || uuid.v4();
-      this.playerids = this.record.playerids || [];
-      this.name = this.record.name || 'game_' + uuid.v4();
+      this.postCreate = __bind(this.postCreate, this);
       this.type = 'SampleGame';
-      this.players = {};
-      resolvearr = [
+      this.resolvearr = [
         {
           name: 'players',
+          "public": true,
           hashtable: true,
           type: 'SamplePlayer',
-          ids: this.playerids
+          ids: this.record.playerids
+        }, {
+          name: 'name',
+          "public": true,
+          value: this.record.name || uuid.v4()
         }
       ];
-      if (noload) {
-        if (this.playerids.length === 0) {
-          this.createPlayers().then((function(_this) {
-            return function() {
-              console.log('Samplegame::constructor. playerids are..');
-              console.dir(_this.playerids);
-              return q.resolve(_this);
-            };
-          })(this));
-        }
-      } else {
-        this.loadFromIds(resolvearr).then((function(_this) {
+    }
+
+    SampleGame.prototype.postCreate = function(q) {
+      if (this.playerids.length === 0) {
+        return this.createPlayers().then((function(_this) {
           return function() {
-            console.log('resolved game ' + _this.id + ' ok');
-            if (_this.playerids.length === 0) {
-              return _this.createPlayers().then(function() {
-                return q.resolve(_this);
-              });
-            } else {
-              console.log('game loaded from db...');
-              console.dir(_this);
-              return q.resolve(_this);
-            }
+            return q.resolve(_this);
           };
         })(this));
+      } else {
+        return q.resolve(this);
       }
-      return q;
-    }
+    };
 
     SampleGame.prototype.createPlayers = function() {
       var q;

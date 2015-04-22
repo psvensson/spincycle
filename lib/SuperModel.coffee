@@ -28,11 +28,47 @@ class SuperModel
    rv._rev = @._rev
    return rv;
 
-  constructor:(@record)->
+  constructor:(@record={})->
+    #console.log 'SuperModel constructor'
+    #console.dir @resolvearr
+    q = defer()
+    @id         = @record.id or uuid.v4()
     OMgr.storeObject(@)
     if @record._rev
       if debug then console.log 'setting _rev to '+@record._rev+' for '+@type+' '+@id
       @_rev = @record._rev
+
+    @loadFromIds(@resolvearr).then( (a) =>
+      if @postCreate
+        @postCreate(q)
+      else
+        q.resolve(@)
+    , error)
+
+    return q
+
+  getRecord: () =>
+    @._getRecord(@, @resolvearr, @record)
+
+  _getRecord: (me, resolvearr, record) ->
+    rv = {}
+    resolvearr.forEach (v) ->
+      k = v.name
+      #console.log 'parsing '+k+' -> '+v
+      if v.value then rv[k] = v.value or record[k]
+      else if v.hashtable
+        varr = []
+        for hk, hv in me[v.name]
+          varr.push hv.id
+        rv[k] = varr
+      else if v.array
+        varr = []
+        me[v.name].forEach (hv) -> varr.push hv.id
+        rv[k] = varr
+      else
+        rv[k] = me[k].id
+
+    return rv
 
   serialize: () =>
     q = defer()

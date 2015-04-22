@@ -7,38 +7,20 @@ SamplePlayer    = require('./SamplePlayer')
 class SampleGame extends SuperModel
 
   constructor: (@record, noload) ->
-
-    q = defer()
-
-    @id         = @record.id or uuid.v4()
-    @playerids  = @record.playerids or []
-    @name       = @record.name or 'game_'+uuid.v4()
     @type       = 'SampleGame'
-    @players     = {}
 
-    resolvearr =
-      [
-        {name: 'players', hashtable: true,   type: 'SamplePlayer', ids: @playerids }
-      ]
+    @resolvearr =
+    [
+      {name: 'players', public: true,   hashtable: true,   type: 'SamplePlayer', ids: @record.playerids }
+      {name: 'name',    public: true,   value: @record.name or uuid.v4() }
+    ]
 
-    if noload
-      if @playerids.length == 0
-        @createPlayers().then () =>
-          console.log 'Samplegame::constructor. playerids are..'
-          console.dir @playerids
-          q.resolve(@)
+  postCreate: (q) =>
+    if @playerids.length == 0
+      @createPlayers().then () =>
+        q.resolve(@)
     else
-      @loadFromIds(resolvearr).then () =>
-        console.log 'resolved game '+@.id+' ok'
-        if @playerids.length == 0
-          @createPlayers().then () =>
-            q.resolve(@)
-        else
-          console.log 'game loaded from db...'
-          console.dir(@)
-          q.resolve(@)
-
-    return q
+      q.resolve(@)
 
   createPlayers: () =>
     console.log 'creating sample players'

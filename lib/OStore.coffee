@@ -56,7 +56,8 @@ class OStore
     #console.log 'updateObj '+record
     #console.dir record
     obj = OStore.objects[record.id]
-    whitelist = obj.getRecord()
+    whitelist = obj.getRecord() #FFS
+    delete whitelist.id
     diff = {}
     changed = false;
     for p of whitelist
