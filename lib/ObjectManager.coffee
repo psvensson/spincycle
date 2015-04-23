@@ -18,12 +18,16 @@ class ObjectManager
     @messageRouter.addTarget('deRegisterForUpdatesOn',  'id,listenerid', @onRegisterForUpdatesOn)
     @messageRouter.addTarget('updateObject',          'obj', @onUpdateObject)
     @messageRouter.addTarget('listTypes',             '<noargs>', @onListTypes)
+    @messageRouter.addTarget('getModelFor',             'modelname', @onGetModelFor)
 
   registerUpdateObjectHook: (hook) =>
     @updateObjectHooks.push hook
 
   onListTypes: (msg) =>
     msg.replyFunc({status: e.general.SUCCESS, info: 'list types', payload: objStore.listTypes()})
+
+  onGetModelFor: (msg) =>
+    msg.replyFunc({status: e.general.SUCCESS, info: 'get model', payload: model})
 
   #---------------------------------------------------------------------------------------------------------------------
   expose: (type) =>

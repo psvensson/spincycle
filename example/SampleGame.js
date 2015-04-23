@@ -18,29 +18,32 @@
   SampleGame = (function(_super) {
     __extends(SampleGame, _super);
 
+    SampleGame.type = 'SampleGame';
+
+    SampleGame.model = [
+      {
+        name: 'players',
+        "public": true,
+        array: true,
+        type: 'SamplePlayer',
+        ids: 'players'
+      }, {
+        name: 'name',
+        "public": true,
+        value: 'name',
+        "default": 'game_' + uuid.v4()
+      }
+    ];
+
     function SampleGame(record, noload) {
       this.record = record;
       this.createPlayers = __bind(this.createPlayers, this);
       this.postCreate = __bind(this.postCreate, this);
-      this.type = 'SampleGame';
-      this.resolvearr = [
-        {
-          name: 'players',
-          "public": true,
-          hashtable: true,
-          type: 'SamplePlayer',
-          ids: this.record.playerids
-        }, {
-          name: 'name',
-          "public": true,
-          value: this.record.name || uuid.v4()
-        }
-      ];
       return SampleGame.__super__.constructor.apply(this, arguments);
     }
 
     SampleGame.prototype.postCreate = function(q) {
-      if (this.playerids.length === 0) {
+      if (this.players.length === 0) {
         return this.createPlayers().then((function(_this) {
           return function() {
             return q.resolve(_this);
@@ -61,7 +64,6 @@
           console.log('sample players created');
           results.forEach(function(player) {
             console.dir(player);
-            _this.playerids.push(player.id);
             _this.players[player.name] = player;
             player.serialize();
             return console.log('  serializing player ' + player.name);

@@ -6,19 +6,19 @@ SamplePlayer    = require('./SamplePlayer')
 
 class SampleGame extends SuperModel
 
-  constructor: (@record, noload) ->
-    @type       = 'SampleGame'
+  @type       = 'SampleGame'
 
-    @resolvearr =
+  @model =
     [
-      {name: 'players', public: true,   hashtable: true,   type: 'SamplePlayer', ids: @record.playerids }
-      {name: 'name',    public: true,   value: @record.name or uuid.v4() }
+      {name: 'players', public: true,   array: true,   type: 'SamplePlayer', ids: 'players' }
+      {name: 'name',    public: true,   value: 'name', default: 'game_'+uuid.v4() }
     ]
 
+  constructor: (@record, noload) ->
     return super
 
   postCreate: (q) =>
-    if @playerids.length == 0
+    if @players.length == 0
       @createPlayers().then () =>
         q.resolve(@)
     else
@@ -32,7 +32,6 @@ class SampleGame extends SuperModel
       console.log 'sample players created'
       results.forEach (player) =>
         console.dir player
-        @playerids.push player.id
         @players[player.name] = player
         player.serialize()
         console.log '  serializing player '+player.name

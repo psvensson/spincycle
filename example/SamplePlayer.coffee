@@ -4,26 +4,14 @@ uuid            = require('node-uuid')
 
 class SamplePlayer extends SuperModel
 
+  @type       = 'SamplePlayer'
+
+  @model =
+    [
+      {name: 'name', public: true, value: 'name', default:  'player_'+uuid.v4()}
+    ]
+
   constructor: (@record={}) ->
-
-    q = defer()
-
-    @id         = @record.id or uuid.v4()
-    @name       = @record.name or 'player_'+uuid.v4()
-    @type       = 'SamplePlayer'
-
-    q.resolve(@)
-    return q
-
-  toClient: () =>
-    @getRecord()
-
-  getRecord: () =>
-    record =
-      id:           @id
-      name:         @name
-      type:         @type
-
-    return record
+    return super
 
 module.exports = SamplePlayer

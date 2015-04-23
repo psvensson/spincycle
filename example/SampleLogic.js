@@ -18,6 +18,11 @@
       this.onListPlayerGames = __bind(this.onListPlayerGames, this);
       this.onNewGame = __bind(this.onNewGame, this);
       this.games = [];
+      DB.createDatabases(['samplegame', 'sampleplayer']).then((function(_this) {
+        return function() {
+          return console.log(' DB init done..');
+        };
+      })(this));
       DB.all('SampleGame', (function(_this) {
         return function(games) {
           console.log(' setting all games to ' + games);

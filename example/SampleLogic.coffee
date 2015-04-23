@@ -8,6 +8,8 @@ class SampleLogic
 
   constructor: (@messageRouter) ->
     @games = []
+    DB.createDatabases(['samplegame', 'sampleplayer']).then ()=>
+      console.log ' DB init done..'
     DB.all 'SampleGame', (games) =>
       console.log ' setting all games to '+games
       console.dir(games)
