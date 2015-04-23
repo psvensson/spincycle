@@ -56,8 +56,7 @@ class SuperModel
       console.dir me
     model.forEach (v) ->
       k = v.name
-      #console.log 'parsing '+k+' -> '+v
-      if v.value then rv[k] = v.value or record[k]
+      if v.value then rv[k] = me[v.value] or record[k]
       else if v.hashtable
         varr = []
         for hk, hv of me[v.name]
@@ -105,6 +104,8 @@ class SuperModel
   loadFromIds:(model) =>
     if debug then console.log '------------------------------------------------> loadfromIds called for '+@.constructor.type+' '+@id+' '+model.length+' properties'
     if debug then console.dir(model)
+    if debug then console.log 'record is...'
+    if debug then console.dir @record
     alldone = defer()
     allpromises = []
     if(not model or model.length == 0)
@@ -117,7 +118,9 @@ class SuperModel
         ((resolveobj) =>
           r = defer()
           allpromises.push(r)
-          @[resolveobj.name] = @record[resolveobj.value] or resolveobj.default if resolveobj.value
+          if resolveobj.value
+            #console.log '++ @record[resolveobj.value] = '+@record[resolveobj.value]+' and resolveobj.default = '+resolveobj.default
+            @[resolveobj.name] = @record[resolveobj.value] or resolveobj.default
           @[resolveobj.name] = [] if resolveobj.array == true
           @[resolveobj.name] = {} if resolveobj.hashtable == true
           ids = @record[resolveobj.ids]
@@ -130,7 +133,6 @@ class SuperModel
             if typeof ids is 'string'
               #if debug then console.log 'upcasting string id to array of ids for '+resolveobj.name
               ids = [ids]
-
             if debug then console.log 'resolveobjds '+resolveobj.name+' ('+(typeof ids)+') ids length are.. '+ids.length
             count = ids.length
             if count == 0
@@ -156,6 +158,7 @@ class SuperModel
                       , error)
                     , error)
                 , error)
+          #console.log '------- property '+resolveobj.name+' now set to '+@[resolveobj.name]
         )(robj)
 
     all(allpromises, error).then( (results) =>
@@ -172,7 +175,7 @@ class SuperModel
       if debug then console.log 'inserting obj '+ro.type+' as hashtable'
       @[ro.name][o.name] = o
     else
-      if debug then console.log 'inserting obj '+ro.type+' as scalar'
+      if debug then console.log 'inserting obj '+ro.type+' as direct reference'
       @[ro.name] = o
     OMgr.storeObject(o)
 
