@@ -11,7 +11,9 @@ A common use-case is that you have a web client which shows some of the properti
 
 ![SpinCycle Diagram](cdraw.png)
 
-  1. It lets the web client easily call exposed functions on the server using Ajax or WebSockets
+In more detail, this is what SpinCycle helps you with:
+
+1. It lets the web client easily call exposed functions on the server using Ajax or WebSockets
   2. The server has a plugin-in AuthenticationManager that control user creation, lookup and rights (Easy to use with Passport).
   3. Object models used in SpinCycle must be a subclass of SpinCycle.SuperModel
   4. The models are always flat, using ids or arrays of ids to refer to other models
