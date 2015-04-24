@@ -7,7 +7,6 @@ SamplePlayer    = require('./SamplePlayer')
 class SampleGame extends SuperModel
 
   @type       = 'SampleGame'
-
   @model =
     [
       {name: 'players', public: true,   array: true,   type: 'SamplePlayer', ids: 'players' }
