@@ -105,10 +105,18 @@ This is not really terribly useful now, is it. So let's look at something which 
 
     module.exports = SampleGame
     
-    
-The important things here are the calls to the super method serialize, which will make sure the object is saved in the datastore of your choice. This is currently hardwired to CouchDB in the DB class inside SpinCycle. I did say it was alpha, didn't I?
+The modle property of the class tells spincycle which properties to save when serializing this object, but also which properties to instantiate this object with when given a record, and finally which properties it's OK to copy over to the client when synchronizing object properties (or just handing out the object to a target service)
 
-When the object is saved, its **getRecord** methis is called to return a flat object that will represent the object when saved. Also, the **toClient** method is called when the objects is to be send over the view to - you know - a client.
+Properties can be basic, like strings or numbers, where the property name is defined in the 'value' property. So that if you want the object property 'shoeSize' to be instantiated from record and saved when serializing you write just that in the 'value' property.
+
+Properties can also be direct object references, arrays or hashtables. In all cases the 'ids' property will be an array where references are stored when serializing the object or read from when creating the object anew from storage.
+
+When spincycle resolves the object class (using file acrobatics and require under the hood) it then chucks an actual reference, array of references or hastable of references (in the latter case the target object's 'name' property is always used as key. Deal with it).
+
+If a property is declared 'public:true', it will be included in object copies sent to client.
+
+The magic is done in the SuperModel super class of each model and it's absolutely necessary to do 'return super' (or possibly just 'super') at the end of the model constructor for all this to work
+
 
 # The Authentication Manager
 
