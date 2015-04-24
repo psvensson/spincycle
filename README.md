@@ -2,10 +2,10 @@
 # SpinCycle
 
 Opinionated message router that let front-end clients subscribe to object property changes on the node.js server.
-SpinCycle uses Node.js and Express and is written in CoffeeScript.
+SpinCycle uses Node.js and Express and is written in CoffeeScript. 
 
 ## Overview
-SpinCycle tries to remove as much boilerplate as possible between client and server communication.
+SpinCycle tries to remove as much boilerplate as possible between client and server communication. Just write models, define model relations, set up endpoints and you're ready to go.
 
   1. It lets the web client easily call exposed functions on the server using Ajax or WebSockets
   2. The server has a plugin-in AuthenticationManager that control user creation, lookup and rights (Easy to use with Passport).
@@ -85,30 +85,23 @@ This is not really terribly useful now, is it. So let's look at something which 
 
     class SampleGame extends SuperModel
 
-      constructor: (@record={}) ->
+      @type       = 'SampleGame'
+  @model =
+    [
+      {name: 'players', public: true,   array: true,   type: 'SamplePlayer', ids: 'players' }
+      {name: 'name',    public: true,   value: 'name', default: 'game_'+uuid.v4() }
+    ]
 
-        q = defer()
-        @id         = @record.id
-        @name       = @record.name or 'game_'+uuid.v4()
-        @type       = 'game'
-
-        if not @id
-          @id = uuid.v4()
-          @serialize()
-
+  constructor: (@record, noload) ->
+    return super
+  
+  # postCreate gets called (if declared) after the full object graph has been reconstructed
+  postCreate: (q) =>
+    if @players.length == 0
+      @createPlayers().then () =>
         q.resolve(@)
-        return q
-
-      toClient: () =>
-        @getRecord()
-
-      getRecord: () =>
-        record =
-          id:           @id
-          name:         @name
-          type:         @type
-
-        return record
+    else
+      q.resolve(@)
 
     module.exports = SampleGame
     
@@ -146,13 +139,21 @@ A very simple implementation could look like this;
         @anonymousUsers[message.client] = user
         return q
 
-      # When a user sends a 'registerForUpdatesOn' message to SpinCycle, this method will be called once to allow or disallow the user to be apply to subscribe to project changes of an object
-      canUserReadFromThisObject: (obj, user) =>
-        true # not much checking, eh?
+       # When a user sends a 'registerForUpdatesOn' message to SpinCycle, this method will be called once to allow or disallow the user to be apply to subscribe to project changes of an object
+  canUserReadFromThisObject: (obj, user) =>
+    true # not much checking, eh?
 
-      # When a user sends a 'updateObject' message, this method gets called to allow or disallow updating of the object
-      canUserWriteToThisObject: (obj, user) =>
-        true # same here
+  # When a user sends a 'updateObject' message, this method gets called to allow or disallow updating of the object
+  canUserWriteToThisObject: (obj, user) =>
+    true # same here
+
+  # When a user sends a '_create'+<object_type> message, this method gets called to allow or disallow creating of the object
+  canUserCreateThisObject: (obj, user) =>
+    true # same here
+
+  # When a user sends a '_create'+<object_type> message, this method gets called to allow or disallow creating of the object
+  canUserListTheseObjects: (type, user) =>
+    true # same here
 
     module.exports = AuthenticationManager
     
