@@ -86,22 +86,22 @@ This is not really terribly useful now, is it. So let's look at something which 
     class SampleGame extends SuperModel
 
       @type       = 'SampleGame'
-  @model =
-    [
-      {name: 'players', public: true,   array: true,   type: 'SamplePlayer', ids: 'players' }
-      {name: 'name',    public: true,   value: 'name', default: 'game_'+uuid.v4() }
-    ]
-
-  constructor: (@record, noload) ->
-    return super
-  
-  # postCreate gets called (if declared) after the full object graph has been reconstructed
-  postCreate: (q) =>
-    if @players.length == 0
-      @createPlayers().then () =>
-        q.resolve(@)
-    else
-      q.resolve(@)
+      @model =
+        [
+          {name: 'players', public: true,   array: true,   type: 'SamplePlayer', ids: 'players' }
+          {name: 'name',    public: true,   value: 'name', default: 'game_'+uuid.v4() }
+        ]
+    
+      constructor: (@record, noload) ->
+        return super
+      
+      # postCreate gets called (if declared) after the full object graph has been reconstructed
+      postCreate: (q) =>
+        if @players.length == 0
+          @createPlayers().then () =>
+            q.resolve(@)
+        else
+          q.resolve(@)
 
     module.exports = SampleGame
     
@@ -127,11 +127,11 @@ A very simple implementation could look like this;
         @anonymousUsers = []
         console.log '** new AuthMgr created **'
 
-      # The messagerouter will make sure the message contains a 'client' property which will be unique for each client (made up of its ip-address + port)
+      # The messagerouter will make sure the message contains a 'client' property which will be unique for each         client (made up of its ip-address + port)
       # This can be used to recognize and map recurring users between messages
       decorateMessageWithUser: (message) =>
         q = defer()
-        # Either we look up the user by client key or we create a super-simple user (containing only an 'id' property) and storing that in our hashtable
+        # Either we look up the user by client key or we create a super-simple user (containing only an 'id'              property) and storing that in our hashtable
         user = @anonymousUsers[message.client] or
           id: uuid.v4()
         message.user = user
@@ -140,20 +140,20 @@ A very simple implementation could look like this;
         return q
 
        # When a user sends a 'registerForUpdatesOn' message to SpinCycle, this method will be called once to allow or disallow the user to be apply to subscribe to project changes of an object
-  canUserReadFromThisObject: (obj, user) =>
-    true # not much checking, eh?
-
-  # When a user sends a 'updateObject' message, this method gets called to allow or disallow updating of the object
-  canUserWriteToThisObject: (obj, user) =>
-    true # same here
-
-  # When a user sends a '_create'+<object_type> message, this method gets called to allow or disallow creating of the object
-  canUserCreateThisObject: (obj, user) =>
-    true # same here
-
-  # When a user sends a '_create'+<object_type> message, this method gets called to allow or disallow creating of the object
-  canUserListTheseObjects: (type, user) =>
-    true # same here
+        canUserReadFromThisObject: (obj, user) =>
+          true # not much checking, eh?
+      
+        # When a user sends a 'updateObject' message, this method gets called to allow or disallow updating of the object
+        canUserWriteToThisObject: (obj, user) =>
+          true # same here
+      
+        # When a user sends a '_create'+<object_type> message, this method gets called to allow or disallow creating of the object
+        canUserCreateThisObject: (obj, user) =>
+          true # same here
+      
+        # When a user sends a '_create'+<object_type> message, this method gets called to allow or disallow creating of the object
+        canUserListTheseObjects: (type, user) =>
+          true # same here
 
     module.exports = AuthenticationManager
     
