@@ -31,6 +31,7 @@ class SuperModel
   constructor:(@record={})->
     #console.log 'SuperModel constructor'
     #console.dir @model
+    @type = @constructor.type
     q = defer()
     @id         = @record.id or uuid.v4()
     OMgr.storeObject(@)
@@ -66,9 +67,9 @@ class SuperModel
         varr = []
         me[v.name].forEach (hv) -> varr.push hv.id
         rv[k] = varr
-      else
-        if debug then console.log 'getRecord accessing property '+k+' of object '+@constructor.type+' -> '+me[k]
-        rv[k] = me[k].id
+      else # direct object reference
+        if debug then console.log 'getRecord accessing property '+k+' of object '+@type+' -> '+me[k]
+        rv[k] = me[k]?.id
 
     rv.id = @id
     rv.type = @.constructor.type
@@ -102,13 +103,13 @@ class SuperModel
 
   loadFromIds:(model) =>
     if debug then console.log '------------------------------------------------> loadfromIds called for '+@.constructor.type+' '+@id+' '+model.length+' properties'
-    if debug then console.dir(model)
-    if debug then console.log 'record is...'
-    if debug then console.dir @record
+    #if debug then console.dir(model)
+    #if debug then console.log 'record is...'
+    #if debug then console.dir @record
     alldone = defer()
     allpromises = []
     if(not model or model.length == 0)
-      console.log ' ++++++++++++++++ NO model ++++++++++++++'
+      #console.log ' ++++++++++++++++ NO model ++++++++++++++'
       q = defer()
       allpromises.push(q)
       q.resolve()
