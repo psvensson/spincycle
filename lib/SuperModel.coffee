@@ -44,7 +44,7 @@ class SuperModel
       else
         q.resolve(@)
     , error)
-
+    if debug then console.log 'returning promise from constructor for '+@constructor.type
     return q
 
   getRecord: () =>
