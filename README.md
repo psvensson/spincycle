@@ -7,7 +7,13 @@ SpinCycle uses Node.js and Express and is written in CoffeeScript.
 ## Overview
 SpinCycle tries to remove as much boilerplate as possible between client and server communication. Just write models, define model relations, set up endpoints and you're ready to go.
 
-  1. It lets the web client easily call exposed functions on the server using Ajax or WebSockets
+A common use-case is that you have a web client which shows some of the properties on some of the models on the server. When these models are updated, the client need to know about this, one way or the other. SpinCycle takes away a lot of the pain and boilerplate in doing just that.
+
+![SpinCycle Diagram](cdraw.png)
+
+In more detail, this is what SpinCycle helps you with:
+
+1. It lets the web client easily call exposed functions on the server using Ajax or WebSockets
   2. The server has a plugin-in AuthenticationManager that control user creation, lookup and rights (Easy to use with Passport).
   3. Object models used in SpinCycle must be a subclass of SpinCycle.SuperModel
   4. The models are always flat, using ids or arrays of ids to refer to other models
