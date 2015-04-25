@@ -35,7 +35,7 @@ class SuperModel
     @id         = @record.id or uuid.v4()
     OMgr.storeObject(@)
     if @record._rev
-      if debug then console.log 'setting _rev to '+@record._rev+' for '+@.constructor.type+' '+@id
+      if debug then console.log 'setting _rev to '+@record._rev+' for '+@constructor.type+' '+@id
       @_rev = @record._rev
 
     @loadFromIds(@constructor.model).then( () =>
@@ -67,6 +67,7 @@ class SuperModel
         me[v.name].forEach (hv) -> varr.push hv.id
         rv[k] = varr
       else
+        if debug then console.log 'getRecord accessing property '+k+' of object '+@constructor.type+' -> '+me[k]
         rv[k] = me[k].id
 
     rv.id = @id
@@ -89,8 +90,6 @@ class SuperModel
     if not @_serializing
       @_serializing = true
       record = @getRecord()
-      #console.log 'serializing record'
-      #console.dir record
       if @_rev then record._rev = @_rev
       OMgr.storeObject(@)
       DB.set(@.constructor.type, record).then () =>
