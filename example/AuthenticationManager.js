@@ -38,7 +38,7 @@
       return true;
     };
 
-    AuthenticationManager.prototype.canUserCreateThisObject = function(obj, user) {
+    AuthenticationManager.prototype.canUserCreateThisObject = function(type, user) {
       return true;
     };
 

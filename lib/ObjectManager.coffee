@@ -33,10 +33,13 @@ class ObjectManager
   expose: (type) =>
     objStore.types[type] = type
     @messageRouter.addTarget '_create'+type, 'obj', (msg) =>
-      console.dir msg
-      if msg.odata.type == type and @messageRouter.authMgr.canUserCreateThisObject(msg.odata, msg.user)
-        SuperModel.resolver.createObjectFrom(msg.odata).then (o) =>
-          msg.replyFunc({status: e.general.SUCCESS, info: 'new '+type, payload: o.id})
+      if @messageRouter.authMgr.canUserCreateThisObject(type, msg.user)
+        console.dir msg
+        if msg.odata.type == type and @messageRouter.authMgr.canUserCreateThisObject(msg.odata, msg.user)
+          SuperModel.resolver.createObjectFrom(msg.odata).then (o) =>
+            msg.replyFunc({status: e.general.SUCCESS, info: 'new '+type, payload: o.id})
+      else
+        msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to create objects of that type', payload: type})
 
     # TODO: delete object hierarchy as well? Maybe also check for other objects referencing this, disallowing if so
     @messageRouter.addTarget '_delete'+type, 'obj', (msg) =>
@@ -60,7 +63,10 @@ class ObjectManager
     @messageRouter.addTarget '_get'+type, 'obj', (msg) =>
       objStore.getObject msg.obj.id, msg.obj.type.then (obj) =>
         if obj
-          msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: obj.toClient()})
+          if @messageRouter.authMgr.canUserReadFromThisbject(obj, msg.user)
+            msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: obj.toClient()})
+          else
+            msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: msg.obj.id})
         else
           console.log 'No object found with id '+msg.obj.id
           console.dir objStore.objects.map (o) -> o.type == msg.obj.type
