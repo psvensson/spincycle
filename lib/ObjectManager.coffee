@@ -27,7 +27,12 @@ class ObjectManager
     msg.replyFunc({status: e.general.SUCCESS, info: 'list types', payload: objStore.listTypes()})
 
   onGetModelFor: (msg) =>
-    msg.replyFunc({status: e.general.SUCCESS, info: 'get model', payload: model})
+    if msg.modelname
+      @messageRouter.ResolveModule.resolve msg.modelname, (model) =>
+        rv = model.model.map (property) -> property.public
+        msg.replyFunc({status: e.general.SUCCESS, info: 'get model', payload: rv})
+    else
+      msg.replyFunc({status: e.general.FAILURE, info: "missing parameter", payload: null})
 
   #---------------------------------------------------------------------------------------------------------------------
   _createObject: (msg) =>

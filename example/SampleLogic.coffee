@@ -21,6 +21,7 @@ class SampleLogic
           console.log '--- adding game '+game.name
           @games.push(game)
       console.log 'added '+@games.length+' games from storage'
+
     @messageRouter.addTarget('listGames',         '<noargs>', @onListPlayerGames)
     @messageRouter.addTarget('listGamePlayers',   'gameId', @onListGamePlayers)
     @messageRouter.addTarget('newGame',           '<noargs>', @onNewGame)
