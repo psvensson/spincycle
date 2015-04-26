@@ -31,11 +31,12 @@ class SuperModel
   constructor:(@record={})->
     #console.log 'SuperModel constructor'
     #console.dir @model
+    @type = @constructor.type
     q = defer()
     @id         = @record.id or uuid.v4()
     OMgr.storeObject(@)
     if @record._rev
-      if debug then console.log 'setting _rev to '+@record._rev+' for '+@.constructor.type+' '+@id
+      if debug then console.log 'setting _rev to '+@record._rev+' for '+@constructor.type+' '+@id
       @_rev = @record._rev
 
     @loadFromIds(@constructor.model).then( () =>
@@ -44,7 +45,7 @@ class SuperModel
       else
         q.resolve(@)
     , error)
-
+    if debug then console.log 'returning promise from constructor for '+@constructor.type
     return q
 
   getRecord: () =>
@@ -66,8 +67,9 @@ class SuperModel
         varr = []
         me[v.name].forEach (hv) -> varr.push hv.id
         rv[k] = varr
-      else
-        rv[k] = me[k].id
+      else # direct object reference
+        if debug then console.log 'getRecord accessing property '+k+' of object '+@type+' -> '+me[k]
+        rv[k] = me[k]?.id
 
     rv.id = @id
     rv.type = @.constructor.type
@@ -89,8 +91,6 @@ class SuperModel
     if not @_serializing
       @_serializing = true
       record = @getRecord()
-      #console.log 'serializing record'
-      #console.dir record
       if @_rev then record._rev = @_rev
       OMgr.storeObject(@)
       DB.set(@.constructor.type, record).then () =>
@@ -103,13 +103,13 @@ class SuperModel
 
   loadFromIds:(model) =>
     if debug then console.log '------------------------------------------------> loadfromIds called for '+@.constructor.type+' '+@id+' '+model.length+' properties'
-    if debug then console.dir(model)
-    if debug then console.log 'record is...'
-    if debug then console.dir @record
+    #if debug then console.dir(model)
+    #if debug then console.log 'record is...'
+    #if debug then console.dir @record
     alldone = defer()
     allpromises = []
     if(not model or model.length == 0)
-      console.log ' ++++++++++++++++ NO model ++++++++++++++'
+      #console.log ' ++++++++++++++++ NO model ++++++++++++++'
       q = defer()
       allpromises.push(q)
       q.resolve()
