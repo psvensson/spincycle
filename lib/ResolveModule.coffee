@@ -34,7 +34,10 @@ class ResolveModule
 
   createObjectFrom: (record) =>
     q = defer()
-    if not record or not record[0]
+    if debug then console.log 'createObjectFrom got record '+record
+
+    if not record[0] then record = [record]
+    if not record[0]
       console.log 'createObjectFrom got null record...'
       q.resolve(null)
     else

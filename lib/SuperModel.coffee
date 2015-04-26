@@ -53,6 +53,7 @@ class SuperModel
 
   _getRecord: (me, model, record) ->
     rv = {}
+    rv._rev = @_rev if @_rev
     if not model
       console.dir me
     model.forEach (v) ->

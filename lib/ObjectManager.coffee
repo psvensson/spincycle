@@ -36,13 +36,12 @@ class ObjectManager
 
   #---------------------------------------------------------------------------------------------------------------------
   _createObject: (msg) =>
-    if @messageRouter.authMgr.canUserCreateThisObject(type, msg.user)
+    if @messageRouter.authMgr.canUserCreateThisObject(msg.obj.type, msg.user)
       console.dir msg
-      if msg.odata.type == type and @messageRouter.authMgr.canUserCreateThisObject(msg.odata, msg.user)
-        SuperModel.resolver.createObjectFrom(msg.odata).then (o) =>
-          msg.replyFunc({status: e.general.SUCCESS, info: 'new '+type, payload: o.id})
+      SuperModel.resolver.createObjectFrom(msg.obj).then (o) =>
+        msg.replyFunc({status: e.general.SUCCESS, info: 'new '+msg.obj.type, payload: o.id})
     else
-      msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to create objects of that type', payload: type})
+      msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to create objects of that type', payload: msg.obj.type})
 
   _deleteObject: (msg) =>
     objStore.getObject msg.obj.id, msg.obj.type.then (obj) =>
@@ -93,8 +92,8 @@ class ObjectManager
       if obj
         if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
           objStore.updateObj(msg.obj)
-          console.log 'persisiting '+obj.id+' rev '+obj._rev+' in db'
-          record = obj._getRecord()
+          console.log 'persisiting '+obj.id+' type '+obj.type+' in db'
+          record = obj.getRecord()
           DB.set(obj.type, record)
           @updateObjectHooks.forEach (hook) => hook(record)
           msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
