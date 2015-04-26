@@ -1,38 +1,26 @@
 0 info it worked if it ends with ok
-1 verbose cli [ '/usr/bin/node', '/usr/bin/npm', 'publish', './' ]
-2 info using npm@1.4.28
-3 info using node@v0.10.33
-4 verbose node symlink /usr/bin/node
-5 verbose publish [ './' ]
-6 verbose cache add [ './', null ]
-7 verbose cache add name=undefined spec="./" args=["./",null]
-8 verbose parsed url { protocol: null,
-8 verbose parsed url   slashes: null,
-8 verbose parsed url   auth: null,
-8 verbose parsed url   host: null,
-8 verbose parsed url   port: null,
-8 verbose parsed url   hostname: null,
-8 verbose parsed url   hash: null,
-8 verbose parsed url   search: null,
-8 verbose parsed url   query: null,
-8 verbose parsed url   pathname: './',
-8 verbose parsed url   path: './',
-8 verbose parsed url   href: './' }
-9 silly lockFile 0ee6c175- ./
-10 verbose lock ./ /home/peter/.npm/0ee6c175-.lock
-11 silly lockFile 0ee6c175- ./
-12 silly lockFile 0ee6c175- ./
-13 error addLocal Could not install ./
-14 error Error: ENOENT, open 'package.json'
-15 error If you need help, you may report this *entire* log,
-15 error including the npm and node versions, at:
-15 error     <http://github.com/npm/npm/issues>
-16 error System Linux 3.13.0-24-generic
-17 error command "/usr/bin/node" "/usr/bin/npm" "publish" "./"
-18 error cwd /home/peter/projects/spincycle/example
-19 error node -v v0.10.33
-20 error npm -v 1.4.28
-21 error path package.json
-22 error code ENOENT
-23 error errno 34
-24 verbose exit [ 34, true ]
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'publish', './' ]
+2 info using npm@2.6.0
+3 info using node@v0.10.30
+4 verbose publish [ './' ]
+5 silly cache add args [ './', null ]
+6 verbose cache add spec ./
+7 silly cache add parsed spec { raw: './',
+7 silly cache add   scope: null,
+7 silly cache add   name: null,
+7 silly cache add   rawSpec: './',
+7 silly cache add   spec: '/home/peter/projects/spincycle/example',
+7 silly cache add   type: 'local' }
+8 error addLocal Could not install /home/peter/projects/spincycle/example
+9 verbose stack Error: EISDIR, read
+10 verbose cwd /home/peter/projects/spincycle/example
+11 error Linux 3.13.0-24-generic
+12 error argv "node" "/usr/local/bin/npm" "publish" "./"
+13 error node v0.10.30
+14 error npm  v2.6.0
+15 error code EISDIR
+16 error errno 28
+17 error EISDIR, read
+18 error If you need help, you may report this error at:
+18 error     <http://github.com/npm/npm/issues>
+19 verbose exit [ 28, true ]
