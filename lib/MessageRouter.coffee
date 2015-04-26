@@ -50,23 +50,27 @@ class MessageRouter
         rv[name] = @args[name]
       msg.replyFunc({status: EventManager.general.SUCCESS, info: 'list of available targets', payload: rv})
 
+  expose: (type) =>
+    for name, method of @methods
+      method.expose(type)
+
   # All messaging method adds their function for registering new paths or whatnot here
   # So for example for express you could add a method which makes sure the target name
   # can be reached by the url ../<targetName>
-  addMethod: (methodName, registrationFunc) =>
+  addMethod: (methodName, method) =>
     #console.log 'addMethod called for "'+methodName+'"'
-    @methods[methodName] = registrationFunc
+    @methods[methodName] = method
     for targetName of @targets
       #console.log 'registering target '+targetName+' on method '+methodName
-      registrationFunc(targetName, @routeMessage)
+      method.registrationFunc(targetName, @routeMessage)
 
   addTarget: (targetName, args, targetFunc) =>
     console.log 'adding route target for "'+targetName+'"'
     @targets[targetName] = targetFunc
     @args[targetName] = args
-    for method, registrationFunc of @methods
+    for name, method of @methods
       #console.log 'registering target '+targetName+' on method '+method
-      registrationFunc(targetName, @routeMessage)
+      method.registrationFunc(targetName, @routeMessage)
 
   removeTarget: (targetName) =>
     @targets[targetName] = null

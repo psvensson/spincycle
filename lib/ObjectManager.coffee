@@ -30,54 +30,57 @@ class ObjectManager
     msg.replyFunc({status: e.general.SUCCESS, info: 'get model', payload: model})
 
   #---------------------------------------------------------------------------------------------------------------------
+  _createObject: (msg) =>
+    if @messageRouter.authMgr.canUserCreateThisObject(type, msg.user)
+      console.dir msg
+      if msg.odata.type == type and @messageRouter.authMgr.canUserCreateThisObject(msg.odata, msg.user)
+        SuperModel.resolver.createObjectFrom(msg.odata).then (o) =>
+          msg.replyFunc({status: e.general.SUCCESS, info: 'new '+type, payload: o.id})
+    else
+      msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to create objects of that type', payload: type})
+
+  _deleteObject: (msg) =>
+    objStore.getObject msg.obj.id, msg.obj.type.then (obj) =>
+      if obj
+        if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
+          DB.remove obj, (removestatus) =>
+            console.log 'exposed object removed through _delete'+type
+            objStore.removeObject(obj)
+            msg.replyFunc({status: e.general.SUCCESS, info: 'delete object', payload: obj.id})
+        else
+          msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to delete object', payload: msg.obj.id})
+      else
+        console.log 'No object found with id '+msg.obj.id
+        console.dir objStore.objects.map (o) -> o.type == msg.obj.type
+        msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
+
+  _updateObject: (msg) =>
+    @onUpdateObject(msg)
+
+  _getObject: (msg) =>
+    objStore.getObject msg.obj.id, msg.obj.type.then (obj) =>
+      if obj
+        if @messageRouter.authMgr.canUserReadFromThisbject(obj, msg.user)
+          msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: obj.toClient()})
+        else
+          msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: msg.obj.id})
+      else
+        console.log 'No object found with id '+msg.obj.id
+        console.dir objStore.objects.map (o) -> o.type == msg.obj.type
+        msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
+
+  _listObjects: (msg) =>
+    if not @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user)
+      msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to list objects of type '+msg.type, payload: msg.type})
+    else
+      rv = objStore.listObjectsByType(msg.type)
+      msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
+
+  #---------------------------------------------------------------------------------------------------------------------
+
   expose: (type) =>
     objStore.types[type] = type
-    @messageRouter.addTarget '_create'+type, 'obj', (msg) =>
-      if @messageRouter.authMgr.canUserCreateThisObject(type, msg.user)
-        console.dir msg
-        if msg.odata.type == type and @messageRouter.authMgr.canUserCreateThisObject(msg.odata, msg.user)
-          SuperModel.resolver.createObjectFrom(msg.odata).then (o) =>
-            msg.replyFunc({status: e.general.SUCCESS, info: 'new '+type, payload: o.id})
-      else
-        msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to create objects of that type', payload: type})
-
-    # TODO: delete object hierarchy as well? Maybe also check for other objects referencing this, disallowing if so
-    @messageRouter.addTarget '_delete'+type, 'obj', (msg) =>
-      objStore.getObject msg.obj.id, msg.obj.type.then (obj) =>
-        if obj
-          if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
-            DB.remove obj, (removestatus) =>
-              console.log 'exposed object removed through _delete'+type
-              objStore.removeObject(obj)
-              msg.replyFunc({status: e.general.SUCCESS, info: 'delete object', payload: obj.id})
-          else
-            msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to delete object', payload: msg.obj.id})
-        else
-          console.log 'No object found with id '+msg.obj.id
-          console.dir objStore.objects.map (o) -> o.type == msg.obj.type
-          msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
-
-    @messageRouter.addTarget '_update'+type, 'obj', (msg) =>
-        @onUpdateObject(msg)
-
-    @messageRouter.addTarget '_get'+type, 'obj', (msg) =>
-      objStore.getObject msg.obj.id, msg.obj.type.then (obj) =>
-        if obj
-          if @messageRouter.authMgr.canUserReadFromThisbject(obj, msg.user)
-            msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: obj.toClient()})
-          else
-            msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: msg.obj.id})
-        else
-          console.log 'No object found with id '+msg.obj.id
-          console.dir objStore.objects.map (o) -> o.type == msg.obj.type
-          msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
-
-    @messageRouter.addTarget '_list'+type+'s', '<noargs>', (msg) =>
-      if not @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user)
-        msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to list objects of type '+msg.type, payload: msg.type})
-      else
-        rv = objStore.listObjectsByType(msg.type)
-        msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
+    @messageRouter.expose(type)
 
   onUpdateObject: (msg) =>
     console.log 'onUpdateObject called for '+msg.obj.type+' - '+msg.obj.id

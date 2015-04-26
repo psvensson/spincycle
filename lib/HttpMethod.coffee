@@ -22,9 +22,14 @@ class HttpMethod
           console.log 'express calling target'
         target(message)
 
-    messageRouter.addMethod 'express', (targetName, targetFunc) ->
-      #console.log 'express registering http route for target '+targetName
-      HttpMethod.httproutes[targetName] = targetFunc
+    messageRouter.addMethod 'express', @
+
+  registrationFunc: (targetName, targetFunc) ->
+    #console.log 'express registering http route for target '+targetName
+    HttpMethod.httproutes[targetName] = targetFunc
+
+  expose: (type) =>
+    console.log 'HttpMethod::Expose called for type '+type+' (unimplemented)'
 
 
 module.exports = HttpMethod

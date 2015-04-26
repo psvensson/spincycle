@@ -6,7 +6,7 @@ class WsMethod
 
   @wsroutes = []
 
-  constructor:(messageRouter, server)->
+  constructor:(@messageRouter, server)->
     io = IO(server)
     io.set( 'origins', '*:*' )
 
@@ -45,8 +45,18 @@ class WsMethod
         console.log 'client at '+adr+' disconnected'
         ClientEndpoints.removeEndpoint(adr)
 
-    messageRouter.addMethod 'ws', (targetName, targetFunc) ->
-      #console.log 'ws registering route for target '+targetName
-      WsMethod.wsroutes[targetName] = targetFunc
+    @messageRouter.addMethod 'ws', @
+
+  registrationFunc: (targetName, targetFunc) ->
+    #console.log 'ws registering route for target '+targetName
+    WsMethod.wsroutes[targetName] = targetFunc
+
+  expose: (type) =>
+    @messageRouter.addTarget '_create'+type, 'obj', @messageRouter.objectManager._createObject
+    # TODO: delete object hierarchy as well? Maybe also check for other objects referencing this, disallowing if so
+    @messageRouter.addTarget '_delete'+type, 'obj', @messageRouter.objectManager._deleteObject
+    @messageRouter.addTarget '_update'+type, 'obj', @messageRouter.objectManager._updateObject
+    @messageRouter.addTarget '_get'+type, 'obj', @messageRouter.objectManager._getObject
+    @messageRouter.addTarget '_list'+type+'s', '<noargs>', @messageRouter.objectManager._listObjects
 
 module.exports = WsMethod
