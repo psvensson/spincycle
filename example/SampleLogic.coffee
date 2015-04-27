@@ -27,7 +27,7 @@ class SampleLogic
     @messageRouter.addTarget('newGame',           '<noargs>', @onNewGame)
 
     @messageRouter.objectManager.expose('SampleGame')
-
+    @messageRouter.objectManager.expose('SamplePlayer')
 
   onNewGame: (msg) =>
     console.log 'SampleLogic: New Game called'
@@ -43,8 +43,8 @@ class SampleLogic
     console.log 'onListPlayerGames for player '+msg.user.id
     console.dir @games
     @games.forEach (game) ->
-      console.log '   onListPlayerGames listing game "'+game.name+'"'
-      rv.push game.toClient()
+      console.log 'onListPlayerGames listing game "'+game.name+'"'
+      rv.push game.id
     msg.replyFunc({status: e.general.SUCCESS, info: '', payload: rv})
 
   onListGamePlayers: (msg) =>

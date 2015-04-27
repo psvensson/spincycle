@@ -26,14 +26,13 @@ class ObjectManager
   onListTypes: (msg) =>
     msg.replyFunc({status: e.general.SUCCESS, info: 'list types', payload: objStore.listTypes()})
 
-
-  #
-  # -- Fix this! Resolver needs to be instantied with dirname. Move all stuff to ResolveModule
-  #
   onGetModelFor: (msg) =>
     if msg.modelname
-      @messageRouter.ResolveModule.resolve msg.modelname, (model) =>
-        rv = model.model.map (property) -> property.public
+      @messageRouter.resolver.resolve msg.modelname, (path) =>
+        model = require(path)
+        console.log 'got model resolved to'
+        console.dir model
+        rv = model.model.map (property) -> property if property.public
         msg.replyFunc({status: e.general.SUCCESS, info: 'get model', payload: rv})
     else
       msg.replyFunc({status: e.general.FAILURE, info: "missing parameter", payload: null})
@@ -43,7 +42,7 @@ class ObjectManager
     if @messageRouter.authMgr.canUserCreateThisObject(msg.obj.type, msg.user)
       console.dir msg
       SuperModel.resolver.createObjectFrom(msg.obj).then (o) =>
-        msg.replyFunc({status: e.general.SUCCESS, info: 'new '+msg.obj.type, payload: o.id})
+        msg.replyFunc({status: e.general.SUCCESS, info: 'new '+msg.obj.type, payload: o})
     else
       msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to create objects of that type', payload: msg.obj.type})
 
@@ -66,9 +65,9 @@ class ObjectManager
     @onUpdateObject(msg)
 
   _getObject: (msg) =>
-    objStore.getObject msg.obj.id, msg.obj.type.then (obj) =>
+    @getObjectPullThrough(msg.obj.id, msg.obj.type).then (obj) =>
       if obj
-        if @messageRouter.authMgr.canUserReadFromThisbject(obj, msg.user)
+        if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
           msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: obj.toClient()})
         else
           msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: msg.obj.id})
@@ -90,17 +89,30 @@ class ObjectManager
     objStore.types[type] = type
     @messageRouter.expose(type)
 
+  getObjectPullThrough: (id, type) =>
+    q = defer()
+    objStore.getObject(id, type).then (o) =>
+      if not o
+        DB.get(type, [id]).then (record) =>
+          @messageRouter.resolver.createObjectFrom(record).then (oo) =>
+            q.resolve(oo)
+      else
+        q.resolve(o)
+    return q
+
   onUpdateObject: (msg) =>
     console.log 'onUpdateObject called for '+msg.obj.type+' - '+msg.obj.id
     objStore.getObject(msg.obj.id, msg.obj.type).then( (obj) =>
       if obj
         if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
-          objStore.updateObj(msg.obj)
-          console.log 'persisiting '+obj.id+' type '+obj.type+' in db'
-          record = obj.getRecord()
-          DB.set(obj.type, record)
-          @updateObjectHooks.forEach (hook) => hook(record)
-          msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
+          # Make sure to resolve object references in arrays and hashtables
+          @resolveReferences(msg.obj, obj.constructor.model).then (robj)=>
+            objStore.updateObj(robj)
+            console.log 'persisting '+obj.id+' type '+obj.type+' in db'
+            record = obj.getRecord()
+            DB.set(obj.type, record)
+            @updateObjectHooks.forEach (hook) => hook(record)
+            msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
         else
           msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.UPDATE_OBJECT_FAIL, payload: msg.obj.id})
       else
@@ -108,6 +120,54 @@ class ObjectManager
         console.dir objStore.objects.map (o) -> o.type == msg.obj.type
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
     )
+
+  resolveReferences: (record, model) =>
+    console.log 'resolveReferences model is '
+    console.dir model
+    rv = {id: record.id}
+    q = defer()
+    count = model.length
+
+    checkFinished = () ->
+      console.log 'checkFinished count = '+count
+      console.dir rv
+      if --count == 0
+        console.log 'resolving back object'
+        q.resolve(rv)
+
+    model.forEach (property) =>
+      console.log 'going through property '+property
+      if property.array
+        resolvedarr = []
+        arr = record[property.name] or []
+        acount = arr.length
+        arr.forEach (id) =>
+          console.log 'attempting to get object type '+property.type+' id '+id
+          @getObjectPullThrough(id, property.type).then (o)=>
+            console.log ' we got object '+o
+            console.dir o
+            resolvedarr.push(o)
+            console.log 'adding array reference '+o.id+' name '+o.name
+            if --acount == 0
+              rv[property.name] = resolvedarr
+              checkFinished()
+      else if property.hashtable
+        resolvedhash = {}
+        harr = record[property.name] or []
+        hcount = harr.length
+        harr.forEach (id) =>
+          @getObjectPullThrough(id, property.type).then (o)=>
+            resolvedhash[o.name] = o
+            console.log 'adding hashtable reference '+o.id+' name '+o.name
+            if --hcount == 0
+              rv[property.name] = resolvedhash
+              checkFinished()
+      else
+        rv[property.name] = record[property.name]
+        checkFinished()
+
+    return q
+
   #---------------------------------------------------------------------------------------------------------------------
 
   onRegisterForUpdatesOn: (msg) =>
