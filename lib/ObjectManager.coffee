@@ -26,6 +26,10 @@ class ObjectManager
   onListTypes: (msg) =>
     msg.replyFunc({status: e.general.SUCCESS, info: 'list types', payload: objStore.listTypes()})
 
+
+  #
+  # -- Fix this! Resolver needs to be instantied with dirname. Move all stuff to ResolveModule
+  #
   onGetModelFor: (msg) =>
     if msg.modelname
       @messageRouter.ResolveModule.resolve msg.modelname, (model) =>
