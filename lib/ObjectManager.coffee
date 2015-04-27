@@ -42,6 +42,7 @@ class ObjectManager
     if @messageRouter.authMgr.canUserCreateThisObject(msg.obj.type, msg.user)
       console.dir msg
       SuperModel.resolver.createObjectFrom(msg.obj).then (o) =>
+        o.serialize()
         msg.replyFunc({status: e.general.SUCCESS, info: 'new '+msg.obj.type, payload: o})
     else
       msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to create objects of that type', payload: msg.obj.type})
