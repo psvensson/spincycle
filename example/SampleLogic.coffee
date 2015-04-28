@@ -41,7 +41,7 @@ class SampleLogic
     console.log("got "+@games.length+" games");
     rv = []
     console.log 'onListPlayerGames for player '+msg.user.id
-    console.dir @games
+    #console.dir @games
     @games.forEach (game) ->
       console.log 'onListPlayerGames listing game "'+game.name+'"'
       rv.push game.id

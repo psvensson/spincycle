@@ -11,15 +11,16 @@ console.log 'starting module resolving from path '+dirname
 class ResolveModule
 
   @modulecache = []
+  @modulepathcache = []
   constructor: () ->
     console.log("+++ new ResolveModule created ++")
     process.on 'resolvemodule', (name, cb) =>
       @resolve(name, cb)
 
   resolve: (name, cb) =>
-    rv = ResolveModule.modulecache[name]
+    rv = ResolveModule.modulepathcache[name]
     if rv
-      #console.log 'resolving module '+name+' from cache'
+      if debug then console.log 'resolving module '+name+' from cache -> '+rv
       cb(rv)
     else
       if debug then console.log '.. looking up module '+name
@@ -34,6 +35,7 @@ class ResolveModule
           file = file.substring(0, file.indexOf('.'))
         if file == name and origfile.indexOf('.js') > -1 and origfile.indexOf('.map') == -1
             rv = origfile
+            ResolveModule.modulepathcache[name] = rv
             finder.stop()
             cb(rv)
 

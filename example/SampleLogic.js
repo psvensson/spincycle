@@ -66,7 +66,6 @@
       console.log("got " + this.games.length + " games");
       rv = [];
       console.log('onListPlayerGames for player ' + msg.user.id);
-      console.dir(this.games);
       this.games.forEach(function(game) {
         console.log('onListPlayerGames listing game "' + game.name + '"');
         return rv.push(game.id);

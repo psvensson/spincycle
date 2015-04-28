@@ -15,7 +15,7 @@ class ObjectManager
 
   setup: () =>
     @messageRouter.addTarget('registerForUpdatesOn',  'obj', @onRegisterForUpdatesOn)
-    @messageRouter.addTarget('deRegisterForUpdatesOn',  'id,listenerid', @onRegisterForUpdatesOn)
+    @messageRouter.addTarget('deRegisterForUpdatesOn',  'id,listenerid', @onDeregisterForUpdatesOn)
     @messageRouter.addTarget('updateObject',          'obj', @onUpdateObject)
     @messageRouter.addTarget('listTypes',             '<noargs>', @onListTypes)
     @messageRouter.addTarget('getModelFor',             'modelname', @onGetModelFor)
@@ -29,6 +29,7 @@ class ObjectManager
   onGetModelFor: (msg) =>
     if msg.modelname
       @messageRouter.resolver.resolve msg.modelname, (path) =>
+        console.log 'onGetModelFor '+msg.modelname+' got back require path '+path
         model = require(path)
         console.log 'got model resolved to'
         console.dir model
@@ -130,10 +131,10 @@ class ObjectManager
     count = model.length
 
     checkFinished = () ->
-      console.log 'checkFinished count = '+count
-      console.dir rv
+      #console.log 'checkFinished count = '+count
+      #console.dir rv
       if --count == 0
-        console.log 'resolving back object'
+        #console.log 'resolving back object'
         q.resolve(rv)
 
     model.forEach (property) =>
@@ -145,8 +146,8 @@ class ObjectManager
         arr.forEach (id) =>
           console.log 'attempting to get object type '+property.type+' id '+id
           @getObjectPullThrough(id, property.type).then (o)=>
-            console.log ' we got object '+o
-            console.dir o
+            #console.log ' we got object '+o
+            #console.dir o
             resolvedarr.push(o)
             console.log 'adding array reference '+o.id+' name '+o.name
             if --acount == 0
@@ -172,6 +173,7 @@ class ObjectManager
   #---------------------------------------------------------------------------------------------------------------------
 
   onRegisterForUpdatesOn: (msg) =>
+    console.dir msg
     console.log 'onRegisterForUpdatesOn called for '+msg.obj.type+' '+msg.obj.id
     objStore.getObject(msg.obj.id, msg.obj.type).then( (obj) =>
       if obj && obj.id
@@ -181,6 +183,7 @@ class ObjectManager
             #console.dir uobj
             ClientEndpoints.sendToEndpoint(msg.client, {status: e.general.SUCCESS, info: e.gamemanager.OBJECT_UPDATE, payload: uobj.toClient() })
           )
+          console.log 'listenerid '+listenerId+' added for updates on object '+obj.name+' ['+obj.id+']'
           msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.REGISTER_UPDATES, payload: listenerId})
         else
           msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.UPDATE_REGISTER_FAIL, payload: msg.obj.id })
@@ -191,8 +194,10 @@ class ObjectManager
 
   onDeregisterForUpdatesOn: (msg) =>
     console.log 'onDeregisterForUpdatesOn called for id '+msg.id+' and listener id '+msg.listenerid
-    objStore.removeListenerFor(msg.id, msg.obj.listenerid)
-    msg.replyFunc({status: e.general.SUCCESS, info: 'deregistered listener for obejct', payload: msg.id })
-
+    if msg.id and msg.listenerid and msg.type
+      objStore.removeListenerFor(msg.id, msg.listenerid)
+      msg.replyFunc({status: e.general.SUCCESS, info: 'deregistered listener for obejct', payload: msg.id })
+    else
+      msg.replyFunc({status: e.general.FAILURE, info: 'missing parameter', payload: null })
 
 module.exports = ObjectManager
