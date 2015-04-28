@@ -49,11 +49,11 @@ class ObjectManager
       msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to create objects of that type', payload: msg.obj.type})
 
   _deleteObject: (msg) =>
-    objStore.getObject msg.obj.id, msg.obj.type.then (obj) =>
+    objStore.getObject(msg.obj.id, msg.obj.type).then (obj) =>
       if obj
         if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
           DB.remove obj, (removestatus) =>
-            console.log 'exposed object removed through _delete'+type
+            console.log 'exposed object removed through _delete'+msg.obj.type
             objStore.removeObject(obj)
             msg.replyFunc({status: e.general.SUCCESS, info: 'delete object', payload: obj.id})
         else
