@@ -57,13 +57,15 @@ class CouchPersistence
                 if --count == 0 then cb rv
 
   get: (_type, id, cb) =>
-    type = _type.toLowerCase()
-    @getDbFor(type).then (db) =>
-      db.getDoc id, (err,res) =>
-        if err
-          console.log '** Couch Get ERROR for type '+type+' id '+id+': '+err
-          console.dir err
-        if cb then cb(res)
+    if type
+      type = _type.toLowerCase()
+      @getDbFor(type).then (db) =>
+        db.getDoc id, (err,res) =>
+          if err
+            console.log '** Couch Get ERROR for type '+type+' id '+id+': '+err
+            console.dir err
+          if cb then cb(res)
+    else cb(null)
 
   set: (_type, obj, cb) =>
     type = _type.toLowerCase()
