@@ -1,4 +1,4 @@
-promise         = require('node-promise').Promise
+defer           = require('node-promise').defer
 all             = require('node-promise').all
 uuid            = require('node-uuid')
 LRU             = require('lru-cache')
@@ -6,6 +6,8 @@ LRU             = require('lru-cache')
 #GDS            = require('./gds')
 #Roach          = require('./cockroach')
 Couch           = require('./CouchPersistence')
+
+debug = process.env["DEBUG"]
 
 class DB
 
@@ -22,7 +24,7 @@ class DB
 
   @createDatabases:(dblist) =>
     store = @getDataStore()
-    q = new promise()
+    q = defer()
     promises = []
     dblist.forEach (dbname) =>
       promises.push store.getDbFor(dbname)
@@ -40,12 +42,12 @@ class DB
       cb []
 
   @get: (type, ids) =>
-    #console.log 'DB.get called for type "'+type+'" and ids "'+ids+'"'
+    if debug then console.log 'DB.get called for type "'+type+'" and ids "'+ids+'"'
     if not ids.length then ids = [ids]
-    q = new promise()
+    q = defer()
     all(ids.map((id) =>
       rv = @lru.get id
-      p = new promise()
+      p = defer()
       #console.log 'DB found in lru: '+rv
       if not rv
         #console.log ' attempting to use datastore'
