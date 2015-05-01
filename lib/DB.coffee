@@ -50,10 +50,11 @@ class DB
       p = defer()
       #console.log 'DB found in lru: '+rv
       if not rv
-        #console.log ' attempting to use datastore'
-        @getDataStore().get type, id, (result) =>
+        #if debug then console.log ' attempting to use datastore for '
+        @getDataStore().get(type, id, (result) =>
           @lru.set(id, result)
           p.resolve(result)
+        )
       else
         p.resolve(rv)
       return p
