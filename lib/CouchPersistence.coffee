@@ -57,7 +57,7 @@ class CouchPersistence
                 if --count == 0 then cb rv
 
   get: (_type, id, cb) =>
-    if type
+    if _type
       type = _type.toLowerCase()
       @getDbFor(type).then (db) =>
         db.getDoc id, (err,res) =>
