@@ -85,6 +85,7 @@ class MessageRouter
         if not m.user
           console.log '** SpinCycle did not get message decorated with user property from AuthenticationManager **'
           exit( -1)
+        console.log 'user found. now calling handler'
         fn(m) # With a player object that matches the session cookies or whatnot in the message
       )
     else
