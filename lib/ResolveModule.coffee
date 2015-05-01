@@ -46,7 +46,7 @@ class ResolveModule
     if debug
       console.log 'createObjectFrom got record '+record
       console.dir record
-    if not record or (record[0] and record[0] == null)
+    if not record or (record[0] and (record[0] == null) or record[0] == 'null')
       console.log '++++++++++++++!!!!!!!!!!!!!!!!!!! NULL RECORD!!'
       xyzzy
     if not record[0] then record = [record]
@@ -55,6 +55,8 @@ class ResolveModule
       q.resolve(null)
     else
       if debug then console.log 'createObjectFrom got record '+record[0].id+' type '+record[0].type
+      if not record[0].id
+        xyzzy
       @resolve record[0].type, (filename) ->
         if debug then console.log 'resolved module '+record[0].type+" as "+filename
         module = ResolveModule.modulecache[record[0].type] or require(filename.replace('.js', ''))
