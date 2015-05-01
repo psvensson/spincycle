@@ -79,11 +79,16 @@ class ObjectManager
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
 
   _listObjects: (msg) =>
-    if not @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user)
-      msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to list objects of type '+msg.type, payload: msg.type})
+    console.log 'listObjects called for type '+msg.type
+    if not msg.type
+      if not @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user)
+        msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to list objects of type '+msg.type, payload: msg.type})
+      else
+        rv = objStore.listObjectsByType(msg.type)
+        console.log 'found '+rv.length+' objects to return'
+        msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
     else
-      rv = objStore.listObjectsByType(msg.type)
-      msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
+      msg.replyFunc({status: e.general.FAILURE, info: 'missing parameter', payload: null })
 
   #---------------------------------------------------------------------------------------------------------------------
 
