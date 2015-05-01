@@ -46,7 +46,7 @@ class ResolveModule
     if debug
       console.log 'createObjectFrom got record '+record
       console.dir record
-    if not record
+    if not record or (record[0] and record[0] == null)
       console.log '++++++++++++++!!!!!!!!!!!!!!!!!!! NULL RECORD!!'
       xyzzy
     if not record[0] then record = [record]
