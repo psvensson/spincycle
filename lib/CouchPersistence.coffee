@@ -65,7 +65,9 @@ class CouchPersistence
             console.log '** Couch Get ERROR for type '+type+' id '+id+': '+err
             console.dir err
           if cb then cb(res)
-    else cb(null)
+    else
+      console.log '...EEEEhh  trying to get DB object with no type+ WTF!'
+      xyzzy
 
   set: (_type, obj, cb) =>
     type = _type.toLowerCase()
