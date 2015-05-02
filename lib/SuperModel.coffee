@@ -152,9 +152,13 @@ class SuperModel
                           console.log 'SuperModel::loadFromIds got back null record from DB for type '+resolveobj.type+' and id '+id
                           if --count == 0 then r.resolve(null)
                         else resolver.createObjectFrom(record).then( (obj) =>
-                          if debug then console.log 'object '+resolveobj.name+' type '+resolveobj.type+' created: '+obj.id
-                          @insertObj(resolveobj, obj)
-                          if --count == 0 then r.resolve(obj)
+                          if not obj
+                            console.og ' Hmm. Missing object reference. Sad Face.'
+                            if --count == 0 then r.resolve(null)
+                          else
+                            if debug then console.log 'object '+resolveobj.name+' type '+resolveobj.type+' created: '+obj.id
+                            @insertObj(resolveobj, obj)
+                            if --count == 0 then r.resolve(obj)
                         , error)
                       , error)
                   , error)
