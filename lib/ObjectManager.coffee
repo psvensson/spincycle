@@ -40,43 +40,53 @@ class ObjectManager
 
   #---------------------------------------------------------------------------------------------------------------------
   _createObject: (msg) =>
-    if @messageRouter.authMgr.canUserCreateThisObject(msg.obj.type, msg.user)
-      console.dir msg
-      SuperModel.resolver.createObjectFrom(msg.obj).then (o) =>
-        o.serialize()
-        msg.replyFunc({status: e.general.SUCCESS, info: 'new '+msg.obj.type, payload: o})
+    if msg.obj.type
+      if @messageRouter.authMgr.canUserCreateThisObject(msg.obj.type, msg.user)
+        console.dir msg
+        SuperModel.resolver.createObjectFrom(msg.obj).then (o) =>
+          o.serialize()
+          msg.replyFunc({status: e.general.SUCCESS, info: 'new '+msg.obj.type, payload: o})
+      else
+        msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to create objects of that type', payload: msg.obj.type})
     else
-      msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to create objects of that type', payload: msg.obj.type})
+      msg.replyFunc({status: e.general.FAILURE, info: 'missing parameter', payload: null })
 
   _deleteObject: (msg) =>
-    objStore.getObject(msg.obj.id, msg.obj.type).then (obj) =>
-      if obj
-        if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
-          DB.remove obj, (removestatus) =>
-            console.log 'exposed object removed through _delete'+msg.obj.type
-            objStore.removeObject(obj)
-            msg.replyFunc({status: e.general.SUCCESS, info: 'delete object', payload: obj.id})
+    if msg.obj and msg.obj.type and msg.obj.id
+      objStore.getObject(msg.obj.id, msg.obj.type).then (obj) =>
+        if obj
+          if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
+            DB.remove obj, (removestatus) =>
+              console.log 'exposed object removed through _delete'+msg.obj.type
+              objStore.removeObject(obj)
+              msg.replyFunc({status: e.general.SUCCESS, info: 'delete object', payload: obj.id})
+          else
+            msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to delete object', payload: msg.obj.id})
         else
-          msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to delete object', payload: msg.obj.id})
-      else
-        console.log 'No object found with id '+msg.obj.id
-        console.dir objStore.objects.map (o) -> o.type == msg.obj.type
-        msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
+          console.log 'No object found with id '+msg.obj.id
+          console.dir objStore.objects.map (o) -> o.type == msg.obj.type
+          msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
+    else
+      msg.replyFunc({status: e.general.FAILURE, info: 'missing parameter', payload: null })
 
   _updateObject: (msg) =>
     @onUpdateObject(msg)
 
   _getObject: (msg) =>
-    @getObjectPullThrough(msg.obj.id, msg.obj.type).then (obj) =>
-      if obj
-        if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
-          msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: obj.toClient()})
+    console.log '_getObject called for type '+msg.type
+    if msg.type
+      @getObjectPullThrough(msg.obj.id, msg.obj.type).then (obj) =>
+        if obj
+          if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
+            msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: obj.toClient()})
+          else
+            msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: msg.obj.id})
         else
-          msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: msg.obj.id})
-      else
-        console.log 'No object found with id '+msg.obj.id
-        console.dir objStore.objects.map (o) -> o.type == msg.obj.type
-        msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
+          console.log 'No object found with id '+msg.obj.id
+          console.dir objStore.objects.map (o) -> o.type == msg.obj.type
+          msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
+    else
+      msg.replyFunc({status: e.general.FAILURE, info: 'missing parameter', payload: null })
 
   _listObjects: (msg) =>
     console.log 'listObjects called for type '+msg.type
@@ -98,13 +108,17 @@ class ObjectManager
 
   getObjectPullThrough: (id, type) =>
     q = defer()
-    objStore.getObject(id, type).then (o) =>
-      if not o
-        DB.get(type, [id]).then (record) =>
-          @messageRouter.resolver.createObjectFrom(record).then (oo) =>
-            q.resolve(oo)
-      else
-        q.resolve(o)
+    if not type
+      console.log 'Objectmanager::getObjectPullThrough called with null type.'
+      q.resolve(null)
+    else
+      objStore.getObject(id, type).then (o) =>
+        if not o
+          DB.get(type, [id]).then (record) =>
+            @messageRouter.resolver.createObjectFrom(record).then (oo) =>
+              q.resolve(oo)
+        else
+          q.resolve(o)
     return q
 
   onUpdateObject: (msg) =>
