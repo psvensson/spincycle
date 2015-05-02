@@ -49,8 +49,8 @@ class ResolveModule
     if not record or (record[0] and (record[0] == null) or record[0] == 'null')
       #console.log '++++++++++++++!!!!!!!!!!!!!!!!!!! NULL RECORD!!'
       q.resolve(null)
-    else if not record[0] then record = [record]
     else
+      if not record[0] then record = [record]
       #if debug then console.log 'createObjectFrom got record '+record[0].id+' type '+record[0].type
       if not record[0].id
         q.resolve(null)

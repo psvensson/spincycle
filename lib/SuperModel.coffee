@@ -137,7 +137,7 @@ class SuperModel
             else
               ids.forEach (_id) =>
                 ((id) =>
-                  if debug then console.log 'trying to get '+resolveobj.name+' with id '+id
+                  if debug then console.log 'SuperModel loadFromIds trying to get '+resolveobj.name+' with id '+id
                   OMgr.getObject(id, resolveobj.type).then( (oo) =>
                     if oo
                       if debug then console.log 'found existing instance of '+resolveobj.name+' type '+resolveobj.type+' in OStore'
