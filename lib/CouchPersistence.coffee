@@ -64,6 +64,7 @@ class CouchPersistence
           if err
             console.log '** Couch Get ERROR for type '+type+' id '+id+': '+err
             console.dir err
+            cb(null)
           if cb then cb(res)
     else
       console.log '...EEEEhh  trying to get DB object with no type+ WTF!'

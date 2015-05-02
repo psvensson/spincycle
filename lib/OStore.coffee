@@ -12,6 +12,7 @@ class OStore
   @objectsByType: []
 
   @listObjectsByType: (type) =>
+    console.log 'OStore::listObjectsByType called for type '+type
     @objectsByType[type] or []
 
   @listTypes: () =>
