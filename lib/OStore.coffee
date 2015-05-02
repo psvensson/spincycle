@@ -4,6 +4,8 @@ DB              = require('./DB')
 uuid            = require('node-uuid')
 error           = require('./Error').error
 
+debug = process.env["DEBUG"]
+
 class OStore
 
   @objects:       []
@@ -12,8 +14,16 @@ class OStore
   @objectsByType: []
 
   @listObjectsByType: (type) =>
-    console.log 'OStore::listObjectsByType called for type '+type
-    @objectsByType[type] or []
+    rv = @objectsByType[type] or []
+    if debug then console.log 'OStore::listObjectsByType called for type '+type
+    if rv.length == 0
+      for k,v of @objectsByType
+        console.log k
+        many = 0
+        for kk,vv of v
+          many++
+        if debug then console.log k+' -> '+many
+    return rv
 
   @listTypes: () =>
     rv = []
