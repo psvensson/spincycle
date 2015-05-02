@@ -147,6 +147,8 @@ class SuperModel
                   else
                     #if debug then console.log 'did not find obj '+resolveobj.name+' ['+id+'] of type '+resolveobj.type+' in OStore. Getting from DB...'
                     DB.get(resolveobj.type, [id]).then( (record) =>
+                      if debug then console.log 'SuperModel get this back from DB.get '+record
+                      if debug then console.dir record
                       if not record
                         console.log 'SuperModel::loadFromIds got back null record from DB for type '+resolveobj.type+' and id '+id
                         r.resolve(null)
