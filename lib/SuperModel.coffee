@@ -153,7 +153,7 @@ class SuperModel
                           if --count == 0 then r.resolve(null)
                         else resolver.createObjectFrom(record).then( (obj) =>
                           if not obj
-                            console.og ' Hmm. Missing object reference. Sad Face.'
+                            console.log ' Hmm. Missing object reference. Sad Face.'
                             if --count == 0 then r.resolve(null)
                           else
                             if debug then console.log 'object '+resolveobj.name+' type '+resolveobj.type+' created: '+obj.id
