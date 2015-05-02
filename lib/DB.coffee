@@ -42,7 +42,7 @@ class DB
       cb []
 
   @get: (type, ids) =>
-    if debug then console.log 'DB.get called for type "'+type+'" and ids "'+ids+'"'
+    #if debug then console.log 'DB.get called for type "'+type+'" and ids "'+ids+'"'
     if not ids.length then ids = [ids]
     q = defer()
     all(ids.map((id) =>

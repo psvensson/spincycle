@@ -145,10 +145,10 @@ class SuperModel
                       if debug then console.log 'resolving '+resolveobj.name+' type '+resolveobj.type+' immediately'
                       r.resolve(oo)
                   else
-                    if debug then console.log 'did not find obj '+resolveobj.name+' ['+id+'] of type '+resolveobj.type+' in OStore. Getting from DB...'
+                    #if debug then console.log 'did not find obj '+resolveobj.name+' ['+id+'] of type '+resolveobj.type+' in OStore. Getting from DB...'
                     DB.get(resolveobj.type, [id]).then( (record) =>
                       resolver.createObjectFrom(record).then( (obj) =>
-                        if debug then console.log 'object '+resolveobj.name+' type '+resolveobj.type+' created: '+obj.id
+                        #if debug then console.log 'object '+resolveobj.name+' type '+resolveobj.type+' created: '+obj.id
                         @insertObj(resolveobj, obj)
                         if --count == 0 then r.resolve(obj)
                       , error)
