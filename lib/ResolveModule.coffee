@@ -20,7 +20,7 @@ class ResolveModule
   resolve: (name, cb) =>
     rv = ResolveModule.modulepathcache[name]
     if rv
-      if debug then console.log 'resolving module '+name+' from cache -> '+rv
+      #if debug then console.log 'resolving module '+name+' from cache -> '+rv
       cb(rv)
     else
       if debug then console.log '.. looking up module '+name

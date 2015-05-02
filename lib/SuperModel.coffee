@@ -31,7 +31,7 @@ class SuperModel
     @id         = @record.id or uuid.v4()
     OMgr.storeObject(@)
     if @record._rev
-      if debug then console.log 'setting _rev to '+@record._rev+' for '+@constructor.type+' '+@id
+      #if debug then console.log 'setting _rev to '+@record._rev+' for '+@constructor.type+' '+@id
       @_rev = @record._rev
 
     @loadFromIds(@constructor.model).then( () =>
@@ -40,7 +40,7 @@ class SuperModel
       else
         q.resolve(@)
     , error)
-    if debug then console.log 'returning promise from constructor for '+@constructor.type
+    #if debug then console.log 'returning promise from constructor for '+@constructor.type
     return q
 
   getRecord: () =>
@@ -123,7 +123,7 @@ class SuperModel
           if not ids or typeof ids == 'undefined' or ids == 'undefined'
             #@[resolveobj.name] = []
             ids = []
-            if debug then console.log '============================== null resolveobj.ids for '+resolveobj.type+' ['+resolveobj.name+']'
+            #if debug then console.log '============================== null resolveobj.ids for '+resolveobj.type+' ['+resolveobj.name+']'
             r.resolve(null)
           else
             if typeof ids is 'string'
