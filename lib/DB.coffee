@@ -67,7 +67,7 @@ class DB
       ,(err) ->
         console.log 'DB.get ERROR: '+err
         console.dir err
-      q.resolve(null)
+        q.resolve(null)
     )
     return q
 
