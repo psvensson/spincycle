@@ -45,23 +45,29 @@ class DB
     #if debug then console.log 'DB.get called for type "'+type+'" and ids "'+ids+'"'
     if not ids.length then ids = [ids]
     q = defer()
-    all(ids.map((id) =>
-      rv = @lru.get id
-      p = defer()
-      #console.log 'DB found in lru: '+rv
-      if not rv
-        #if debug then console.log ' attempting to use datastore for '
-        @getDataStore().get(type, id, (result) =>
-          @lru.set(id, result)
-          p.resolve(result)
-        )
-      else
-        p.resolve(rv)
-      return p
-    )).then((result) ->
-      #console.log 'DB.get resolving ->'
-      #console.dir result
-      q.resolve(result)
+    all(ids.map(
+      (id) =>
+        rv = @lru.get id
+        p = defer()
+        #console.log 'DB found in lru: '+rv
+        if not rv
+          #if debug then console.log ' attempting to use datastore for '
+          @getDataStore().get(type, id, (result) =>
+            @lru.set(id, result)
+            p.resolve(result)
+          )
+        else
+          p.resolve(rv)
+        return p
+    )).then(
+      (result) ->
+        #console.log 'DB.get resolving ->'
+        #console.dir result
+        q.resolve(result)
+      ,(err) ->
+        console.log 'DB.get ERROR: '+err
+        console.dir err
+      q.resolve(null)
     )
     return q
 
