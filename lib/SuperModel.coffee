@@ -163,7 +163,7 @@ class SuperModel
                       , error)
                   , error)
                 )(_id)
-          console.log '------- property '+resolveobj.name+' now set to '+@[resolveobj.name]
+          if debug then console.log '------- property '+resolveobj.name+' now set to '+@[resolveobj.name]
         )(robj)
 
     all(allpromises, error).then( (results) =>
