@@ -67,6 +67,7 @@ class WsMethod
       @messageRouter.objectManager._getObject(type)
     @messageRouter.addTarget '_list'+type+'s', '<noargs>', (msg) =>
       msg.type = type
+      console.log 'calling _listObjects from WsMethod with type '+type
       @messageRouter.objectManager._listObjects(type)
 
 module.exports = WsMethod
