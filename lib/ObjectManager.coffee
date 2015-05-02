@@ -193,23 +193,29 @@ class ObjectManager
 
   onRegisterForUpdatesOn: (msg) =>
     console.dir msg
-    console.log 'onRegisterForUpdatesOn called for '+msg.obj.type+' '+msg.obj.id
-    objStore.getObject(msg.obj.id, msg.obj.type).then( (obj) =>
-      if obj && obj.id
-        if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
-          listenerId = objStore.addListenerFor(msg.obj.id, msg.obj.type, (uobj) ->
-            console.log '--------------------- sending update of object '+msg.obj.id+' type '+msg.obj.type+' to client'
-            #console.dir uobj
-            ClientEndpoints.sendToEndpoint(msg.client, {status: e.general.SUCCESS, info: e.gamemanager.OBJECT_UPDATE, payload: uobj.toClient() })
-          )
-          console.log 'listenerid '+listenerId+' added for updates on object '+obj.name+' ['+obj.id+']'
-          msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.REGISTER_UPDATES, payload: listenerId})
-        else
-          msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.UPDATE_REGISTER_FAIL, payload: msg.obj.id })
+    if msg.obj or not msg.obj.id or not msg.obj.type
+      console.log 'onRegisterForUpdatesOn called for '+msg.obj.type+' '+msg.obj.id
+      if typeof msg.obj.id is 'string'
+        objStore.getObject(msg.obj.id, msg.obj.type).then( (obj) =>
+          if obj && obj.id
+            if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
+              listenerId = objStore.addListenerFor(msg.obj.id, msg.obj.type, (uobj) ->
+                console.log '--------------------- sending update of object '+msg.obj.id+' type '+msg.obj.type+' to client'
+                #console.dir uobj
+                ClientEndpoints.sendToEndpoint(msg.client, {status: e.general.SUCCESS, info: e.gamemanager.OBJECT_UPDATE, payload: uobj.toClient() })
+              )
+              console.log 'listenerid '+listenerId+' added for updates on object '+obj.name+' ['+obj.id+']'
+              msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.REGISTER_UPDATES, payload: listenerId})
+            else
+              msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.UPDATE_REGISTER_FAIL, payload: msg.obj.id })
+          else
+            console.dir obj
+            msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id })
+        , error)
       else
-        console.dir obj
-        msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id })
-    , error)
+      msg.replyFunc({status: e.general.FAILURE, info: 'wrong parameter format', payload: 'id' })
+    else
+      msg.replyFunc({status: e.general.FAILURE, info: 'missing parameter', payload: null })
 
   onDeregisterForUpdatesOn: (msg) =>
     console.log 'onDeregisterForUpdatesOn called for id '+msg.id+' and listener id '+msg.listenerid
