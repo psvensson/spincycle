@@ -98,7 +98,7 @@ class SuperModel
     return q
 
   loadFromIds:(model) =>
-    if debug then console.log '------------------------------------------------> loadfromIds called for '+@.constructor.type+' '+@id+' '+model.length+' properties'
+    #if debug then console.log '------------------------------------------------> loadfromIds called for '+@.constructor.type+' '+@id+' '+model.length+' properties'
     #if debug then console.dir(model)
     #if debug then console.log 'record is...'
     #if debug then console.dir @record
@@ -129,14 +129,14 @@ class SuperModel
             if typeof ids is 'string'
               #if debug then console.log 'upcasting string id to array of ids for '+resolveobj.name
               ids = [ids]
-            if debug then console.log 'resolveobjds '+resolveobj.name+' ('+(typeof ids)+') ids length are.. '+ids.length
+            #if debug then console.log 'resolveobjds '+resolveobj.name+' ('+(typeof ids)+') ids length are.. '+ids.length
             count = ids.length
             if count == 0
               if debug then console.log 'no ids for '+resolveobj.name+' so resolving null'
               r.resolve(null)
             else
               ids.forEach (id) =>
-                if debug then console.log 'trying to get '+resolveobj.name+' with id '+id
+                #if debug then console.log 'trying to get '+resolveobj.name+' with id '+id
                 OMgr.getObject(id, resolveobj.type).then( (oo) =>
                   if oo
                     if debug then console.log 'found existing instance of '+resolveobj.name+' type '+resolveobj.type+' in OStore'
@@ -158,20 +158,20 @@ class SuperModel
         )(robj)
 
     all(allpromises, error).then( (results) =>
-      if debug then console.log '<------------------------------------------------ loadfromIds done for '+@.constructor.type+' '+@id+' '+model.length+' properties'
+      #if debug then console.log '<------------------------------------------------ loadfromIds done for '+@.constructor.type+' '+@id+' '+model.length+' properties'
       alldone.resolve(results)
     ,error)
     return alldone
 
   insertObj: (ro, o) =>
     if ro.array == true
-      if debug then console.log 'inserting obj '+ro.type+' as array'
+      #if debug then console.log 'inserting obj '+ro.type+' as array'
       @[ro.name].push(o)
     else if ro.hashtable == true
-      if debug then console.log 'inserting obj '+ro.type+' as hashtable'
+      #if debug then console.log 'inserting obj '+ro.type+' as hashtable'
       @[ro.name][o.name] = o
     else
-      if debug then console.log 'inserting obj '+ro.type+' as direct reference'
+      #if debug then console.log 'inserting obj '+ro.type+' as direct reference'
       @[ro.name] = o
     OMgr.storeObject(o)
 
