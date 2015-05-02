@@ -135,28 +135,30 @@ class SuperModel
               if debug then console.log 'no ids for '+resolveobj.name+' so resolving null'
               r.resolve(null)
             else
-              ids.forEach (id) =>
-                #if debug then console.log 'trying to get '+resolveobj.name+' with id '+id
-                OMgr.getObject(id, resolveobj.type).then( (oo) =>
-                  if oo
-                    if debug then console.log 'found existing instance of '+resolveobj.name+' type '+resolveobj.type+' in OStore'
-                    @insertObj(resolveobj, oo)
-                    if --count == 0
-                      if debug then console.log 'resolving '+resolveobj.name+' type '+resolveobj.type+' immediately'
-                      r.resolve(oo)
-                  else
-                    #if debug then console.log 'did not find obj '+resolveobj.name+' ['+id+'] of type '+resolveobj.type+' in OStore. Getting from DB...'
-                    DB.get(resolveobj.type, [id]).then( (record) =>
-                      if not record
-                        console.log 'SuperModel::loadFromIds got back null record from DB for type '+resolveobj.type+' and id '+id
-                        if --count == 0 then r.resolve(null)
-                      else resolver.createObjectFrom(record).then( (obj) =>
-                        #if debug then console.log 'object '+resolveobj.name+' type '+resolveobj.type+' created: '+obj.id
-                        @insertObj(resolveobj, obj)
-                        if --count == 0 then r.resolve(obj)
+              ids.forEach (_id) =>
+                ((id) =>
+                  #if debug then console.log 'trying to get '+resolveobj.name+' with id '+id
+                  OMgr.getObject(id, resolveobj.type).then( (oo) =>
+                    if oo
+                      if debug then console.log 'found existing instance of '+resolveobj.name+' type '+resolveobj.type+' in OStore'
+                      @insertObj(resolveobj, oo)
+                      if --count == 0
+                        if debug then console.log 'resolving '+resolveobj.name+' type '+resolveobj.type+' immediately'
+                        r.resolve(oo)
+                    else
+                      #if debug then console.log 'did not find obj '+resolveobj.name+' ['+id+'] of type '+resolveobj.type+' in OStore. Getting from DB...'
+                      DB.get(resolveobj.type, [id]).then( (record) =>
+                        if not record
+                          console.log 'SuperModel::loadFromIds got back null record from DB for type '+resolveobj.type+' and id '+id
+                          if --count == 0 then r.resolve(null)
+                        else resolver.createObjectFrom(record).then( (obj) =>
+                          #if debug then console.log 'object '+resolveobj.name+' type '+resolveobj.type+' created: '+obj.id
+                          @insertObj(resolveobj, obj)
+                          if --count == 0 then r.resolve(obj)
+                        , error)
                       , error)
-                    , error)
-                , error)
+                  , error)
+                )(_id)
           #console.log '------- property '+resolveobj.name+' now set to '+@[resolveobj.name]
         )(robj)
 
