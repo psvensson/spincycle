@@ -52,11 +52,21 @@ class WsMethod
     WsMethod.wsroutes[targetName] = targetFunc
 
   expose: (type) =>
-    @messageRouter.addTarget '_create'+type, 'obj', @messageRouter.objectManager._createObject
+    @messageRouter.addTarget '_create'+type, 'obj', (msg) ->
+      msg.type = type
+      @messageRouter.objectManager._createObject(msg)
     # TODO: delete object hierarchy as well? Maybe also check for other objects referencing this, disallowing if so
-    @messageRouter.addTarget '_delete'+type, 'obj', @messageRouter.objectManager._deleteObject
-    @messageRouter.addTarget '_update'+type, 'obj', @messageRouter.objectManager._updateObject
-    @messageRouter.addTarget '_get'+type, 'obj', @messageRouter.objectManager._getObject
-    @messageRouter.addTarget '_list'+type+'s', '<noargs>', @messageRouter.objectManager._listObjects
+    @messageRouter.addTarget '_delete'+type, 'obj', (msg) ->
+      msg.type = type
+      @messageRouter.objectManager._deleteObject(type)
+    @messageRouter.addTarget '_update'+type, 'obj', (msg) ->
+      msg.type = type
+      @messageRouter.objectManager._updateObject(type)
+    @messageRouter.addTarget '_get'+type, 'obj', (msg) ->
+      msg.type = type
+      @messageRouter.objectManager._getObject(type)
+    @messageRouter.addTarget '_list'+type+'s', '<noargs>', (msg) ->
+      msg.type = type
+      @messageRouter.objectManager._listObjects(type)
 
 module.exports = WsMethod
