@@ -14,7 +14,7 @@ class OStore
   @objectsByType: []
 
   @listObjectsByType: (type) =>
-    rv = @objectsByType[type] or []
+    rv = []
     if debug then console.log 'OStore::listObjectsByType called for type '+type
     if rv.length == 0
       for k,v of @objectsByType
@@ -22,6 +22,7 @@ class OStore
         many = 0
         for kk,vv of v
           many++
+          rv.push vv
         if debug then console.log k+' -> '+many
     return rv
 
