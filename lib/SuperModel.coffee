@@ -98,7 +98,7 @@ class SuperModel
     return q
 
   loadFromIds:(model) =>
-    #if debug then console.log '------------------------------------------------> loadfromIds called for '+@.constructor.type+' '+@id+' '+model.length+' properties'
+    if debug then console.log '------------------------------------------------> loadfromIds called for '+@.constructor.type+' '+@id+' '+model.length+' properties'
     #if debug then console.dir(model)
     #if debug then console.log 'record is...'
     #if debug then console.dir @record
@@ -123,7 +123,7 @@ class SuperModel
           if not ids or typeof ids == 'undefined' or ids == 'undefined'
             #@[resolveobj.name] = []
             ids = []
-            if debug then console.log '============================== null resolveobj.ids for '+resolveobj.type+' ['+resolveobj.name+']'
+            #if debug then console.log '============================== null resolveobj.ids for '+resolveobj.type+' ['+resolveobj.name+']'
             r.resolve(null)
           else
             if typeof ids is 'string'
@@ -159,11 +159,11 @@ class SuperModel
                       , error)
                   , error)
                 )(_id)
-          #console.log '------- property '+resolveobj.name+' now set to '+@[resolveobj.name]
+          console.log '------- property '+resolveobj.name+' now set to '+@[resolveobj.name]
         )(robj)
 
     all(allpromises, error).then( (results) =>
-      #if debug then console.log '<------------------------------------------------ loadfromIds done for '+@.constructor.type+' '+@id+' '+model.length+' properties'
+      if debug then console.log '<------------------------------------------------ loadfromIds done for '+@.constructor.type+' '+@id+' '+model.length+' properties'
       alldone.resolve(results)
     ,error)
     return alldone
