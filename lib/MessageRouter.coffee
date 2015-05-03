@@ -24,16 +24,15 @@ class MessageRouter
   @ClientEndpoints = ClientEndpoints
   @OStore = OStore
   @ResolveModule = ResolveModule
-  @debug = no
 
-  constructor: (@authMgr, debug) ->
+  debug = process.env["DEBUG"]
+
+  constructor: (@authMgr) ->
     console.log 'messageRouter constructor'
     console.dir @authMgr
-    MessageRouter.debug = debug
     @resolver = new ResolveModule()
-    console.log 'debug = '+MessageRouter.debug
-
     @targets  = []
+    @debugtargets  = []
     @args     = []
     @methods  = []
     #@authMgr  = AuthenticationManager
@@ -79,7 +78,7 @@ class MessageRouter
   # Message format is {messageId: i, client: <ip:port>, messageTarget: t, replyFunction: r, messageBody: {b}}
   routeMessage: (message) =>
     fn = @targets[message.target]
-    console.log 'routeMessage called for "'+message.target+'"'
+    if debug then console.log 'routeMessage called for "'+message.target+'"'
     if fn
       @authMgr.decorateMessageWithUser(message).then( (m)->
         if not m.user
