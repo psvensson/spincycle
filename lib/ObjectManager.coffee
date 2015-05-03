@@ -74,17 +74,20 @@ class ObjectManager
 
   _getObject: (msg) =>
     console.log '_getObject called for type '+msg.type
-    if msg.type
-      @getObjectPullThrough(msg.obj.id, msg.obj.type).then (obj) =>
-        if obj
-          if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
-            msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: obj.toClient()})
+    if msg.type and msg.obj.id
+      if typeof msg.obj.id == 'string'
+        @getObjectPullThrough(msg.obj.id, msg.obj.type).then (obj) =>
+          if obj
+            if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
+              msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: obj.toClient()})
+            else
+              msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: msg.obj.id})
           else
-            msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: msg.obj.id})
-        else
-          console.log 'No object found with id '+msg.obj.id
-          console.dir objStore.objects.map (o) -> o.type == msg.obj.type
-          msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
+            console.log 'No object found with id '+msg.obj.id
+            console.dir objStore.objects.map (o) -> o.type == msg.obj.type
+            msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
+      else
+        msg.replyFunc({status: e.general.FAILURE, info: 'id parameter in wrong format', payload: null })
     else
       msg.replyFunc({status: e.general.FAILURE, info: 'missing parameter', payload: null })
 
