@@ -7,6 +7,7 @@ ClientEndpoints = require('./ClientEndpoints')
 objStore        = require('./OStore')
 error           = require('./Error').error
 
+debug = process.env["DEBUG"]
 
 class ObjectManager
 
@@ -57,7 +58,7 @@ class ObjectManager
         if obj
           if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
             DB.remove obj, (removestatus) =>
-              console.log 'exposed object removed through _delete'+msg.obj.type
+              if debug then console.log 'exposed object removed through _delete'+msg.obj.type
               objStore.removeObject(obj)
               msg.replyFunc({status: e.general.SUCCESS, info: 'delete object', payload: obj.id})
           else
@@ -132,7 +133,7 @@ class ObjectManager
           # Make sure to resolve object references in arrays and hashtables
           @resolveReferences(msg.obj, obj.constructor.model).then (robj)=>
             objStore.updateObj(robj)
-            console.log 'persisting '+obj.id+' type '+obj.type+' in db'
+            if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db'
             record = obj.getRecord()
             DB.set(obj.type, record)
             @updateObjectHooks.forEach (hook) => hook(record)
@@ -146,8 +147,8 @@ class ObjectManager
     )
 
   resolveReferences: (record, model) =>
-    console.log 'resolveReferences model is '
-    console.dir model
+    if debug then console.log 'resolveReferences model is '
+    if debug then console.dir model
     rv = {id: record.id}
     q = defer()
     count = model.length
@@ -166,12 +167,12 @@ class ObjectManager
         arr = record[property.name] or []
         acount = arr.length
         arr.forEach (id) =>
-          console.log 'attempting to get object type '+property.type+' id '+id
+          if debug then console.log 'attempting to get object type '+property.type+' id '+id
           @getObjectPullThrough(id, property.type).then (o)=>
             #console.log ' we got object '+o
             #console.dir o
             resolvedarr.push(o)
-            console.log 'adding array reference '+o.id+' name '+o.name
+            if debug then console.log 'adding array reference '+o.id+' name '+o.name
             if --acount == 0
               rv[property.name] = resolvedarr
               checkFinished()
@@ -182,7 +183,7 @@ class ObjectManager
         harr.forEach (id) =>
           @getObjectPullThrough(id, property.type).then (o)=>
             resolvedhash[o.name] = o
-            console.log 'adding hashtable reference '+o.id+' name '+o.name
+            if debug then console.log 'adding hashtable reference '+o.id+' name '+o.name
             if --hcount == 0
               rv[property.name] = resolvedhash
               checkFinished()
@@ -197,17 +198,17 @@ class ObjectManager
   onRegisterForUpdatesOn: (msg) =>
     console.dir msg
     if msg.obj or not msg.obj.id or not msg.obj.type
-      console.log 'onRegisterForUpdatesOn called for '+msg.obj.type+' '+msg.obj.id
+      if debug then console.log 'onRegisterForUpdatesOn called for '+msg.obj.type+' '+msg.obj.id
       if typeof msg.obj.id is 'string'
         objStore.getObject(msg.obj.id, msg.obj.type).then( (obj) =>
           if obj && obj.id
             if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
               listenerId = objStore.addListenerFor(msg.obj.id, msg.obj.type, (uobj) ->
-                console.log '--------------------- sending update of object '+msg.obj.id+' type '+msg.obj.type+' to client'
+                if debug then console.log '--------------------- sending update of object '+msg.obj.id+' type '+msg.obj.type+' to client'
                 #console.dir uobj
                 ClientEndpoints.sendToEndpoint(msg.client, {status: e.general.SUCCESS, info: e.gamemanager.OBJECT_UPDATE, payload: uobj.toClient() })
               )
-              console.log 'listenerid '+listenerId+' added for updates on object '+obj.name+' ['+obj.id+']'
+              if debug then console.log 'listenerid '+listenerId+' added for updates on object '+obj.name+' ['+obj.id+']'
               msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.REGISTER_UPDATES, payload: listenerId})
             else
               msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.UPDATE_REGISTER_FAIL, payload: msg.obj.id })
@@ -221,7 +222,7 @@ class ObjectManager
       msg.replyFunc({status: e.general.FAILURE, info: 'missing parameter', payload: null })
 
   onDeregisterForUpdatesOn: (msg) =>
-    console.log 'onDeregisterForUpdatesOn called for id '+msg.id+' and listener id '+msg.listenerid
+    if debug then console.log 'onDeregisterForUpdatesOn called for id '+msg.id+' and listener id '+msg.listenerid
     if msg.id and msg.listenerid and msg.type
       objStore.removeListenerFor(msg.id, msg.listenerid)
       msg.replyFunc({status: e.general.SUCCESS, info: 'deregistered listener for obejct', payload: msg.id })
