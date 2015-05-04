@@ -74,7 +74,7 @@ class ObjectManager
     @onUpdateObject(msg)
 
   _getObject: (msg) =>
-    console.log '_getObject called for type '+msg.type
+    if debug then console.log '_getObject called for type '+msg.type
     if msg.type and msg.obj.id
       if typeof msg.obj.id == 'string'
         @getObjectPullThrough(msg.obj.id, msg.obj.type).then (obj) =>
@@ -118,7 +118,10 @@ class ObjectManager
     else
       objStore.getObject(id, type).then (o) =>
         if not o
+          console.log 'did not find object i ostore, getting from db'
           DB.get(type, [id]).then (record) =>
+            console.log 'getting record from db'
+            console.dir record
             @messageRouter.resolver.createObjectFrom(record).then (oo) =>
               q.resolve(oo)
         else
