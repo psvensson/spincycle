@@ -52,8 +52,6 @@ class ResolveModule
     else
       if not record[0] then record = [record]
       #if debug then console.log 'createObjectFrom got record '+record[0].id+' type '+record[0].type
-      if not record[0].id
-        q.resolve(null)
       else @resolve record[0].type, (filename) ->
         #if debug then console.log 'resolved module '+record[0].type+" as "+filename
         module = ResolveModule.modulecache[record[0].type] or require(filename.replace('.js', ''))

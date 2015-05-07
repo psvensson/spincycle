@@ -66,7 +66,6 @@ class WsMethod
       @messageRouter.objectManager._updateObject(msg)
 
     @messageRouter.addTarget '_get'+type, 'obj', (msg) =>
-      console.log 'get something called'
       msg.type = type
       @messageRouter.objectManager._getObject(msg)
 

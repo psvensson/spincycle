@@ -74,26 +74,22 @@ class ObjectManager
     @onUpdateObject(msg)
 
   _getObject: (msg) =>
-    console.log '_getObject called for type '+msg.type
+    if debug then console.log '_getObject called for type '+msg.type
     if msg.type and msg.obj.id
       if typeof msg.obj.id == 'string'
         @getObjectPullThrough(msg.obj.id, msg.obj.type).then (obj) =>
           if obj
             if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
-              console.log 'yohoo'
               msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: obj.toClient()})
             else
-              console.log 'not allowed'
               msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: msg.obj.id})
           else
             console.log 'No object found with id '+msg.obj.id
             console.dir objStore.objects.map (o) -> o.type == msg.obj.type
             msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
       else
-        console.log 'id param in wrong format'
         msg.replyFunc({status: e.general.FAILURE, info: 'id parameter in wrong format', payload: null })
     else
-      console.log 'missing param'
       msg.replyFunc({status: e.general.FAILURE, info: 'missing parameter', payload: null })
 
   _listObjects: (msg) =>
@@ -124,8 +120,8 @@ class ObjectManager
         if not o
           console.log 'did not find object i ostore, getting from db'
           DB.get(type, [id]).then (record) =>
-            console.log 'getting record from db'
-            console.dir record
+            #console.log 'getting record from db'
+            #console.dir record
             @messageRouter.resolver.createObjectFrom(record).then (oo) =>
               q.resolve(oo)
         else
