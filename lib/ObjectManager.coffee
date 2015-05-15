@@ -44,6 +44,8 @@ class ObjectManager
     if msg.obj.type
       if @messageRouter.authMgr.canUserCreateThisObject(msg.obj.type, msg.user)
         console.dir msg
+        msg.obj.createdAt = Date.now()
+        msg.obj.createdBy = msg.user.id
         SuperModel.resolver.createObjectFrom(msg.obj).then (o) =>
           o.serialize()
           msg.replyFunc({status: e.general.SUCCESS, info: 'new '+msg.obj.type, payload: o})
@@ -134,6 +136,7 @@ class ObjectManager
       if obj
         if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
           # Make sure to resolve object references in arrays and hashtables
+          msg.obj.modifiedAt = Date.now()
           @resolveReferences(msg.obj, obj.constructor.model).then (robj)=>
             objStore.updateObj(robj)
             if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db'

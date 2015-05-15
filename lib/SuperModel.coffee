@@ -26,6 +26,11 @@ class SuperModel
   constructor:(@record={})->
     #console.log 'SuperModel constructor'
     #console.dir @model
+
+    @constructor.model.push({ name: 'createdAt',    public: true,   value: 'createdAt' })
+    @constructor.model.push({ name: 'modifiedAt',   public: true,   value: 'modifiedAt' })
+    @constructor.model.push({ name: 'createdBy',    public: true,   value: 'createdBy' })
+
     @type = @constructor.type
     q = defer()
     @id         = @record.id or uuid.v4()
