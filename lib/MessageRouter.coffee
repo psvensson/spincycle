@@ -30,6 +30,7 @@ class MessageRouter
   constructor: (@authMgr) ->
     console.log 'messageRouter constructor'
     console.dir @authMgr
+    @authMgr.messagerouter = @
     @resolver = new ResolveModule()
     @targets  = []
     @debugtargets  = []
