@@ -54,8 +54,6 @@ class SuperModel
   _getRecord: (me, model, record) ->
     rv = {}
     rv._rev = @_rev if @_rev
-    if not model
-      console.dir me
     model.forEach (v) ->
       k = v.name
       if v.value then rv[k] = me[v.value] or record[k]
