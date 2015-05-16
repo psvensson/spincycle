@@ -137,10 +137,12 @@ class ObjectManager
     objStore.getObject(msg.obj.id, msg.obj.type).then( (obj) =>
       if obj
         if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
+          if debug then console.log 'can write'
           if @changedPropertiesNotInBlacklist(obj, msg.obj)
+            if debug then console.log 'no blacklist'
             # Make sure to resolve object references in arrays and hashtables
-            msg.obj.modifiedAt = Date.now()
             @resolveReferences(msg.obj, obj.constructor.model).then (robj)=>
+              if debug then console.log 'found object'
               objStore.updateObj(robj)
               if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db'
               record = obj.getRecord()

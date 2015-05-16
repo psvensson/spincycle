@@ -80,7 +80,7 @@ class SuperModel
     rv = {}
     for k,v of r
       ra.forEach (el) ->
-        if el.name == k and el.public then rv[k] = v
+        if el.name == k and k != 'record' and el.public then rv[k] = v
     rv.id = @id
     rv.type = @.constructor.type
     return rv

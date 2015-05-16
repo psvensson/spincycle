@@ -80,6 +80,7 @@ class OStore
             changed = true
           obj[pp] = record[pp]
           console.log 'updating property "'+pp+'" on '+record.type+' id '+record.id
+    obj.modifiedAt = Date.now()
     OStore.objects[record.id] = obj
     listeners = OStore.listeners[obj.id] or []
     if changed
