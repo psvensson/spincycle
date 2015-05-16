@@ -160,7 +160,9 @@ class ObjectManager
   changedPropertiesNotInBlacklist: (origobj, chobj) =>
     rv = true
     for p of origobj
-      if p in @blackList and chobj[p] != origobj[p] then rv = false
+      if p in @blackList and chobj[p] != origobj[p]
+        console.log 'property '+p+' is in blacklist for object '+origobj.name+' ['+origobj.id+']'
+        rv = false
     return rv
 
   resolveReferences: (record, model) =>
