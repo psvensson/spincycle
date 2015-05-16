@@ -13,6 +13,7 @@ class ObjectManager
 
   constructor: (@messageRouter) ->
    @updateObjectHooks = []
+   @blackList = ['id', 'createdAt', 'createdBy', 'updatedAt']
 
   setup: () =>
     @messageRouter.addTarget('registerForUpdatesOn',  'obj', @onRegisterForUpdatesOn)
@@ -136,15 +137,18 @@ class ObjectManager
     objStore.getObject(msg.obj.id, msg.obj.type).then( (obj) =>
       if obj
         if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
-          # Make sure to resolve object references in arrays and hashtables
-          msg.obj.modifiedAt = Date.now()
-          @resolveReferences(msg.obj, obj.constructor.model).then (robj)=>
-            objStore.updateObj(robj)
-            if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db'
-            record = obj.getRecord()
-            DB.set(obj.type, record)
-            @updateObjectHooks.forEach (hook) => hook(record)
-            msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
+          if @changedPropertiesNotInBlacklist(obj, msg.obj)
+            # Make sure to resolve object references in arrays and hashtables
+            msg.obj.modifiedAt = Date.now()
+            @resolveReferences(msg.obj, obj.constructor.model).then (robj)=>
+              objStore.updateObj(robj)
+              if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db'
+              record = obj.getRecord()
+              DB.set(obj.type, record)
+              @updateObjectHooks.forEach (hook) => hook(record)
+              msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
+          else
+            msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'Not allowed to change property', payload: msg.obj.id})
         else
           msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.UPDATE_OBJECT_FAIL, payload: msg.obj.id})
       else
@@ -152,6 +156,12 @@ class ObjectManager
         console.dir objStore.objects.map (o) -> o.type == msg.obj.type
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
     )
+
+  changedPropertiesNotInBlacklist: (origobj, chobj) =>
+    rv = true
+    for p of origobj
+      if p in @blackList and chobj[p] != origobj[p] then rv = false
+    return rv
 
   resolveReferences: (record, model) =>
     if debug then console.log 'resolveReferences model is '
