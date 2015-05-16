@@ -144,7 +144,7 @@ class ObjectManager
               objStore.updateObj(robj)
               if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db'
               record = obj.getRecord()
-              DB.set(obj.type, record)
+              obj.serialize()
               @updateObjectHooks.forEach (hook) => hook(record)
               msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
           else
@@ -178,7 +178,7 @@ class ObjectManager
         q.resolve(rv)
 
     model.forEach (property) =>
-      console.log 'going through property '+property
+      #console.log 'going through property '+property.name
       if property.array
         resolvedarr = []
         arr = record[property.name] or []
