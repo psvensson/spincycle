@@ -175,7 +175,7 @@ class ObjectManager
     count = model.length
 
     checkFinished = () ->
-      #console.log 'checkFinished count = '+count
+      if debug then console.log 'checkFinished count = '+count
       #console.dir rv
       if --count == 0
         #console.log 'resolving back object'
@@ -209,6 +209,7 @@ class ObjectManager
               rv[property.name] = resolvedhash
               checkFinished()
       else
+        if debug then console.log 'resolveReference adding direct reference '+property.name
         rv[property.name] = record[property.name]
         checkFinished()
 
