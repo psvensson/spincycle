@@ -235,7 +235,6 @@ class ObjectManager
             if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
               listenerId = objStore.addListenerFor(msg.obj.id, msg.obj.type, (uobj) ->
                 if debug then console.log '--------------------- sending update of object '+msg.obj.id+' type '+msg.obj.type+' to client'
-                #console.dir uobj
                 ClientEndpoints.sendToEndpoint(msg.client, {status: e.general.SUCCESS, info: e.gamemanager.OBJECT_UPDATE, payload: uobj.toClient() })
               )
               if debug then console.log 'listenerid '+listenerId+' added for updates on object '+obj.name+' ['+obj.id+']'

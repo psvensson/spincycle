@@ -86,7 +86,10 @@ class SuperModel
     rv = {}
     for k,v of r
       ra.forEach (el) =>
-        if el.name == k and k != 'record' and el.public then rv[k] = @prettyPrint(k, v)
+        if el.name == k and k != 'record' and el.public
+          res = @prettyPrint(k, v)
+          if debug then console.log 'toClient '+k+' -> '+res
+          rv[k] = res
     rv.id = @id
     rv.type = @.constructor.type
     return rv
@@ -108,7 +111,7 @@ class SuperModel
 
   prettyPrint: (name, value) =>
     rv = value
-    if name == 'createdAt' or name == 'modifiedAt' then rv = new Date(parseInt(value)).toUTCString()
+    if (name == 'createdAt' or name == 'modifiedAt') and value then rv = new Date(parseInt(value)).toUTCString()
     return rv
 
   unPrettify: (record) =>
