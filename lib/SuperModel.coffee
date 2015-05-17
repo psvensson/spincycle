@@ -103,13 +103,8 @@ class SuperModel
     return q
 
   prettyPrint: (name, value) =>
-    rv = ""
-    if name == 'createdBy'
-
-
-    else if name == 'createdAt' or name == 'updatedAt'
-      rv = new Date(parseInt(value)).toUTCString()
-
+    rv = value
+    if name == 'createdAt' or name == 'modifiedAt' then rv = new Date(parseInt(value)).toUTCString()
     return rv
 
   unPrettify: (record) =>
