@@ -27,6 +27,8 @@ class SuperModel
     #console.log 'SuperModel constructor'
     #console.dir @model
 
+    @record = @unPrettify(@record)
+
     @constructor.model.push({ name: 'createdAt',    public: true,   value: 'createdAt' })
     @constructor.model.push({ name: 'modifiedAt',   public: true,   value: 'modifiedAt' })
     @constructor.model.push({ name: 'createdBy',    public: true,   value: 'createdBy' })
@@ -80,7 +82,7 @@ class SuperModel
     rv = {}
     for k,v of r
       ra.forEach (el) ->
-        if el.name == k and k != 'record' and el.public then rv[k] = v
+        if el.name == k and k != 'record' and el.public then rv[k] = @prettyPrint(k, v)
     rv.id = @id
     rv.type = @.constructor.type
     return rv
@@ -99,6 +101,19 @@ class SuperModel
     else
       q.resolve(@)
     return q
+
+  prettyPrint: (name, value) =>
+    rv = ""
+    if name == 'createdBy'
+
+
+    else if name == 'createdAt' or name == 'updatedAt'
+      rv = Date.toUTCString(value)
+
+    return rv
+
+  unPrettify: (record) =>
+    #TODO: Perhaps if createdBy is used, but it should actually be solved by the client instead (request name for user id referenced)
 
   loadFromIds:(model) =>
     if debug then console.log '------------------------------------------------> loadfromIds called for '+@.constructor.type+' '+@id+' '+model.length+' properties'
