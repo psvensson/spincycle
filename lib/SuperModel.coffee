@@ -81,7 +81,7 @@ class SuperModel
     ra = @.constructor.model
     rv = {}
     for k,v of r
-      ra.forEach (el) ->
+      ra.forEach (el) =>
         if el.name == k and k != 'record' and el.public then rv[k] = @prettyPrint(k, v)
     rv.id = @id
     rv.type = @.constructor.type
