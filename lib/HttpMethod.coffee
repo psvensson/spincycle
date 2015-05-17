@@ -31,5 +31,4 @@ class HttpMethod
   expose: (type) =>
     console.log 'HttpMethod::Expose called for type '+type+' (unimplemented)'
 
-
 module.exports = HttpMethod

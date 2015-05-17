@@ -114,6 +114,7 @@ class SuperModel
 
   unPrettify: (record) =>
     #TODO: Perhaps if createdBy is used, but it should actually be solved by the client instead (request name for user id referenced)
+    record
 
   loadFromIds:(model) =>
     if debug then console.log '------------------------------------------------> loadfromIds called for '+@.constructor.type+' '+@id+' '+model.length+' properties'
