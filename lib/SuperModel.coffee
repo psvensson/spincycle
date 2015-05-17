@@ -28,10 +28,12 @@ class SuperModel
     #console.dir @model
 
     @record = @unPrettify(@record)
-
-    @constructor.model.push({ name: 'createdAt',    public: true,   value: 'createdAt' })
-    @constructor.model.push({ name: 'modifiedAt',   public: true,   value: 'modifiedAt' })
-    @constructor.model.push({ name: 'createdBy',    public: true,   value: 'createdBy' })
+    missing = true
+    @constructor.model.forEach (mp) -> if mp.name == 'createdAt' then missing = false
+    if missing
+      @constructor.model.push({ name: 'createdAt',    public: true,   value: 'createdAt' })
+      @constructor.model.push({ name: 'modifiedAt',   public: true,   value: 'modifiedAt' })
+      @constructor.model.push({ name: 'createdBy',    public: true,   value: 'createdBy' })
 
     @type = @constructor.type
     q = defer()

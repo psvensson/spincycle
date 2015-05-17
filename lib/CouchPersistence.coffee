@@ -36,6 +36,8 @@ class CouchPersistence
     return q
 
   query: (_type, query, cb) =>
+    console.log 'couchPersistence query got query'
+    console.dir query
     rv = []
     type = _type.toLowerCase()
     @client.request type, query, (err, res) =>
