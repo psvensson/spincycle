@@ -32,7 +32,7 @@ class CouchPersistence
                   emit doc.id, doc
 
               'byProviderId': map: (doc)->
-                if doc.id and doc.type.toLowerCase() == type
+                if doc.type.toLowerCase() == type
                   emit doc.providerId, doc
 
             @dbs[type] = db
