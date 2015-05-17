@@ -49,6 +49,8 @@ class CouchPersistence
     type = _type.toLowerCase()
     @getDbFor(type).then (db) =>
       matches = db.view(type+'/byProviderId', { key: pid })
+      console.log 'matches = '+matches
+      console.dir matches
       q.resolve(matches.rows.map(@dot('value')))
     return q
 
