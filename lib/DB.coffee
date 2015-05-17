@@ -33,9 +33,12 @@ class DB
 
     return q
 
-  @query: (type, query, cb) =>
+  @byProviderId: (type, pid) =>
+    q = defer()
     store = @getDataStore()
-    store.query(type, query, cb)
+    store.byProviderId(type.pid).then (res) =>
+      q.resolve(res)
+    return q
 
   @all: (type, cb) =>
     store = @getDataStore()

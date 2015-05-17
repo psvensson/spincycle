@@ -26,27 +26,30 @@ class CouchPersistence
           db.create (er) =>
             if (er) then console.log 'DB create error: '+JSON.stringify(er)
             # --------------------------------------------- Create 'all' view
-            db.saveDesign type, views: 'all': map: (doc)->
-              if doc.id and doc.type.toLowerCase() == type
-                emit doc.id, doc
+            db.saveDesign type, views:
+              'all': map: (doc)->
+                if doc.id and doc.type.toLowerCase() == type
+                  emit doc.id, doc
+
+              'byProviderId': map: (doc)->
+                if doc.id and doc.type.toLowerCase() == type
+                  emit doc.providerId, doc
 
             @dbs[type] = db
             q.resolve(db)
 
     return q
 
-  query: (_type, query, cb) =>
-    console.log 'couchPersistence query got query'
-    console.dir query
-    rv = []
+  dot: (attr) ->
+    return (obj) ->
+      obj[attr]
+
+  byProviderId: (_type, pid) =>
+    q = defer()
     type = _type.toLowerCase()
-    @client.request type, query, (err, res) =>
-      if (err)
-        console.log 'CouchPersistence fetch all ERROR: '+err
-        console.dir err
-        cb []
-      else
-        cb rv
+    matches = db.view(type+'/byProviderId', { key: pid })
+    q.resolve(matches.rows.map(@dot('value')))
+    return q
 
   all: (_type, cb) =>
     rv = []
