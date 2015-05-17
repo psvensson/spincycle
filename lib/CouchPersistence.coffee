@@ -33,7 +33,7 @@ class CouchPersistence
 
               'providerid': map: (doc)->
                 if doc.providerId
-                  emit doc.providerId, null
+                  emit doc.providerId, doc
 
             @dbs[type] = db
             q.resolve(db)
@@ -45,11 +45,11 @@ class CouchPersistence
       obj[attr]
 
   byProviderId: (_type, pid) =>
-    console.log 'byProviderId called for pid '+pid
+    console.log 'byProviderId called for pid '+pid+' and type '+_type
     q = defer()
     type = _type.toLowerCase()
     @getDbFor(type).then (db) =>
-      matches = db.view type, 'providerid', { key: pid, include_docs: true }, (err, matches) =>
+      matches = db.view type, 'providerid', { key: pid}, (err, matches) =>
         console.log 'err = '+err+' matches = '+matches
         console.dir matches
         q.resolve(matches.rows.map(@dot('value')))
