@@ -33,6 +33,10 @@ class DB
 
     return q
 
+  @query: (type, query, cb) =>
+    store = @getDataStore()
+    store.query(type, query, cb)
+
   @all: (type, cb) =>
     store = @getDataStore()
     if store.all

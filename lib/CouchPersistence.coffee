@@ -35,6 +35,17 @@ class CouchPersistence
 
     return q
 
+  query: (_type, query, cb) =>
+    rv = []
+    type = _type.toLowerCase()
+    @client.request type, query, (err, res) =>
+      if (err)
+        console.log 'CouchPersistence fetch all ERROR: '+err
+        console.dir err
+        cb []
+      else
+        cb rv
+
   all: (_type, cb) =>
     rv = []
     type = _type.toLowerCase()
