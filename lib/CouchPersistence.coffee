@@ -47,8 +47,9 @@ class CouchPersistence
   byProviderId: (_type, pid) =>
     q = defer()
     type = _type.toLowerCase()
-    matches = db.view(type+'/byProviderId', { key: pid })
-    q.resolve(matches.rows.map(@dot('value')))
+    @getDbFor(type).then (db) =>
+      matches = db.view(type+'/byProviderId', { key: pid })
+      q.resolve(matches.rows.map(@dot('value')))
     return q
 
   all: (_type, cb) =>
