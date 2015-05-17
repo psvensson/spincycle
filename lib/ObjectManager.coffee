@@ -159,6 +159,7 @@ class ObjectManager
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
     )
 
+  #TODO: make sure to actuqally save properties that ARE ok, but not those in blacklist of many are goven
   changedPropertiesNotInBlacklist: (origobj, chobj) =>
     rv = true
     for p of origobj
