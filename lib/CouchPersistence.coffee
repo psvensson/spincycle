@@ -45,6 +45,7 @@ class CouchPersistence
       obj[attr]
 
   byProviderId: (_type, pid) =>
+    console.log 'byProviderId called for pid '+pid
     q = defer()
     type = _type.toLowerCase()
     @getDbFor(type).then (db) =>
