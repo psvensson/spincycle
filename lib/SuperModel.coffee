@@ -108,7 +108,7 @@ class SuperModel
 
 
     else if name == 'createdAt' or name == 'updatedAt'
-      rv = Date.toUTCString(value)
+      rv = new Date(value).toUTCString()
 
     return rv
 
