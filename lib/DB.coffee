@@ -36,7 +36,7 @@ class DB
   @byProviderId: (type, pid) =>
     q = defer()
     store = @getDataStore()
-    store.byProviderId(type.pid).then (res) =>
+    store.byProviderId(type, pid).then (res) =>
       q.resolve(res)
     return q
 
