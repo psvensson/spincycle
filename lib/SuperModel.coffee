@@ -63,12 +63,14 @@ class SuperModel
       if v.value then rv[k] = me[v.value] or record[k]
       else if v.hashtable
         varr = []
-        for hk, hv of me[v.name]
+        ha = me[v.name] or []
+        for hk, hv of ha
           varr.push hv.id
         rv[k] = varr
       else if v.array
         varr = []
-        me[v.name].forEach (hv) -> varr.push hv.id
+        marr = me[v.name] or []
+        marr.forEach (hv) -> varr.push hv.id
         rv[k] = varr
       else # direct object reference
         if debug then console.log 'getRecord accessing property '+k+' of object '+@type+' -> '+me[k]
