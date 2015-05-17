@@ -49,10 +49,11 @@ class CouchPersistence
     q = defer()
     type = _type.toLowerCase()
     @getDbFor(type).then (db) =>
-      matches = db.view type, 'providerid', { key: pid}, (err, matches) =>
-        console.log 'err = '+err+' matches = '+matches
-        console.dir matches
-        q.resolve(matches.rows.map(@dot('value')))
+        db.view(type,'providerid',{ key: pid},(err, matches) =>
+          console.log 'err = '+err+' matches = '+matches
+          console.dir matches
+          q.resolve(matches.rows.map(@dot('value')))
+        )
     return q
 
   all: (_type, cb) =>
