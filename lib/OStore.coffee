@@ -76,7 +76,7 @@ class OStore
         #console.log '  comparing to incoming property '+pp
         if pp is p
           #console.log '    match!'
-          if obj[pp] != record[pp] and pp not in @blackList
+          if obj[pp] != record[pp] and pp not in OStore.blackList
             diff[pp] = record[pp]
             changed = true
             obj[pp] = record[pp]
