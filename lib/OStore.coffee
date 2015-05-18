@@ -12,6 +12,7 @@ class OStore
   @types:         []
   @listeners:     []
   @objectsByType: []
+  @blackList:     ['id', 'createdAt', 'createdBy', 'updatedAt']
 
   @listObjectsByType: (type) =>
     rv = []
@@ -75,7 +76,7 @@ class OStore
         #console.log '  comparing to incoming property '+pp
         if pp is p
           #console.log '    match!'
-          if obj[pp] != record[pp]
+          if obj[pp] != record[pp] and pp not in @blackList
             diff[pp] = record[pp]
             changed = true
           obj[pp] = record[pp]
