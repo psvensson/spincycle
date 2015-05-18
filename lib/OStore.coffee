@@ -70,6 +70,7 @@ class OStore
     delete whitelist.id
     diff = {}
     changed = false;
+    record.modifiedAt = Date.now()
     for p of whitelist
       #console.log 'checking whitelist property '+p
       for pp of record
@@ -80,8 +81,8 @@ class OStore
             diff[pp] = record[pp]
             changed = true
             obj[pp] = record[pp]
-            console.log 'updating property "'+pp+'" on '+record.type+' id '+record.id
-    obj.modifiedAt = Date.now()
+            console.log 'updating property "'+pp+'" on '+obj.type+' id '+record.id+' to '+record[pp]
+
     OStore.objects[record.id] = obj
     listeners = OStore.listeners[obj.id] or []
     if changed
