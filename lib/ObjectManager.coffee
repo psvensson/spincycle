@@ -141,9 +141,9 @@ class ObjectManager
           @resolveReferences(msg.obj, obj.constructor.model).then (robj)=>
             if debug then console.log 'found object'
             objStore.updateObj(robj)
-            if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db'
-            record = obj.getRecord()
-            obj.serialize()
+            if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db. modifiedAt = '+robj.modifiedAt
+            record = robj.getRecord()
+            robj.serialize()
             @updateObjectHooks.forEach (hook) => hook(record)
             msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
         else
