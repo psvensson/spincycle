@@ -224,7 +224,7 @@ class ObjectManager
                 if debug then console.log '--------------------- sending update of object '+msg.obj.id+' type '+msg.obj.type+' to client'
                 toclient = uobj.toClient()
                 console.dir(toclient)
-                ClientEndpoints.sendToEndpoint(msg.client, {status: e.general.SUCCESS, info: 'subscription succeeded', payload: toclient })
+                ClientEndpoints.sendToEndpoint(msg.client, {status: e.general.SUCCESS, info: 'OBJECT_UPDATE', payload: toclient })
               )
               if debug then console.log 'listenerid '+listenerId+' added for updates on object '+obj.name+' ['+obj.id+']'
               msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.REGISTER_UPDATES, payload: listenerId})
