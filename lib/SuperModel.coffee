@@ -101,7 +101,7 @@ class SuperModel
       record = @getRecord()
       if @_rev then record._rev = @_rev
       OMgr.storeObject()
-      OMgr.updateObj(updatedObj)
+      OMgr.updateObj(updatedObj) if updatedObj
       DB.set(@.constructor.type, record).then () =>
         @_serializing = false
         q.resolve(@)

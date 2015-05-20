@@ -228,7 +228,7 @@ class ObjectManager
                 if ClientEndpoints.exists(msg.client)
                   ClientEndpoints.sendToEndpoint(msg.client, {status: e.general.SUCCESS, info: 'OBJECT_UPDATE', payload: toclient })
                 else
-                  console.log 'removing dangling endpoint from object updates..'
+                  console.log 'removing dangling endpoint from object updates for obj id '+msg.id+' and listenerId '+rememberedListenerId
                   objStore.removeListenerFor(msg.id, rememberedListenerId)
               )
               rememberedListenerId = listenerId
