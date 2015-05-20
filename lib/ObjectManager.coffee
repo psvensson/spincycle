@@ -220,6 +220,7 @@ class ObjectManager
         objStore.getObject(msg.obj.id, msg.obj.type).then( (obj) =>
           if obj && obj.id
             if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
+              rememberedListenerId = undefinded
               listenerId = objStore.addListenerFor(msg.obj.id, msg.obj.type, (uobj) ->
                 if debug then console.log '--------------------- sending update of object '+msg.obj.id+' type '+msg.obj.type+' to client'
                 toclient = uobj.toClient()
@@ -228,8 +229,9 @@ class ObjectManager
                   ClientEndpoints.sendToEndpoint(msg.client, {status: e.general.SUCCESS, info: 'OBJECT_UPDATE', payload: toclient })
                 else
                   console.log 'removing dangling endpoint from object updates..'
-                  objStore.removeListenerFor(msg.id, listenerId)
+                  objStore.removeListenerFor(msg.id, rememberedListenerId)
               )
+              rememberedListenerId = listenerId
               if debug then console.log 'listenerid '+listenerId+' added for updates on object '+obj.name+' ['+obj.id+']'
               msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.REGISTER_UPDATES, payload: listenerId})
             else
