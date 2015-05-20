@@ -94,13 +94,13 @@ class SuperModel
     rv.type = @.constructor.type
     return rv
 
-  serialize: () =>
+  serialize: (updatedObj) =>
     q = defer()
     if not @_serializing
       @_serializing = true
       record = @getRecord()
       if @_rev then record._rev = @_rev
-      OMgr.storeObject(@)
+      OMgr.storeObject(updatedObj)
       DB.set(@.constructor.type, record).then () =>
         @_serializing = false
         q.resolve(@)
