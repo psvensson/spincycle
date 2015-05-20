@@ -29,7 +29,6 @@ class WsMethod
           #console.dir datastring
           data = datastring # TODO: Guard against hax0r dataz
 
-
         data.client    = ip+':'+port
         data.messageId = data.messageId || uuid.v4()
         data.replyFunc = (replydata) ->

@@ -94,9 +94,9 @@ class OStore
     listenerId = uuid.v4()
     list[listenerId] = cb
     OStore.listeners[id] = list
-    @getObject(id, type).then((result) ->
-      cb(result)
-    , error)
+    #@getObject(id, type).then((result) ->
+    #  cb(result)
+    #, error)
     return listenerId
 
   @removeListenerFor: (id, listenerId) =>
