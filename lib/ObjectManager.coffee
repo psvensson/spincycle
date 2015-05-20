@@ -53,7 +53,7 @@ class ObjectManager
       else
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to create objects of that type', payload: msg.obj.type})
     else
-      msg.replyFunc({status: e.general.FAILURE, info: 'missing parameter', payload: null })
+      msg.replyFunc({status: e.general.FAILURE, info: '_createObject missing parameter', payload: null })
 
   _deleteObject: (msg) =>
     if msg.obj and msg.obj.type and msg.obj.id
@@ -71,7 +71,7 @@ class ObjectManager
           console.dir objStore.objects.map (o) -> o.type == msg.obj.type
           msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
     else
-      msg.replyFunc({status: e.general.FAILURE, info: 'missing parameter', payload: null })
+      msg.replyFunc({status: e.general.FAILURE, info: '_deleteObject missing parameter', payload: null })
 
   _updateObject: (msg) =>
     @onUpdateObject(msg)
@@ -93,7 +93,7 @@ class ObjectManager
       else
         msg.replyFunc({status: e.general.FAILURE, info: 'id parameter in wrong format', payload: null })
     else
-      msg.replyFunc({status: e.general.FAILURE, info: 'missing parameter', payload: null })
+      msg.replyFunc({status: e.general.FAILURE, info: '_getObject missing parameter', payload: null })
 
   _listObjects: (msg) =>
     console.log 'listObjects called for type '+msg.type
@@ -105,7 +105,7 @@ class ObjectManager
         console.log 'found '+rv.length+' objects to return'
         msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
     else
-      msg.replyFunc({status: e.general.FAILURE, info: 'missing parameter', payload: null })
+      msg.replyFunc({status: e.general.FAILURE, info: '_listObjects missing parameter', payload: null })
 
   #---------------------------------------------------------------------------------------------------------------------
 
@@ -235,9 +235,9 @@ class ObjectManager
             msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id })
         , error)
       else
-      msg.replyFunc({status: e.general.FAILURE, info: 'wrong parameter format', payload: 'id' })
+        msg.replyFunc({status: e.general.FAILURE, info: 'onRegisterForUpdatesOn wrong parameter format', payload: 'id' })
     else
-      msg.replyFunc({status: e.general.FAILURE, info: 'missing parameter', payload: null })
+      msg.replyFunc({status: e.general.FAILURE, info: 'onRegisterForUpdatesOn missing parameter', payload: null })
 
   onDeregisterForUpdatesOn: (msg) =>
     if debug then console.log 'onDeregisterForUpdatesOn called for id '+msg.id+' and listener id '+msg.listenerid
@@ -245,6 +245,6 @@ class ObjectManager
       objStore.removeListenerFor(msg.id, msg.listenerid)
       msg.replyFunc({status: e.general.SUCCESS, info: 'deregistered listener for obejct', payload: msg.id })
     else
-      msg.replyFunc({status: e.general.FAILURE, info: 'missing parameter', payload: null })
+      msg.replyFunc({status: e.general.FAILURE, info: 'onDeregisterForUpdatesOn missing parameter', payload: null })
 
 module.exports = ObjectManager
