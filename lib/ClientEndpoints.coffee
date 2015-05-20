@@ -23,6 +23,9 @@ class ClientEndpoints
     else
       console.log '** no endpoint found for address '+address
 
+  @exists: (address) =>
+    @endpoints[address]
+
   @onDisconnect: (cb) =>
     @ondisconnectcbs.push cb
 
