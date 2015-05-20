@@ -140,7 +140,7 @@ class ObjectManager
           # Make sure to resolve object references in arrays and hashtables
           @resolveReferences(msg.obj, obj.constructor.model).then (robj)=>
             if debug then console.log 'found object'
-            objStore.updateObj(robj)
+            #objStore.updateObj(robj)
             if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db. modifiedAt = '+obj.modifiedAt
             obj.serialize().then () =>
               record = obj.getRecord()
