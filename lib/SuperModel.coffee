@@ -29,7 +29,13 @@ class SuperModel
     @id         = @record.id or uuid.v4()
 
     # populate 'aggregate' list object for all_* in OStore so that it can be subscribed to
-    obj = {id: 'all_'+@constructor.type, list: [@.id]}
+    obj =
+    {
+      id: 'all_'+@constructor.type
+      list: [@.id]
+      getRecord: ()->
+        obj
+    }
     OMgr.getObject('all_'+@constructor.type, @constructor.type).then (oo) =>
       if oo
         oo.list.push @.id
