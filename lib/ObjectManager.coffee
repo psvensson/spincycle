@@ -110,7 +110,7 @@ class ObjectManager
   _listObjects: (msg) =>
     console.log 'listObjects called for type '+msg.type
     if typeof msg.type != 'undefined'
-      if not @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user)
+      if @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user) == no
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to list objects of type '+msg.type, payload: msg.type})
       else
         #rv = objStore.listObjectsByType(msg.type)
