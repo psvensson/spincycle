@@ -12,7 +12,7 @@ class OStore
   @types:         []
   @listeners:     []
   @objectsByType: []
-  @blackList:     ['id', 'createdAt', 'createdBy', 'updatedAt']
+  @blackList:     ['id', 'createdAt', 'createdBy', 'updatedAt', 'admin']
 
   @listObjectsByType: (type) =>
     rv = []

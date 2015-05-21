@@ -137,7 +137,7 @@ class SuperModel
           r = defer()
           allpromises.push(r)
           if resolveobj.value
-            if debug then console.log '++ @record[resolveobj.value] = '+@record[resolveobj.value]+' and resolveobj.default = '+resolveobj.default
+            #if debug then console.log '++ @record[resolveobj.value] = '+@record[resolveobj.value]+' and resolveobj.default = '+resolveobj.default
             @[resolveobj.name] = @record[resolveobj.value] or resolveobj.default
           @[resolveobj.name] = [] if resolveobj.array == true
           @[resolveobj.name] = {} if resolveobj.hashtable == true
@@ -185,7 +185,7 @@ class SuperModel
                       , error)
                   , error)
                 )(_id)
-          if debug then console.log '------- property '+resolveobj.name+' now set to '+@[resolveobj.name]
+          #if debug then console.log '------- property '+resolveobj.name+' now set to '+@[resolveobj.name]
         )(robj)
 
     all(allpromises, error).then( (results) =>
