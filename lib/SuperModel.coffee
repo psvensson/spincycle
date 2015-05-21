@@ -69,7 +69,7 @@ class SuperModel
         rv[k] = varr
       else if v.array
         varr = []
-        marr = me[v.name] or []
+        marr = me[v.value] or []
         marr.forEach (hv) -> varr.push hv.id
         rv[k] = varr
       else # direct object reference
