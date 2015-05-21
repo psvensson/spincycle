@@ -113,9 +113,11 @@ class ObjectManager
       if not @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user)
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to list objects of type '+msg.type, payload: msg.type})
       else
-        rv = objStore.listObjectsByType(msg.type)
-        console.log 'found '+rv.length+' objects to return'
-        msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
+        #rv = objStore.listObjectsByType(msg.type)
+        DB.all(msg.type, (rv) ->
+          console.log 'found '+rv.length+' objects to return'
+          msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
+        )
     else
       msg.replyFunc({status: e.general.FAILURE, info: '_listObjects missing parameter', payload: null })
 
