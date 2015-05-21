@@ -50,6 +50,14 @@ class ObjectManager
         SuperModel.resolver.createObjectFrom(msg.obj).then (o) =>
           o.serialize()
           msg.replyFunc({status: e.general.SUCCESS, info: 'new '+msg.obj.type, payload: o})
+          # populate 'aggregate' list object for all_* in OStore so that it can be subscribed to
+          rv = objStore.listObjectsByType(msg.obj.type)
+          obj = {id: 'all_'+msg.obj.type, list: rv}
+          objStore.getObj('all_'+smg.obj.type, msg.obj.type).then (oo) =>
+            if oo
+              objStore.updateObj(obj)
+            else
+              objStore.storeObject(obj)
       else
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to create objects of that type', payload: msg.obj.type})
     else
@@ -80,21 +88,32 @@ class ObjectManager
     if debug then console.log '_getObject called for type '+msg.type
     if msg.type and msg.obj.id
       if typeof msg.obj.id == 'string'
-        @getObjectPullThrough(msg.obj.id, msg.obj.type).then (obj) =>
-          if obj
-            if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
-              msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: obj.toClient()})
+        if msg.obj.id.indexOf('all_') > -1
+          @getAggregateObjects(msg)
+        else
+          @getObjectPullThrough(msg.obj.id, msg.obj.type).then (obj) =>
+            if obj
+              if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
+                msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: obj.toClient()})
+              else
+                console.log '_getObject got NOT ALLOWED for user '+msg.user.id+' for '+msg.type+' id '+obj.id
+                msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: msg.obj.id})
             else
-              console.log '_getObject got NOT ALLOWED for user '+msg.user.id+' for '+msg.type+' id '+obj.id
-              msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: msg.obj.id})
-          else
-            console.log 'No object found with id '+msg.obj.id
-            console.dir objStore.objects.map (o) -> o.type == msg.obj.type
-            msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
+              console.log 'No object found with id '+msg.obj.id
+              console.dir objStore.objects.map (o) -> o.type == msg.obj.type
+              msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
       else
         msg.replyFunc({status: e.general.FAILURE, info: 'id parameter in wrong format', payload: null })
     else
       msg.replyFunc({status: e.general.FAILURE, info: '_getObject missing parameter', payload: null })
+
+  getAggregateObjects: (msg) =>
+    if not @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user)
+      msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to list objects of type '+msg.type, payload: msg.type})
+    else
+      rv = objStore.listObjectsByType(msg.obj.type)
+      obj = {id: msg.obj.id, list: rv}
+      msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: obj})
 
   _listObjects: (msg) =>
     console.log 'listObjects called for type '+msg.type
