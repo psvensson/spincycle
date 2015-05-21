@@ -50,14 +50,6 @@ class ObjectManager
         SuperModel.resolver.createObjectFrom(msg.obj).then (o) =>
           o.serialize()
           msg.replyFunc({status: e.general.SUCCESS, info: 'new '+msg.obj.type, payload: o})
-          # populate 'aggregate' list object for all_* in OStore so that it can be subscribed to
-          rv = objStore.listObjectsByType(msg.obj.type)
-          obj = {id: 'all_'+msg.obj.type, list: rv}
-          objStore.getObj('all_'+smg.obj.type, msg.obj.type).then (oo) =>
-            if oo
-              objStore.updateObj(obj)
-            else
-              objStore.storeObject(obj)
       else
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to create objects of that type', payload: msg.obj.type})
     else

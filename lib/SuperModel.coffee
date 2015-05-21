@@ -26,6 +26,16 @@ class SuperModel
   constructor:(@record={})->
     #console.log 'SuperModel constructor'
     #console.dir @model
+    @id         = @record.id or uuid.v4()
+
+    # populate 'aggregate' list object for all_* in OStore so that it can be subscribed to
+    obj = {id: 'all_'+@constructor.type, list: [@.id]}
+    OMgr.getObj('all_'+@constructor.type, @constructor.type).then (oo) =>
+      if oo
+        oo.list.push @.id
+        OMgr.updateObj(oo)
+      else
+        OMgr.storeObject(obj)
 
     @record = @unPrettify(@record)
     missing = true
@@ -37,7 +47,7 @@ class SuperModel
 
     @type = @constructor.type
     q = defer()
-    @id         = @record.id or uuid.v4()
+
     OMgr.storeObject(@)
     if @record._rev
       #if debug then console.log 'setting _rev to '+@record._rev+' for '+@constructor.type+' '+@id
