@@ -44,7 +44,7 @@ class ObjectManager
   _createObject: (msg) =>
     if msg.obj.type
       if @messageRouter.authMgr.canUserCreateThisObject(msg.obj.type, msg.user)
-        console.dir msg
+        #console.dir msg
         msg.obj.createdAt = Date.now()
         msg.obj.createdBy = msg.user.id
         SuperModel.resolver.createObjectFrom(msg.obj).then (o) =>
