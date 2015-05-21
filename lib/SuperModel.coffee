@@ -30,7 +30,7 @@ class SuperModel
 
     # populate 'aggregate' list object for all_* in OStore so that it can be subscribed to
     obj = {id: 'all_'+@constructor.type, list: [@.id]}
-    OMgr.getObj('all_'+@constructor.type, @constructor.type).then (oo) =>
+    OMgr.getObject('all_'+@constructor.type, @constructor.type).then (oo) =>
       if oo
         oo.list.push @.id
         OMgr.updateObj(oo)
