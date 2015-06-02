@@ -27,6 +27,7 @@ class DB
     q = defer()
     promises = []
     dblist.forEach (dbname) =>
+      if debug then console.log 'attempting to get store for '+dbname
       promises.push store.getDbFor(dbname)
     all(promises).then (results) =>
       q.resolve(results)
