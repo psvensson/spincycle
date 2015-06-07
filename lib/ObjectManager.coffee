@@ -114,9 +114,15 @@ class ObjectManager
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to list objects of type '+msg.type, payload: msg.type})
       else
         #rv = objStore.listObjectsByType(msg.type)
-        DB.all(msg.type, (rv) ->
-          console.log 'found '+rv.length+' objects to return'
-          msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
+        DB.all(msg.type, (records) ->
+          rv = []
+          console.log 'found '+records.length+' objects to return'
+          count = records.length
+          records.forEach (record) =>
+            @messageRouter.resolver.createObjectFrom(record).then (o) =>
+              rv.push o.toClient()
+              if --count == 0
+                msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
         )
     else
       msg.replyFunc({status: e.general.FAILURE, info: '_listObjects missing parameter', payload: null })
@@ -163,7 +169,7 @@ class ObjectManager
         else
           msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.UPDATE_OBJECT_FAIL, payload: msg.obj.id})
       else
-        console.log 'No object found with id '+msg.obj.id
+        console.log 'Not object found with id '+msg.obj.id
         console.dir objStore.objects.map (o) -> o.type == msg.obj.type
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
     )
