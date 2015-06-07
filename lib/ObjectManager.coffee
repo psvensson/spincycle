@@ -114,7 +114,7 @@ class ObjectManager
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to list objects of type '+msg.type, payload: msg.type})
       else
         #rv = objStore.listObjectsByType(msg.type)
-        DB.all(msg.type, (records) ->
+        DB.all(msg.type, (records) =>
           rv = []
           console.log 'found '+records.length+' objects to return'
           count = records.length
