@@ -114,10 +114,10 @@ class SuperModel
     q = defer()
     if not @_serializing
       @_serializing = true
-      record = @getRecord()
-      if @_rev then record._rev = @_rev
       OMgr.storeObject()
       OMgr.updateObj(updatedObj) if updatedObj
+      record = @getRecord()
+      if @_rev then record._rev = @_rev
       DB.set(@.constructor.type, record).then () =>
         @_serializing = false
         q.resolve(@)
