@@ -120,7 +120,8 @@ class ObjectManager
           count = records.length
           records.forEach (record) =>
             @messageRouter.resolver.createObjectFrom(record).then (o) =>
-              rv.push o.toClient()
+              if debug then console.log 'resolved object '+o.id+' count = '+count
+              rv.push(o.toClient())
               if --count == 0
                 msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
         )
