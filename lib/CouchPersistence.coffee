@@ -1,6 +1,7 @@
 couchdb         = require('felix-couchdb');
 defer           = require('node-promise').defer
 OStore          = require('./OStore')
+uuid            = require('node-uuid')
 
 debug = process.env["DEBUG"]
 
@@ -13,16 +14,26 @@ class CouchPersistence
     @client = couchdb.createClient(5984, 'localhost', auth: { username: 'admin', password: process.env["COUCH_ADMIN_PW"] })
 
   getDbFor: (_type) =>
+    #console.log 'getDbFor called for '+_type
     q = defer()
+    q.tag = uuid.v4()
     type = _type.toLowerCase()
     db = @dbs[type]
     if not db
+      console.log 'no db found for '+type+' q = '+q.tag
       db = @client.db(type)
       db.exists (er, exists) =>
+        #console.log 'exists returned '+exists+' for db '+type+' q = '+q.tag
+        if er
+          console.log 'ERROR ---------------- '+er
+          console.dir er
         if exists
-          q.resolve(db)
+          #console.log 'database '+type+' exists, so returning that'+' q = '+q.tag
+          @dbs[type] = db
+          if not q.done then q.resolve(db)
+          q.done = true
         else
-          console.log('database '+type+' does not exists. creating as we speak...')
+          console.log('database '+type+' does not exists. creating as we speak...'+' q = '+q.tag)
           db.create (er) =>
             if (er) then console.log 'DB create error: '+JSON.stringify(er)
             # --------------------------------------------- Create 'all' view
@@ -35,9 +46,11 @@ class CouchPersistence
                 if doc.providerId
                   emit doc.providerId, doc
 
+            console.log 'new database '+type+' created'+' q = '+q.tag
             @dbs[type] = db
             q.resolve(db)
-
+    else
+      q.resolve(db)
     return q
 
   dot: (attr) ->
