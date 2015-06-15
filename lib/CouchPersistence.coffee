@@ -20,15 +20,15 @@ class CouchPersistence
     type = _type.toLowerCase()
     db = @dbs[type]
     if not db
-      console.log 'no db found for '+type+' q = '+q.tag
+      console.log 'no cached db found for '+type+' q = '+q.tag
       db = @client.db(type)
       db.exists (er, exists) =>
-        #console.log 'exists returned '+exists+' for db '+type+' q = '+q.tag
+        console.log 'exists returned '+exists+' for db '+type+' q = '+q.tag
         if er
           console.log 'ERROR ---------------- '+er
           console.dir er
         if exists
-          #console.log 'database '+type+' exists, so returning that'+' q = '+q.tag
+          console.log 'database '+type+' exists, so returning that'+' q = '+q.tag
           @dbs[type] = db
           if not q.done then q.resolve(db)
           q.done = true
@@ -48,7 +48,9 @@ class CouchPersistence
 
             console.log 'new database '+type+' created'+' q = '+q.tag
             @dbs[type] = db
-            q.resolve(db)
+
+            if not q.done then q.resolve(db)
+            q.done = true
     else
       q.resolve(db)
     return q

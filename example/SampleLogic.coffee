@@ -8,8 +8,9 @@ class SampleLogic
 
   constructor: (@messageRouter) ->
     @games = []
-    DB.createDatabases(['samplegame', 'sampleplayer']).then ()=>
+    DB.createDatabases(['samplegame', 'sampleplayer']).then (results)=>
       console.log ' DB init done..'
+      console.dir results
     DB.all 'SampleGame', (games) =>
       console.log ' setting all games to '+games
       console.dir(games)
@@ -31,7 +32,7 @@ class SampleLogic
 
   onNewGame: (msg) =>
     console.log 'SampleLogic: New Game called'
-    new Game({name: 'New Game '+(SampleLogic.gamecount++)}, true).then (game)=>
+    new Game({name: 'New Game '+(SampleLogic.gamecount++)}).then (game)=>
       console.log 'SampleLogic: -- new game '+game.name+' created --'
       game.serialize()
       @games.push game

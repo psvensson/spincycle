@@ -153,54 +153,33 @@ class SuperModel
           r = defer()
           allpromises.push(r)
           if resolveobj.value
-            #if debug then console.log '++ @record[resolveobj.value] = '+@record[resolveobj.value]+' and resolveobj.default = '+resolveobj.default
-            @[resolveobj.name] = @record[resolveobj.value] or resolveobj.default
-          @[resolveobj.name] = [] if resolveobj.array == true
-          @[resolveobj.name] = {} if resolveobj.hashtable == true
-          ids = @record[resolveobj.ids]
-          if not ids or typeof ids == 'undefined' or ids == 'undefined'
-            #@[resolveobj.name] = []
-            ids = []
-            #if debug then console.log '============================== null resolveobj.ids for '+resolveobj.type+' ['+resolveobj.name+']'
-            r.resolve(null)
-          else
-            if typeof ids is 'string'
-              #if debug then console.log 'upcasting string id to array of ids for '+resolveobj.name
-              ids = [ids]
-            if debug then console.log 'resolveobjds '+resolveobj.name+' ('+(typeof ids)+') ids length are.. '+ids.length
-            count = ids.length
-            if count == 0
-              if debug then console.log 'no ids for '+resolveobj.name+' so resolving null'
-              r.resolve(null)
+            if resolveobj.type
+              @resolveObj(resolveobj, @record[resolveobj.value], r)                 # direct object reference by id
             else
-              ids.forEach (_id) =>
-                ((id) =>
-                  if debug then console.log 'SuperModel loadFromIds trying to get '+resolveobj.name+' with id '+id
-                  OMgr.getObject(id, resolveobj.type).then( (oo) =>
-                    if oo
-                      if debug then console.log 'found existing instance of '+resolveobj.name+' type '+resolveobj.type+' in OStore'
-                      @insertObj(resolveobj, oo)
-                      if --count == 0
-                        if debug then console.log 'resolving '+resolveobj.name+' type '+resolveobj.type+' immediately'
-                        r.resolve(oo)
-                    else
-                      if debug then console.log 'did not find obj '+resolveobj.name+' ['+id+'] of type '+resolveobj.type+' in OStore. Getting from DB...'
-                      DB.get(resolveobj.type, [id]).then( (record) =>
-                        if not record
-                          console.log 'SuperModel::loadFromIds got back null record from DB for type '+resolveobj.type+' and id '+id
-                          if --count == 0 then r.resolve(null)
-                        else resolver.createObjectFrom(record).then( (obj) =>
-                          if not obj
-                            console.log ' Hmm. Missing object reference. Sad Face.'
-                            if --count == 0 then r.resolve(null)
-                          else
-                            if debug then console.log 'object '+resolveobj.name+' type '+resolveobj.type+' created: '+obj.id
-                            @insertObj(resolveobj, obj)
-                            if --count == 0 then r.resolve(obj)
-                        , error)
-                      , error)
-                  , error)
-                )(_id)
+              @[resolveobj.name] = @record[resolveobj.value] or resolveobj.default  # scalar
+            r.resolve(@[resolveobj.name])
+          else
+            @[resolveobj.name] = [] if resolveobj.array == true
+            @[resolveobj.name] = {} if resolveobj.hashtable == true
+            ids = @record[resolveobj.ids]
+            if not ids or typeof ids == 'undefined' or ids == 'undefined'
+              ids = []
+              #if debug then console.log '============================== null resolveobj.ids for '+resolveobj.type+' ['+resolveobj.name+']'
+              r.resolve(null)
+            else                                                                    # array or hashtable by array of ids
+              if typeof ids is 'string'
+                ids = [ids]
+              if debug then console.log 'resolveobjds '+resolveobj.name+' ('+(typeof ids)+') ids length are.. '+ids.length
+              count = ids.length
+              if count == 0
+                if debug then console.log 'no ids for '+resolveobj.name+' so resolving null'
+                r.resolve(null)
+              else
+                ids.forEach (_id) =>
+                  ((id) =>
+                    if debug then console.log 'SuperModel loadFromIds trying to get '+resolveobj.name+' with id '+id
+                    @resolveObj(resolveobj, id, r)
+                  )(_id)
           #if debug then console.log '------- property '+resolveobj.name+' now set to '+@[resolveobj.name]
         )(robj)
 
@@ -209,6 +188,32 @@ class SuperModel
       alldone.resolve(results)
     ,error)
     return alldone
+
+  resolveObj: (resolveobj, id, r) =>
+    OMgr.getObject(id, resolveobj.type).then( (oo) =>
+      if oo
+        if debug then console.log 'found existing instance of '+resolveobj.name+' type '+resolveobj.type+' in OStore'
+        @insertObj(resolveobj, oo)
+        if --count == 0
+          if debug then console.log 'resolving '+resolveobj.name+' type '+resolveobj.type+' immediately'
+          r.resolve(oo)
+      else
+        if debug then console.log 'did not find obj '+resolveobj.name+' ['+id+'] of type '+resolveobj.type+' in OStore. Getting from DB...'
+        DB.get(resolveobj.type, [id]).then( (record) =>
+          if not record
+            console.log 'SuperModel::loadFromIds got back null record from DB for type '+resolveobj.type+' and id '+id
+            if --count == 0 then r.resolve(null)
+          else resolver.createObjectFrom(record).then( (obj) =>
+            if not obj
+              console.log ' Hmm. Missing object reference. Sad Face.'
+              if --count == 0 then r.resolve(null)
+            else
+              if debug then console.log 'object '+resolveobj.name+' type '+resolveobj.type+' created: '+obj.id
+              @insertObj(resolveobj, obj)
+              if --count == 0 then r.resolve(obj)
+          , error)
+        , error)
+    , error)
 
   insertObj: (ro, o) =>
     if ro.array == true
