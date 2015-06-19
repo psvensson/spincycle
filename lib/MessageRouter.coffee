@@ -19,7 +19,6 @@ class MessageRouter
   @DB = DB
   @EventManager = EventManager
   @SuperModel = SuperModel
-  @DB = DB
   @ObjectManager = ObjectManager
   @ClientEndpoints = ClientEndpoints
   @OStore = OStore

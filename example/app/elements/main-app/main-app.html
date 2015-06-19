@@ -18,7 +18,7 @@
       </div>
     Games:
     <ul id="gamelist">
-        <template repeat="{{game in games}}">
+        <template repeat="{{game in generatedgames}}">
             <li>
                 <input is="core-input" gameid="{{game.id}}" value="{{game.name}}" on-change="{{onGameNameChange}}"> </input> <paper-button raised on-click="{{selectGame}}" gameid="{{game.id}}">Select</paper-button>
             </li>
@@ -40,10 +40,10 @@
             this.asyncFire('core-signal', {name: "emit", data: {target:'listGames', callback: this.onListGames.bind(this) }});
         },
 
-          gameById: function(id)
-          {
-              return this.games.filter(function(g) { return g.id == id })[0];
-          },
+      gameById: function(id)
+      {
+          return this.games.filter(function(g) { return g.id == id })[0];
+      },
 
         newGame: function()
         {
@@ -62,7 +62,19 @@
         {
             console.log("onGamesList called with ");
             console.dir(games);
-            this.games = games;
+            this.gameids = games;
+            this.generatedgames = [];
+            this.gameids.forEach(function(gameid)
+            {
+                this.asyncFire('core-signal', {name: "emit", data: {target:'_getSampleGame', obj:{id: gameid, type: 'samplegame'}, callback: this.onGameDetails.bind(this) } });
+            }.bind(this))
+        },
+
+        onGameDetails: function(msg)
+        {
+            console.log('got game details');
+            console.dir(msg);
+            this.generatedgames.push(msg)
         },
 
         onGameNameChange: function(e, detail, el)

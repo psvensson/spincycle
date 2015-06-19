@@ -6,6 +6,7 @@ LRU             = require('lru-cache')
 #GDS            = require('./gds')
 #Roach          = require('./cockroach')
 Couch           = require('./CouchPersistence')
+Mongo           = require('./MongoPersistence')
 
 debug = process.env["DEBUG"]
 
@@ -14,11 +15,16 @@ class DB
   @lru: LRU()
   @lrudiff: LRU()
 
-  @getDataStore: () =>
+  @getDataStore: (name) =>
     if not @DataStore
       #@DataStore = new GDS()
       #@DataStore = new Roach()
-      @DataStore = new Couch()
+      if not name
+        @DataStore = new Mongo()
+      else if name == 'couchdb'
+        @DataStore = new Couch()
+      else if name == 'mogodbdb'
+        @DataStore = new Mongo()
       @DataStore.connect()
     return @DataStore
 
