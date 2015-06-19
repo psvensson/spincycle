@@ -46,15 +46,12 @@ class MongoPersistence
     db = @dbs[type]
     if not db
       @getConnection().then (connection) =>
-        console.log 'getDbFor got connection '+connection+' typeof is '+(typeof connection)
         connection.collection(type, (err, collection) =>
           if err
             console.log 'MONGO Error getting collection: '+err
             console.dir err
             q.resolve(null)
           else
-            console.log 'Getting mongo collection '+type
-            console.dir collection
             @dbs[type] = collection
             q.resolve(collection)
         )
