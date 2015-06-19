@@ -76,7 +76,7 @@ class MongoPersistence
 
   get: (_type, id, cb) =>
     type = _type.toLowerCase()
-    console.lo 'Mongo.get called for type '+type+' and id '+id
+    console.log 'Mongo.get called for type '+type+' and id '+id
     @getDbFor(type).then (collection) =>
       collection.findOne {id: id}, (err, item) =>
         if err
