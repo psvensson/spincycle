@@ -13,7 +13,7 @@ class SampleGame extends SuperModel
       {name: 'name',    public: true,   value: 'name', default: 'game_'+uuid.v4() }
     ]
 
-  constructor: (@record, noload) ->
+  constructor: (@record) ->
     return super
 
   postCreate: (q) =>

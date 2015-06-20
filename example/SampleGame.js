@@ -35,7 +35,7 @@
       }
     ];
 
-    function SampleGame(record, noload) {
+    function SampleGame(record) {
       this.record = record;
       this.createPlayers = bind(this.createPlayers, this);
       this.postCreate = bind(this.postCreate, this);
