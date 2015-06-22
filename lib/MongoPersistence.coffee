@@ -88,7 +88,7 @@ class MongoPersistence
     console.log 'byProviderId called for pid '+pid+' and type '+_type
     q = defer()
     type = _type.toLowerCase()
-    @getDbFor(type).then (db) =>
+    @getDbFor(type).then (collection) =>
       collection.findOne {providerId: pid}, (err, item) =>
         if err
           console.log 'MONGO byProviderId Error: '+err
