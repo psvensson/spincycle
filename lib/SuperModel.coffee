@@ -156,7 +156,7 @@ class SuperModel
             if resolveobj.type
               if debug then console.log 'supermodel creating direct reference of type '+resolveobj.type+', value '+resolveobj.value+' object '+ @record[resolveobj.value]
               if debug then console.dir @record[resolveobj.value]
-              @resolveObj(resolveobj, @record[resolveobj.value], r)                 # direct object reference by id
+              @resolveObj(resolveobj, @record[resolveobj.value], r, 0)                 # direct object reference by id
             else
               @[resolveobj.name] = @record[resolveobj.value] or resolveobj.default  # scalar
             r.resolve(@[resolveobj.name])
@@ -180,7 +180,7 @@ class SuperModel
                 ids.forEach (_id) =>
                   ((id) =>
                     if debug then console.log 'SuperModel loadFromIds trying to get '+resolveobj.name+' with id '+id
-                    @resolveObj(resolveobj, id, r)
+                    @resolveObj(resolveobj, id, r, --count)
                   )(_id)
           #if debug then console.log '------- property '+resolveobj.name+' now set to '+@[resolveobj.name]
         )(robj)
@@ -191,12 +191,12 @@ class SuperModel
     ,error)
     return alldone
 
-  resolveObj: (resolveobj, id, r) =>
+  resolveObj: (resolveobj, id, r, count) =>
     OMgr.getObject(id, resolveobj.type).then( (oo) =>
       if oo
         if debug then console.log 'found existing instance of '+resolveobj.name+' type '+resolveobj.type+' in OStore'
         @insertObj(resolveobj, oo)
-        if --count == 0
+        if count == 0
           if debug then console.log 'resolving '+resolveobj.name+' type '+resolveobj.type+' immediately'
           r.resolve(oo)
       else
@@ -204,15 +204,15 @@ class SuperModel
         DB.get(resolveobj.type, [id]).then( (record) =>
           if not record
             console.log 'SuperModel::loadFromIds got back null record from DB for type '+resolveobj.type+' and id '+id
-            if --count == 0 then r.resolve(null)
+            if count == 0 then r.resolve(null)
           else resolver.createObjectFrom(record).then( (obj) =>
             if not obj
               console.log ' Hmm. Missing object reference. Sad Face.'
-              if --count == 0 then r.resolve(null)
+              if count == 0 then r.resolve(null)
             else
               if debug then console.log 'object '+resolveobj.name+' type '+resolveobj.type+' created: '+obj.id
               @insertObj(resolveobj, obj)
-              if --count == 0 then r.resolve(obj)
+              if count == 0 then r.resolve(obj)
           , error)
         , error)
     , error)
