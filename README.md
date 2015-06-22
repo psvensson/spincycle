@@ -17,7 +17,7 @@ In more detail, this is what SpinCycle helps you with:
   2. The server has a plugin-in AuthenticationManager that control user creation, lookup and rights (Easy to use with Passport).
   3. Object models used in SpinCycle must be a subclass of SpinCycle.SuperModel
   4. The models are always flat, using ids or arrays of ids to refer to other models
-  5. The models are created and persisted using records that are separated from the DB used (currently CouchDB is the only working DB adapter, but more soon to come)
+  5. The models are created and persisted using records that are separated from the DB used (currently working adapters are CouchDB and MongoDB, with MongoDB being used as default)
   6. A web client can subscribe to changes to object properties (if using the WebSockets transport method) as well as update objects, both using any custom AuthenticationManager for control.
 
 So you really only need to create your model classes and expose functions giving access to them and all client updates will occur automatically.
@@ -98,7 +98,7 @@ This is not really terribly useful now, is it. So let's look at something which 
           {name: 'name',    public: true,   value: 'name', default: 'game_'+uuid.v4() }
         ]
     
-      constructor: (@record, noload) ->
+      constructor: (@record) ->
         return super
       
       # postCreate gets called (if declared) after the full object graph has been reconstructed
@@ -111,7 +111,7 @@ This is not really terribly useful now, is it. So let's look at something which 
 
     module.exports = SampleGame
     
-The modle property of the class tells spincycle which properties to save when serializing this object, but also which properties to instantiate this object with when given a record, and finally which properties it's OK to copy over to the client when synchronizing object properties (or just handing out the object to a target service)
+The model property of the class tells spincycle which properties to save when serializing this object, but also which properties to instantiate this object with when given a record, and finally which properties it's OK to copy over to the client when synchronizing object properties (or just handing out the object to a target service)
 
 Properties can be basic, like strings or numbers, where the property name is defined in the 'value' property. So that if you want the object property 'shoeSize' to be instantiated from record and saved when serializing you write just that in the 'value' property.
 
