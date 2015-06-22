@@ -84,6 +84,18 @@ class MongoPersistence
         else
           cb(item)
 
+  byProviderId: (_type, pid) =>
+    console.log 'byProviderId called for pid '+pid+' and type '+_type
+    q = defer()
+    type = _type.toLowerCase()
+    @getDbFor(type).then (db) =>
+      collection.findOne {providerId: pid}, (err, item) =>
+        if err
+          console.log 'MONGO byProviderId Error: '+err
+          console.dir err
+          cb(null)
+        else
+          cb(item)
 
   set: (_type, obj, cb)=>
     type = _type.toLowerCase()
