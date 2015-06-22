@@ -93,9 +93,10 @@ class MongoPersistence
         if err
           console.log 'MONGO byProviderId Error: '+err
           console.dir err
-          cb(null)
+          q.resolve(null)
         else
-          cb(item)
+          q.resolve(item)
+    return q
 
   set: (_type, obj, cb)=>
     type = _type.toLowerCase()
