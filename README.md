@@ -1,7 +1,7 @@
 ![SpinCycle](washing-machine-99242_1280_small.png)
 # SpinCycle
 
-Opinionated message router that let front-end clients subscribe to object property changes on the node.js server.
+Opinionated message router and generalized ORM (with automatically persisted and loaded heirarchies) that let front-end clients subscribe to object property changes on the node.js server.
 SpinCycle uses Node.js and Express and is written in CoffeeScript. 
 
 ## Overview
