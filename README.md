@@ -14,11 +14,11 @@ A common use-case is that you have a web client which shows some of the properti
 In more detail, this is what SpinCycle helps you with:
 
 1. It lets the web client easily call exposed functions on the server using Ajax or WebSockets
-  2. The server has a plugin-in AuthenticationManager that control user creation, lookup and rights (Easy to use with Passport).
-  3. Object models used in SpinCycle must be a subclass of SpinCycle.SuperModel
-  4. The models are always flat, using ids or arrays of ids to refer to other models
-  5. The models are created and persisted using records that are separated from the DB used (currently working adapters are CouchDB and MongoDB, with MongoDB being used as default)
-  6. A web client can subscribe to changes to object properties (if using the WebSockets transport method) as well as update objects, both using any custom AuthenticationManager for control.
+2. The server has a plugin-in AuthenticationManager that control user creation, lookup and rights (Easy to use with Passport).
+3. Object models used in SpinCycle must be a subclass of SpinCycle.SuperModel
+4. The models are always flat, using ids or arrays of ids to refer to other models
+5. The models are created and persisted using records that are separated from the DB used (currently working adapters are CouchDB and MongoDB, with MongoDB being used as default)
+6. A web client can subscribe to changes to object properties (if using the WebSockets transport method) as well as update objects, both using any custom AuthenticationManager for control.
 
 So you really only need to create your model classes and expose functions giving access to them and all client updates will occur automatically.
 
