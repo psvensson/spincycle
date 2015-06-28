@@ -3,6 +3,8 @@ all             = require('node-promise').all
 uuid            = require('node-uuid')
 LRU             = require('lru-cache')
 
+OStore          = require('.Ostore')
+
 #GDS            = require('./gds')
 #Roach          = require('./cockroach')
 Couch           = require('./CouchPersistence')
@@ -34,6 +36,15 @@ class DB
     promises = []
     dblist.forEach (dbname) =>
       if debug then console.log 'attempting to get store for '+dbname
+      obj =
+      {
+        id: 'all_'+@constructor.type
+        list: [@.id]
+        getRecord: ()->
+          {id: obj.id, list: obj.list}
+      }
+      OStore.storeObject(obj)
+
       promises.push store.getDbFor(dbname)
     all(promises).then (results) =>
       q.resolve(results)
