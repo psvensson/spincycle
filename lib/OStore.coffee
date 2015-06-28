@@ -85,15 +85,19 @@ class OStore
     OStore.objects[record.id] = obj
     listeners = OStore.listeners[obj.id] or []
     console.log 'there are '+listeners.length+' listeners for object updates. changed = '+changed
+    console.dir OStore.listeners[obj.id]
     if changed
       for lid of listeners
         listeners[lid](obj)
 
   @addListenerFor:(id, type, cb) =>
+    console.log 'OStore::addListenerFor called with type:'+type+' id '+id
     list = OStore.listeners[id] or []
     listenerId = uuid.v4()
     list[listenerId] = cb
     OStore.listeners[id] = list
+    console.log 'listeners list is now'
+    console.dir OStore.listeners[id]
     #@getObject(id, type).then((result) ->
     #  cb(result)
     #, error)
