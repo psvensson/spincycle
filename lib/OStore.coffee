@@ -1,6 +1,5 @@
 defer           = require('node-promise').defer
 
-DB              = require('./DB')
 uuid            = require('node-uuid')
 error           = require('./Error').error
 

@@ -43,7 +43,7 @@ class DB
         getRecord: ()->
           {id: obj.id, list: obj.list}
       }
-      console.dir OStore
+      #console.dir OStore
       OStore.storeObject(obj)
 
       promises.push store.getDbFor(dbname)
