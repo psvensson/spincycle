@@ -44,6 +44,7 @@ class DB
         getRecord: ()->
           {id: obj.id, list: obj.list}
       }
+      cosole.log '------ creating original all_'+dbname+' collection objects ---'
       #console.dir OStore
       OStore.storeObject(obj)
 
