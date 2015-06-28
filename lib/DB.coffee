@@ -38,7 +38,8 @@ class DB
       if debug then console.log 'attempting to get store for '+dbname
       obj =
       {
-        id: 'all_'+@constructor.type
+        id: 'all_'+dbname
+        type: dbname
         list: [@.id]
         getRecord: ()->
           {id: obj.id, list: obj.list}

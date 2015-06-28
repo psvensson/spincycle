@@ -32,6 +32,7 @@ class SuperModel
     obj =
     {
       id: 'all_'+@constructor.type
+      type: @constructor.type
       list: [@.id]
       getRecord: ()->
         obj
