@@ -17,6 +17,7 @@ class PostgresqlPersistence
         @client = client
         console.log 'Created PostgreSQL successfully'
 
+
   getDbFor: (_type) =>
     q = defer()
     type = _type.toLowerCase()

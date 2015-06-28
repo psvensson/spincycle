@@ -17,6 +17,7 @@ class GDS
     @credentials.authorize ((computeErr) ->
       if computeErr
         errors = "compute auth error": computeErr
+
         if process.env["DATASTORE_SERVICE_ACCOUNT"]
           @credentials = new googleapis.auth.JWT(process.env["DATASTORE_SERVICE_ACCOUNT"], process.env["DATASTORE_PRIVATE_KEY_FILE"], SCOPES)
           @credentials.authorize ((jwtErr) ->
