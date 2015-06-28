@@ -15,7 +15,7 @@ class WsMethod
       port  = socket.conn.remotePort
       adr = ip+':'+port
       console.log 'new ws connection from '+adr
-      console.dir(socket.conn)
+      #console.dir(socket.conn)
       ClientEndpoints.registerEndpoint adr, (msg) ->
         socket.emit('message', msg)
 

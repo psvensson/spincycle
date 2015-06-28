@@ -37,11 +37,11 @@ class SuperModel
         obj
     }
     OMgr.getObject('all_'+@constructor.type, @constructor.type).then (oo) =>
-      if oo
-        oo.list.push @.id
-        OMgr.updateObj(oo)
-      else
-        OMgr.storeObject(obj)
+      oo = oo or []
+      oo.list.push @.id
+      OMgr.updateObj(oo)
+
+    OMgr.storeObject(obj)
 
     @record = @unPrettify(@record)
     missing = true
