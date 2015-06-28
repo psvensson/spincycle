@@ -3,7 +3,7 @@ all             = require('node-promise').all
 uuid            = require('node-uuid')
 LRU             = require('lru-cache')
 
-OStore          = require('.Ostore')
+OStore          = require('./Ostore')
 
 #GDS            = require('./gds')
 #Roach          = require('./cockroach')
