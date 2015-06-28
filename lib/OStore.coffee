@@ -72,11 +72,11 @@ class OStore
     changed = false;
     record.modifiedAt = Date.now()
     for p of whitelist
-      #console.log 'checking whitelist property '+p
+      console.log 'checking whitelist property '+p
       for pp of record
-        #console.log '  comparing to incoming property '+pp
+        console.log '  comparing to incoming property '+pp
         if pp is p
-          #console.log '    match!'
+          console.log '    match!'
           if obj[pp] != record[pp] and pp not in OStore.blackList
             diff[pp] = record[pp]
             changed = true
@@ -85,6 +85,7 @@ class OStore
 
     OStore.objects[record.id] = obj
     listeners = OStore.listeners[obj.id] or []
+    console.log 'there are '+listeners.length+' listeners for object updates'
     if changed
       for lid of listeners
         listeners[lid](obj)
