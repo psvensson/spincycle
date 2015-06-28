@@ -40,6 +40,7 @@ class SuperModel
       if oo
         if debug then console.log 'adding '+@constructor.type+' id '+@id+' to all_ list'
         oo.list.push @.id
+        console.dir oo
         OMgr.updateObj(oo)
       else
         if debug
