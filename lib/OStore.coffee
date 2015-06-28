@@ -76,16 +76,15 @@ class OStore
         #console.log '  comparing to incoming property '+pp
         if pp is p
           #console.log '    match!'
-          if obj[pp] != record[pp] and pp not in OStore.blackList
-            diff[pp] = record[pp]
-            changed = true
-            obj[pp] = record[pp]
-            console.log 'updating property "'+pp+'" on '+obj.type+' id '+record.id+' to '+record[pp]
+          if pp not in OStore.blackList
+            if obj[pp] != record[pp] or (obj[pp].length and obj[pp].length != record[pp].length)
+              diff[pp] = record[pp]
+              changed = true
+              obj[pp] = record[pp]
+              console.log 'updating property "'+pp+'" on '+obj.type+' id '+record.id+' to '+record[pp]
 
     OStore.objects[record.id] = obj
     listeners = OStore.listeners[obj.id] or []
-    console.log 'there are '+listeners.length+' listeners for object updates. changed = '+changed
-    console.dir OStore.listeners[obj.id]
     if changed
       for lid of listeners
         listeners[lid](obj)
