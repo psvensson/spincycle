@@ -11,18 +11,6 @@ class MongoPersistence
   connect: ()=>
     console.log 'Mongo connect called'
 
-#    mongoclient = new MongoClient(new Server("localhost", 27017), {native_parser: true})
-#    console.log 'mongoclient = '+mongoclient
-#    console.dir mongoclient
-#    mongoclient.open((err, db) =>
-#      if err
-#        console.log 'MONGO Error connection: '+err
-#        console.dir err
-#      else
-#        console.log("---- We are connected ----")
-#        @db = db
-#    )
-
   getConnection: () =>
     q = defer()
     if @db
