@@ -15,6 +15,7 @@ class WsMethod
       port  = socket.handshake.port
       adr = ip+':'+port
       console.log 'new ws connection from '+adr
+      console.dir socket.handshake
       #console.dir(socket.conn)
       ClientEndpoints.registerEndpoint adr, (msg) ->
         socket.emit('message', msg)
