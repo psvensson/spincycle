@@ -63,9 +63,12 @@ class ObjectManager
         if obj
           if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
             DB.remove obj, (removestatus) =>
-              if debug then console.log 'exposed object removed through _delete'+msg.obj.type
-              objStore.removeObject(obj)
-              msg.replyFunc({status: e.general.SUCCESS, info: 'delete object', payload: obj.id})
+              objStore.getObject('all_'+msg.obj.type, msg.obj.type).then (oo) =>
+                if debug then console.log 'exposed object removed through _delete'+msg.obj.type
+                oo.list = oo.list.map( (e) => return e if e.id is not obj.id)
+                objStore.removeObject(obj)
+                objStore.sendUpdatesFor(oo, true)
+                msg.replyFunc({status: e.general.SUCCESS, info: 'delete object', payload: obj.id})
           else
             msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to delete object', payload: msg.obj.id})
         else
