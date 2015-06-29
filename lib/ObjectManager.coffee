@@ -65,7 +65,9 @@ class ObjectManager
             DB.remove obj, (removestatus) =>
               objStore.getObject('all_'+msg.obj.type, msg.obj.type).then (oo) =>
                 if debug then console.log 'exposed object removed through _delete'+msg.obj.type
-                oo.list = oo.list.map (e) =>  e.id != obj.id
+                oo.list = oo.list.filter (e) =>  e.id != obj.id
+                if debug then console.log 'resulting list is'
+                if debug then console.dir oo.list
                 objStore.removeObject(obj)
                 objStore.sendUpdatesFor(oo, true)
                 msg.replyFunc({status: e.general.SUCCESS, info: 'delete object', payload: obj.id})
