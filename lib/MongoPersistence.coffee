@@ -102,7 +102,6 @@ class MongoPersistence
   remove: (_type, obj, cb) =>
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>
-      collection = @getDbFor(_type)
       collection.remove {id: obj.id}, {w:1}, (err, numberOfRemovedDocs) =>
         if err
           console.log 'MONGO remove Error: '+err
