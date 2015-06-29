@@ -40,7 +40,7 @@ class DB
       {
         id: 'all_'+dbname
         type: dbname
-        list: [@.id]
+        list: []
         getRecord: ()->
           {id: obj.id, list: obj.list}
       }

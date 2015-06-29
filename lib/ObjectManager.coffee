@@ -48,6 +48,7 @@ class ObjectManager
         msg.obj.createdAt = Date.now()
         msg.obj.createdBy = msg.user.id
         SuperModel.resolver.createObjectFrom(msg.obj).then (o) =>
+          objStore.sendUpdatesFor('all_'+msg.obj.type, true)
           o.serialize()
           msg.replyFunc({status: e.general.SUCCESS, info: 'new '+msg.obj.type, payload: o})
       else
