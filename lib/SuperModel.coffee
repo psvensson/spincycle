@@ -35,7 +35,9 @@ class SuperModel
       type: @constructor.type
       list: [@.id]
       getRecord: ()->
-        obj
+        {type: obj.type, id: obj.id, list: obj.list}
+      toClient: ()->
+        obj.getRecord()
     }
     OMgr.getObject('all_'+@constructor.type, @constructor.type).then (oo) =>
       if oo

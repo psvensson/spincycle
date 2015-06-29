@@ -42,7 +42,9 @@ class DB
         type: dbname
         list: []
         getRecord: ()->
-          {id: obj.id, list: obj.list}
+          {type: dbname, id: obj.id, list: obj.list}
+        toClient: ()->
+          obj.getRecord()
       }
       console.log '------ creating original all_'+dbname+' collection objects ---'
       #console.dir OStore
