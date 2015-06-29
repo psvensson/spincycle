@@ -11,8 +11,8 @@ class WsMethod
     io.set( 'origins', '*:*' )
 
     io.on "connection", (socket) ->
-      ip    = socket.conn.remoteAddress
-      port  = socket.conn.remotePort
+      ip    = socket.handshake.address
+      port  = socket.handshake.port
       adr = ip+':'+port
       console.log 'new ws connection from '+adr
       #console.dir(socket.conn)

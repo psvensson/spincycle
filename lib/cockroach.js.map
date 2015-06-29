@@ -1,0 +1,10 @@
+{
+  "version": 3,
+  "file": "cockroach.js",
+  "sourceRoot": "",
+  "sources": [
+    "cockroach.coffee"
+  ],
+  "names": [],
+  "mappings": ";AAAA;AAAA,MAAA,KAAA;;AAAA,EAAA,KAAA,GAAQ,OAAA,CAAQ,SAAR,CAAR,CAAA;;AAAA,EAEA,KAAA,CAAM,SAAA,CAEJ;AAAA,IAAA,WAAA,EAAa,SAAA,GAAA;aACX,IAAC,CAAA,MAAD,GAAc,IAAA,KAAA,CAAM;AAAA,QAAC,GAAA,EAAK,uBAAN;OAAN,EADH;IAAA,CAAb;GAFI,CAAN,CAFA,CAAA;;AAAA,EAQA,MAAM,CAAC,OAAP,GAAiB,SARjB,CAAA;AAAA"
+}
