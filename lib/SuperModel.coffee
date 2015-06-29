@@ -42,7 +42,7 @@ class SuperModel
     OMgr.getObject('all_'+@constructor.type, @constructor.type).then (oo) =>
       if oo
         if debug then console.log 'adding '+@constructor.type+' id '+@id+' to all_ list'
-        oo.list.push @.id
+        oo.list.push @.id if @id not in oo.list
       else
         if debug
           console.log 'creating original all_'+@constructor.type+' list object'
