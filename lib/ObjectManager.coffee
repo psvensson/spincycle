@@ -48,9 +48,10 @@ class ObjectManager
         msg.obj.createdAt = Date.now()
         msg.obj.createdBy = msg.user.id
         SuperModel.resolver.createObjectFrom(msg.obj).then (o) =>
-          objStore.sendUpdatesFor('all_'+msg.obj.type, true)
-          o.serialize()
-          msg.replyFunc({status: e.general.SUCCESS, info: 'new '+msg.obj.type, payload: o})
+          objStore.getObject('all_'+msg.obj.type, msg.obj.type).then (oo) =>
+            objStore.sendUpdatesFor(oo, true)
+            o.serialize()
+            msg.replyFunc({status: e.general.SUCCESS, info: 'new '+msg.obj.type, payload: o})
       else
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to create objects of that type', payload: msg.obj.type})
     else

@@ -88,10 +88,10 @@ class OStore
               console.log 'updating property "'+pp+'" on '+obj.type+' id '+record.id+' to '+record[pp]
 
     OStore.objects[record.id] = obj
-    OStore.sendUpdatesFor(record.id, changed)
+    OStore.sendUpdatesFor(obj, changed)
 
-  @sendUpdatesFor: (id, changed) =>
-    listeners = OStore.listeners[id] or []
+  @sendUpdatesFor: (obj, changed) =>
+    listeners = OStore.listeners[obj.id] or []
     if changed
       for lid of listeners
         listeners[lid](obj)
