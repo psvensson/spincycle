@@ -96,6 +96,18 @@ class OStore
       for lid of listeners
         listeners[lid](obj)
 
+  @sendAllUpdatesFor: (obj, changed) =>
+    sendobj = {id: obj.id, type:obj.type, list:[]}
+    count = obj.list.length
+    obj.list.forEach (id) =>
+      OStore.getObject(id, obj.type).then (o) =>
+        sendobj.list.push o.toClient()
+        if --count == 0
+          listeners = OStore.listeners[obj.id] or []
+          if changed
+            for lid of listeners
+              listeners[lid](sendobj)
+
   @addListenerFor:(id, type, cb) =>
     console.log 'OStore::addListenerFor called with type:'+type+' id '+id
     list = OStore.listeners[id] or []

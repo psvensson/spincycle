@@ -49,7 +49,7 @@ class ObjectManager
         msg.obj.createdBy = msg.user.id
         SuperModel.resolver.createObjectFrom(msg.obj).then (o) =>
           objStore.getObject('all_'+msg.obj.type, msg.obj.type).then (oo) =>
-            objStore.sendUpdatesFor(oo, true)
+            objStore.sendAllUpdatesFor(oo, true)
             o.serialize()
             msg.replyFunc({status: e.general.SUCCESS, info: 'new '+msg.obj.type, payload: o})
       else
@@ -65,11 +65,11 @@ class ObjectManager
             DB.remove obj, (removestatus) =>
               objStore.getObject('all_'+msg.obj.type, msg.obj.type).then (oo) =>
                 if debug then console.log 'exposed object removed through _delete'+msg.obj.type
-                oo.list = oo.list.filter (e) =>  e.id != obj.id
+                oo.list = oo.list.filter (id) =>  id != obj.id
                 if debug then console.log 'resulting list is'
                 if debug then console.dir oo.list
                 objStore.removeObject(obj)
-                objStore.sendUpdatesFor(oo, true)
+                objStore.sendAllUpdatesFor(oo, true)
                 msg.replyFunc({status: e.general.SUCCESS, info: 'delete object', payload: obj.id})
           else
             msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to delete object', payload: msg.obj.id})
