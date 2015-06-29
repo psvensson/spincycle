@@ -97,7 +97,7 @@ class OStore
         listeners[lid](obj)
 
   @sendAllUpdatesFor: (obj, changed) =>
-    sendobj = {id: obj.id, type:obj.type, list:[], toClient: () -> {id: obj.id, type:obj.type, list:[]}}
+    sendobj = {id: obj.id, type:obj.type, list:[], toClient: () -> {id: obj.id, type:obj.type, list:sendobj.list}}
     count = obj.list.length
     obj.list.forEach (id) =>
       OStore.getObject(id, obj.type).then (o) =>
