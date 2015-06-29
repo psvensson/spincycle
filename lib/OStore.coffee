@@ -101,6 +101,8 @@ class OStore
     count = obj.list.length
     obj.list.forEach (id) =>
       OStore.getObject(id, obj.type).then (o) =>
+        if debug then console.log 'sendAllUpdatesFor adding list object '+id
+        if debug then console.dir o
         sendobj.list.push o.toClient()
         if --count == 0
           listeners = OStore.listeners[obj.id] or []
