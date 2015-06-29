@@ -12,11 +12,12 @@ class WsMethod
 
     io.on "connection", (socket) ->
       ip    = socket.handshake.address
-      port  = socket.handshake.port
+      port  = socket.request.connection.remotePort
       adr = ip+':'+port
       console.log 'new ws connection from '+adr
       console.dir socket.handshake
-      #console.dir(socket.conn)
+      console.log 'connection------------------------------------------------'
+      console.dir socket.request.connection
       ClientEndpoints.registerEndpoint adr, (msg) ->
         socket.emit('message', msg)
 
