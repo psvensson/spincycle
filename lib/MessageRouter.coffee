@@ -2,6 +2,7 @@ ObjectManager   = require('./ObjectManager')
 error           = require('./Error').error
 HttpMethod      = require('./HttpMethod');
 WsMethod        = require('./WsMethod');
+RedisMethod     = require('./RedisMethod')
 DB              = require('./DB')
 EventManager    = require('./EventManager')
 SuperModel      = require('./SuperModel')
@@ -16,6 +17,7 @@ class MessageRouter
 
   @HttpMethod = HttpMethod
   @WsMethod = WsMethod
+  @RedisMethod = RedisMethod
   @DB = DB
   @EventManager = EventManager
   @SuperModel = SuperModel
