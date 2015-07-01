@@ -35,7 +35,7 @@ class RedisMethod
         replydata.messageId = data.messageId
         @sendclient.publish(clientChannel, replydata)
     else
-      console.log 'RedisMethod: could not find target "'+msg.target+'"'
+      console.log 'RedisMethod: could not find target "'+msg.target+'" sending failure back to channel "'+clientChannel+'"'
       @sendclient.publish(clientChannel, {status: 'FAILURE', info: 'could not find target "'+msg.target+'"', payload: null })
 
 
