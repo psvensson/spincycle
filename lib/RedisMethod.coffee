@@ -44,7 +44,5 @@ class RedisMethod
     #console.log 'express registering redis route for target '+targetName
     @redisroutes[targetName] = targetFunc
 
-  expose: (type) =>
-    console.log 'RedisMethod::Expose called for type '+type+' (unimplemented)'
 
 module.exports = RedisMethod

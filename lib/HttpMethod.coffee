@@ -28,7 +28,5 @@ class HttpMethod
     #console.log 'express registering http route for target '+targetName
     HttpMethod.httproutes[targetName] = targetFunc
 
-  expose: (type) =>
-    console.log 'HttpMethod::Expose called for type '+type+' (unimplemented)'
 
 module.exports = HttpMethod

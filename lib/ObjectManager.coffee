@@ -139,7 +139,27 @@ class ObjectManager
 
   expose: (type) =>
     objStore.types[type] = type
-    @messageRouter.expose(type)
+    @messageRouter.addTarget '_create'+type, 'obj', (msg) =>
+      msg.type = type
+      @_createObject(msg)
+
+    # TODO: delete object hierarchy as well? Maybe also check for other objects referencing this, disallowing if so
+    @messageRouter.addTarget '_delete'+type, 'obj', (msg) =>
+      msg.type = type
+      @_deleteObject(msg)
+
+    @messageRouter.addTarget '_update'+type, 'obj', (msg) =>
+      msg.type = type
+      @_updateObject(msg)
+
+    @messageRouter.addTarget '_get'+type, 'obj', (msg) =>
+      msg.type = type
+      @_getObject(msg)
+
+    @messageRouter.addTarget '_list'+type+'s', '<noargs>', (msg) =>
+      msg.type = type
+      #console.log 'calling _listObjects from WsMethod with type '+type
+      @._listObjects(msg)
 
   getObjectPullThrough: (id, type) =>
     q = defer()
