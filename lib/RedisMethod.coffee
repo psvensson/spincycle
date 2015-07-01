@@ -10,7 +10,7 @@ class RedisMethod
     @listenclient = redis.createClient()
 
     @listenclient.subscribe('spinchannel')
-    @listenclient.on('message', RedisMethod.onChannelMessage)
+    @listenclient.on('message', @onChannelMessage)
     messageRouter.addMethod 'redis', @
 
   onChannelMessage: (channel, message) ->
