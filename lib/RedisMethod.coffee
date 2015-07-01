@@ -1,9 +1,8 @@
 uuid            = require('node-uuid')
 redis           = require('redis')
+ClientEndpoints = require('./ClientEndpoints')
 
 class RedisMethod
-
-
 
   constructor: (messageRouter, app, basePath) ->
     @redisroutes = []
@@ -21,10 +20,12 @@ class RedisMethod
     msg = JSON.parse(message)
     console.dir msg
     clientChannel = msg.channelID
+    if clientChannel then ClientEndpoints.registerEndpoint adr, (msg) ->
+      @sendclient.publish(clientChannel, JSON.stringify(msg))
     #
     # TODO:
     #
-    # Since redis pubsub is stateless, we must remember the client backchannels for some time but cull them after a time limit, in ClientEndpoints
+    # Since redis pubsub is stateless, we must remember to cull client backchannels from ClientEndpoints now and then !!!!
     #
     #
     target = @redisroutes[msg.target]
