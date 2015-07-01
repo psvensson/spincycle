@@ -3,12 +3,14 @@ redis           = require('redis')
 
 class RedisMethod
 
-  @redisroutes = []
-  @client = redis.createClient()
+
 
   constructor: (messageRouter, app, basePath) ->
-    @client.subscribe('spinchannel')
-    @client.on('message', RedisMethod.onChannelMessage)
+    @redisroutes = []
+    @listenclient = redis.createClient()
+
+    @listenclient.subscribe('spinchannel')
+    @listenclient.on('message', RedisMethod.onChannelMessage)
     messageRouter.addMethod 'redis', @
 
   onChannelMessage: (channel, message) ->
