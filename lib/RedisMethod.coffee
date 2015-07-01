@@ -22,7 +22,7 @@ class RedisMethod
 
   registrationFunc: (targetName, targetFunc) ->
     #console.log 'express registering redis route for target '+targetName
-    RedisMethod.redisroutes[targetName] = targetFunc
+    @redisroutes[targetName] = targetFunc
 
   expose: (type) =>
     console.log 'RedisMethod::Expose called for type '+type+' (unimplemented)'
