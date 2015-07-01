@@ -36,6 +36,7 @@ class RedisMethod
         @sendclient.publish(clientChannel, replydata)
     else
       console.log 'RedisMethod: could not find target "'+msg.target+'"'
+      @sendclient.publish(clientChannel, {status: 'FAILURE', info: 'could not find target "'+msg.target+'"', payload: null })
 
 
   registrationFunc: (targetName, targetFunc) =>
