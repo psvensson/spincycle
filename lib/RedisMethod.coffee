@@ -33,10 +33,10 @@ class RedisMethod
       msg.messageId = data.messageId || uuid.v4()
       msg.replyFunc = (replydata) =>
         replydata.messageId = data.messageId
-        @sendclient.publish(clientChannel, replydata)
+        @sendclient.publish(clientChannel, JSON.stringify(replydata))
     else
       console.log 'RedisMethod: could not find target "'+msg.target+'" sending failure back to channel "'+clientChannel+'"'
-      @sendclient.publish(clientChannel, {status: 'FAILURE', info: 'could not find target "'+msg.target+'"', payload: null })
+      @sendclient.publish(clientChannel, JSON.stringify({status: 'FAILURE', info: 'could not find target "'+msg.target+'"', payload: null }))
 
 
   registrationFunc: (targetName, targetFunc) =>
