@@ -18,7 +18,7 @@ class RedisMethod
     console.log 'redismethod got channel '+channel+' message '+message
     console.dir channel
     console.log '-------------------------------------------------------------------'
-    msg = JSON.pars(message)
+    msg = JSON.parse(message)
     console.dir msg
     clientChannel = msg.channelId
     #
