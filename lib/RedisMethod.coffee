@@ -20,7 +20,7 @@ class RedisMethod
     msg = JSON.parse(message)
     console.dir msg
     clientChannel = msg.channelID
-    if clientChannel then ClientEndpoints.registerEndpoint adr, (msg) ->
+    if clientChannel then ClientEndpoints.registerEndpoint msg.channelID, (msg) ->
       @sendclient.publish(clientChannel, JSON.stringify(msg))
     #
     # TODO:
