@@ -30,7 +30,7 @@ class RedisMethod
     #
     target = @redisroutes[msg.target]
     if target
-      msg.client    = ip+':'+port
+      msg.client    = data.messageId
       msg.messageId = data.messageId || uuid.v4()
       msg.replyFunc = (replydata) =>
         replydata.messageId = data.messageId
