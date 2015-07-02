@@ -30,10 +30,10 @@ class RedisMethod
     #
     target = @redisroutes[msg.target]
     if target
-      msg.client    = data.messageId
-      msg.messageId = data.messageId || uuid.v4()
+      msg.client    = msg.channelId
+      msg.messageId = msg.messageId || uuid.v4()
       msg.replyFunc = (replydata) =>
-        replydata.messageId = data.messageId
+        replydata.messageId = msg.messageId
         @sendclient.publish(clientChannel, JSON.stringify(replydata))
     else
       console.log 'RedisMethod: could not find target "'+msg.target+'" sending failure back to channel "'+clientChannel+'"'
