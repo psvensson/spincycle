@@ -14,9 +14,9 @@ class RedisMethod
     messageRouter.addMethod 'redis', @
 
   onChannelMessage: (channel, message) =>
-    console.log 'redismethod got channel '+channel+' message '+message
-    console.dir channel
-    console.log '-------------------------------------------------------------------'
+    #console.log 'redismethod got channel '+channel+' message '+message
+    #console.dir channel
+    #console.log '-------------------------------------------------------------------'
     msg = JSON.parse(message)
     console.dir msg
     clientChannel = msg.channelID
