@@ -280,6 +280,9 @@ class ObjectManager
                   objStore.removeListenerFor(msg.id, rememberedListenerId)
               )
               rememberedListenerId = listenerId
+              ClientEndpoints.onDisconnect (adr) =>
+                if adr == msg.client then objStore.removeListenerFor(msg.obj.id, listenerId)
+
               if debug then console.log 'listenerid '+listenerId+' added for updates on object '+obj.name+' ['+obj.id+']'
               msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.REGISTER_UPDATES, payload: listenerId})
             else
