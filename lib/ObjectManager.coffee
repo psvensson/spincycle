@@ -13,6 +13,12 @@ class ObjectManager
 
   constructor: (@messageRouter) ->
    @updateObjectHooks = []
+   @populationListeners = []
+   SuperModel.onCreate (newmodel)=>
+     @populationListeners.forEach (client) =>
+       if ClientEndpoints.exists(client)
+         ClientEndpoints.sendToEndpoint(client, {status: e.general.SUCCESS, info: 'POPULATION_UPDATE', payload: { added: newmodel.toClient() } })
+
 
   setup: () =>
     @messageRouter.addTarget('registerForUpdatesOn',  'obj', @onRegisterForUpdatesOn)
@@ -20,6 +26,7 @@ class ObjectManager
     @messageRouter.addTarget('updateObject',          'obj', @onUpdateObject)
     @messageRouter.addTarget('listTypes',             '<noargs>', @onListTypes)
     @messageRouter.addTarget('getModelFor',             'modelname', @onGetModelFor)
+    @messageRouter.addTarget('registerForPopulationChangesFor', 'type', @onRegisterForPopulationChanges)
 
   registerUpdateObjectHook: (hook) =>
     @updateObjectHooks.push hook
@@ -63,6 +70,9 @@ class ObjectManager
         if obj
           if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
             DB.remove obj, (removestatus) =>
+              @populationListeners.forEach (client) =>
+                if ClientEndpoints.exists(client)
+                  ClientEndpoints.sendToEndpoint(client, {status: e.general.SUCCESS, info: 'POPULATION_UPDATE', payload: { removed: obj.toClient() } })
               objStore.getObject('all_'+msg.obj.type, msg.obj.type).then (oo) =>
                 if debug then console.log 'exposed object removed through _delete'+msg.obj.type
                 oo.list = oo.list.filter (id) =>  id != obj.id
@@ -70,7 +80,7 @@ class ObjectManager
                 if debug then console.dir oo.list
                 objStore.removeObject(obj)
                 objStore.sendAllUpdatesFor(oo, true)
-                msg.replyFunc({status: e.general.SUCCESS, info: 'delete object', payload: obj.id})
+              msg.replyFunc({status: e.general.SUCCESS, info: 'delete object', payload: obj.id})
           else
             msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to delete object', payload: msg.obj.id})
         else
@@ -303,5 +313,18 @@ class ObjectManager
       msg.replyFunc({status: e.general.SUCCESS, info: 'deregistered listener for obejct', payload: msg.id })
     else
       msg.replyFunc({status: e.general.FAILURE, info: 'onDeregisterForUpdatesOn missing parameter', payload: null })
+
+  onRegisterForPopulationChanges: (msg) =>
+    if msg.type
+      @populationListeners.push msg.client
+      msg.replyFunc({status: e.general.SUCCESS, info: 'registered for population changes for type '+msg.type, payload: type})
+      ClientEndpoints.onDisconnect (adr) =>
+        if adr == msg.client
+          idx = -1
+          @populationListeners.forEach (client, i) =>
+            if client == msg.client then idx = i
+          @populationListeners.splice(i, 1)
+    else
+      msg.replyFunc({status: e.general.FAILURE, info: 'onRegisterForPopulationChanges missing parameter', payload: null })
 
 module.exports = ObjectManager

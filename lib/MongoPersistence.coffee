@@ -86,6 +86,23 @@ class MongoPersistence
           q.resolve(item)
     return q
 
+    # This is not easily implementable in couch, so now we're diverging
+  find: (_type, property, value) =>
+    console.log 'byProviderId called for pid '+pid+' and type '+_type
+    q = defer()
+    type = _type.toLowerCase()
+    @getDbFor(type).then (collection) =>
+      query = {}
+      query[property] = value
+      collection.findOne query, (err, item) =>
+        if err
+          console.log 'MONGO find Error: '+err
+          console.dir err
+          q.resolve(null)
+        else
+          q.resolve(item)
+    return q
+
   set: (_type, obj, cb)=>
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>

@@ -71,6 +71,16 @@ class DB
       console.log 'DB.all: All not implemented in underlying persistence logic'
       cb []
 
+  @find: (type, property, value) =>
+    q = defer()
+    @getDataStore().find(type, property, value).then (result) =>
+      if not result
+        console.log 'DB.get find type '+type+', property '+property+', value '+value+' got back '+result
+      else
+        @lru.set(id, result)
+      q.resolve(result)
+    return q
+
   @get: (type, ids) =>
     #if debug then console.log 'DB.get called for type "'+type+'" and ids "'+ids+'"'
     if not ids.length then ids = [ids]

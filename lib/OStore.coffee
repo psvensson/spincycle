@@ -110,12 +110,6 @@ class OStore
             for lid of listeners
               listeners[lid](sendobj)
 
-  """
-
-    !!!!!!!!!!!!!!!!!!!!!!!!  FFS !!!!!!!!!!!!!!!!
-    MAKE SURE TO REMOVE LISTENERES WHEN CLIENTENDPOINTS DROPS OUT
-
-  """
   @addListenerFor:(id, type, cb) =>
     console.log 'OStore::addListenerFor called with type:'+type+' id '+id
     list = OStore.listeners[id] or []
@@ -136,5 +130,8 @@ class OStore
     for i, cb of list
       tmp[i] = cb if cb
     OStore.listeners[id] = tmp
+    if debug then console.log 'removing listener for object '+id
+    if debug then console.log 'listeners list is now'
+    if debug then console.dir OStore.listeners[id]
 
 module.exports = OStore

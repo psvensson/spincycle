@@ -17,6 +17,9 @@ debug = process.env["DEBUG"]
 class SuperModel
 
   SuperModel.resolver = resolver
+  SuperModel.oncreatelisteners = []
+  SuperModel.onCreate = (cb)->
+    SuperModel.oncreatelisteners.push cb
 
   _getRecord:() =>
    rv = @getRecord()
@@ -27,8 +30,36 @@ class SuperModel
     #console.log 'SuperModel constructor'
     #console.dir @model
     @id         = @record.id or uuid.v4()
+    @record = @unPrettify(@record)
 
-    # populate 'aggregate' list object for all_* in OStore so that it can be subscribed to
+    missing = true
+    @constructor.model.forEach (mp) -> if mp.name == 'createdAt' then missing = false
+    if missing
+      @constructor.model.push({ name: 'createdAt',    public: true,   value: 'createdAt' })
+      @constructor.model.push({ name: 'modifiedAt',   public: true,   value: 'modifiedAt' })
+      @constructor.model.push({ name: 'createdBy',    public: true,   value: 'createdBy' })
+      @updateAllModels()
+      SuperModel.oncreatelisteners.forEach (listener) -> listener(@)
+
+    @type = @constructor.type
+    q = defer()
+
+    OMgr.storeObject(@)
+    if @record._rev
+      #if debug then console.log 'setting _rev to '+@record._rev+' for '+@constructor.type+' '+@id
+      @_rev = @record._rev
+
+    @loadFromIds(@constructor.model).then( () =>
+      if @postCreate
+        @postCreate(q)
+      else
+        q.resolve(@)
+    , error)
+    #if debug then console.log 'returning promise from constructor for '+@constructor.type
+    return q
+
+  updateAllModels: () ->
+# populate 'aggregate' list object for all_* in OStore so that it can be subscribed to
     obj =
     {
       id: 'all_'+@constructor.type
@@ -48,31 +79,6 @@ class SuperModel
           console.log 'creating original all_'+@constructor.type+' list object'
           console.dir obj
         OMgr.storeObject(obj)
-
-    @record = @unPrettify(@record)
-    missing = true
-    @constructor.model.forEach (mp) -> if mp.name == 'createdAt' then missing = false
-    if missing
-      @constructor.model.push({ name: 'createdAt',    public: true,   value: 'createdAt' })
-      @constructor.model.push({ name: 'modifiedAt',   public: true,   value: 'modifiedAt' })
-      @constructor.model.push({ name: 'createdBy',    public: true,   value: 'createdBy' })
-
-    @type = @constructor.type
-    q = defer()
-
-    OMgr.storeObject(@)
-    if @record._rev
-      #if debug then console.log 'setting _rev to '+@record._rev+' for '+@constructor.type+' '+@id
-      @_rev = @record._rev
-
-    @loadFromIds(@constructor.model).then( () =>
-      if @postCreate
-        @postCreate(q)
-      else
-        q.resolve(@)
-    , error)
-    #if debug then console.log 'returning promise from constructor for '+@constructor.type
-    return q
 
   getRecord: () =>
     @._getRecord(@, @constructor.model, @record)
@@ -211,7 +217,7 @@ class SuperModel
           if not record
             console.log 'SuperModel::loadFromIds got back null record from DB for type '+resolveobj.type+' and id '+id
             if count == 0 then r.resolve(null)
-          else resolver.createObjectFrom(record).then( (obj) =>
+          else SuperModel.resolver.createObjectFrom(record).then( (obj) =>
             if not obj
               console.log ' Hmm. Missing object reference. Sad Face.'
               if count == 0 then r.resolve(null)
