@@ -88,7 +88,7 @@ class SuperModel
     rv._rev = @_rev if @_rev
     model.forEach (v) ->
       k = v.name
-      if v.value then rv[k] = me[v.value] or record[k]
+      if v.value and not v.type then rv[k] = me[v.value] or record[k]
       else if v.hashtable
         varr = []
         ha = me[v.name] or []
