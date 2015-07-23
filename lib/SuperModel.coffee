@@ -173,7 +173,7 @@ class SuperModel
             if resolveobj.type
               if debug then console.log 'supermodel creating direct reference of type '+resolveobj.type+', value '+resolveobj.value+' name '+ resolveobj.name + ' id '+@record[resolveobj.value]
               if debug then console.dir @record[resolveobj.value]
-              if debug then console.dir resolveobj
+              if debug then console.dir @record
               @resolveObj(resolveobj, @record[resolveobj.value], r, 0)                 # direct object reference by id
             else
               @[resolveobj.name] = @record[resolveobj.value] or resolveobj.default  # scalar
