@@ -93,7 +93,7 @@ class DB
         if not rv
           #if debug then console.log ' attempting to use datastore for '
           @getDataStore().get(type, id, (result) =>
-            if not result then console.log 'DB.get for type '+type+' got back '+result
+            if not result then console.log 'DB.get for type '+type+' and id '+id+' got back '+result
             @lru.set(id, result)
             p.resolve(result)
           )
