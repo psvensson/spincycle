@@ -65,6 +65,7 @@ class MongoPersistence
     if typeof id == 'object'
       console.log 'Mongo.get got an object as id instead of string !!!!! '
       console.dir id
+      throw 'illegal id'
     @getDbFor(type).then (collection) =>
       collection.findOne {id: id}, (err, item) =>
         if err
