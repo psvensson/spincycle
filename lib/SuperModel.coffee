@@ -33,7 +33,7 @@ class SuperModel
     @record = @unPrettify(@record)
 
     missing = true
-    @constructor.model.forEach (mp) -> if mp.name == 'createdAt' then missing = false
+    @constructor.model.forEach (mp) -> if mp.name == 'createdAt' or mp.name == 'createdBy' then missing = false
     if missing
       @constructor.model.push({ name: 'createdAt',    public: true,   value: 'createdAt' })
       @constructor.model.push({ name: 'modifiedAt',   public: true,   value: 'modifiedAt' })
