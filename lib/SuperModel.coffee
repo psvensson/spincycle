@@ -88,14 +88,18 @@ class SuperModel
     rv._rev = @_rev if @_rev
     model.forEach (v) ->
       k = v.name
-      if v.value and not v.type then rv[k] = me[v.value] or record[k]
+      if v.value and not v.type
+        if debug then console.log 'direct value '+v.value
+        rv[k] = me[v.value] or record[k]
       else if v.hashtable
+        if debug then console.log 'hashtable '
         varr = []
         ha = me[v.name] or []
         for hk, hv of ha
           varr.push hv.id
         rv[k] = varr
       else if v.array
+        if debug then console.log 'direct array'
         varr = []
         marr = me[v.name] or []
         marr.forEach (hv) -> varr.push hv.id
