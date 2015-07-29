@@ -2,8 +2,10 @@ defer           = require('node-promise').defer
 
 uuid            = require('node-uuid')
 error           = require('./Error').error
+ResolveModule   = require('./ResolveModule')
 
-debug = process.env["DEBUG"]
+resolver  = new ResolveModule()
+debug     = process.env["DEBUG"]
 
 class OStore
 
@@ -42,6 +44,17 @@ class OStore
       list = OStore.listeners[obj.id] or []
       for lid, listener of list
         listener(obj)
+
+  @getOrCreateObjectFromRecord: (record) =>
+    q = defer()
+    OStore.getObject(record.id, record.type).then (o) =>
+      if o
+        q.resovle(o)
+      else
+        resolver.createObjectFrom(record).then (oo) =>
+          q.resolve(oo)
+
+    return q
 
   @getObject: (id, type) =>
     q = defer()

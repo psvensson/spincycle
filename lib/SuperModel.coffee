@@ -59,7 +59,7 @@ class SuperModel
     return q
 
   updateAllModels: () ->
-# populate 'aggregate' list object for all_* in OStore so that it can be subscribed to
+  # populate 'aggregate' list object for all_* in OStore so that it can be subscribed to
     obj =
     {
       id: 'all_'+@constructor.type
