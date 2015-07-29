@@ -49,7 +49,7 @@ class OStore
     q = defer()
     OStore.getObject(record.id, record.type).then (o) =>
       if o
-        q.resovle(o)
+        q.resolve(o)
       else
         resolver.createObjectFrom(record).then (oo) =>
           q.resolve(oo)
