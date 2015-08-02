@@ -5,6 +5,9 @@ defer           = require('node-promise').defer
 
 class MongoPersistence
 
+  madr = process.env('MONGODB_PORT_28017_TCP_ADDR') or '127.0.0.1'
+  mport = process.env('MONGODB_PORT_28017_TCP_PORT') or '27017'
+
   constructor: () ->
     @dbs = []
 
@@ -16,7 +19,7 @@ class MongoPersistence
     if @db
       q.resolve(@db)
     else
-      MongoClient.connect( 'mongodb://localhost:27017/spincycle', (err, db) =>
+      MongoClient.connect( 'mongodb://mongodb:27017/spincycle', (err, db) =>
         if err
           console.log 'MONGO Error connection: '+err
           console.dir err
