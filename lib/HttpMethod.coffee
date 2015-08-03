@@ -24,6 +24,7 @@ class HttpMethod
 
     messageRouter.addMethod 'express', @
 
+
   registrationFunc: (targetName, targetFunc) ->
     #console.log 'express registering http route for target '+targetName
     HttpMethod.httproutes[targetName] = targetFunc
