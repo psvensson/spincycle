@@ -6,8 +6,12 @@ class RedisMethod
 
   constructor: (messageRouter, app, basePath) ->
     @redisroutes = []
-    @listenclient = redis.createClient()
-    @sendclient = redis.createClient()
+
+    rhost = process.env['REDIS_PORT_6379_TCP_ADDR'] or '127.0.0.1'
+    rport = process.env['REDIS_PORT_6379_TCP_PORT'] or '6379'
+
+    @listenclient = redis.createClient(rport, rhost)
+    @sendclient = redis.createClient(rport, rhost)
 
     @listenclient.subscribe('spinchannel')
     @listenclient.on('message', @onChannelMessage)
