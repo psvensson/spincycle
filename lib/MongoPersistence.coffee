@@ -19,7 +19,7 @@ class MongoPersistence
     if @db
       q.resolve(@db)
     else
-      MongoClient.connect( 'mongodb://mongodb:27017/spincycle', (err, db) =>
+      MongoClient.connect( 'mongodb://'+madr+':'+mport+'/spincycle', (err, db) =>
         if err
           console.log 'MONGO Error connection: '+err
           console.dir err
