@@ -19,20 +19,21 @@ class MongoPersistence
     if @db
       q.resolve(@db)
     else
-      foo: () =>
-        MongoClient.connect('mongodb://'+madr+':'+mport+'/spincycle', (err, db) =>
-          if err
-            console.log 'MONGO Error connection: '+err
-            console.dir err
-            console.log 'retrying.....'
-            setTimeout foo, 200
-          else
-            console.log("---- We are connected ----")
-            @db = db
-            q.resolve(db)
-        )
-      foo()
+      @foo(q)
     return q
+
+  foo: (q) =>
+    MongoClient.connect('mongodb://'+madr+':'+mport+'/spincycle', (err, db) =>
+      if err
+        console.log 'MONGO Error connection: '+err
+        console.dir err
+        console.log 'retrying.....'
+        setTimeout @foo, 200
+      else
+        console.log("---- We are connected ----")
+        @db = db
+        q.resolve(db)
+    )
 
   getDbFor: (_type) =>
     q = defer()
