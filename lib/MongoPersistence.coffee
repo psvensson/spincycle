@@ -23,9 +23,10 @@ class MongoPersistence
     return q
 
   foo: (q) =>
-    MongoClient.connect('mongodb://'+madr+':'+mport+'/spincycle', (err, db) =>
+    cstring = 'mongodb://'+madr+':'+mport+'/spincycle'
+    MongoClient.connect(cstring, (err, db) =>
       if err
-        console.log 'MONGO Error connection: '+err
+        console.log 'MONGO Error connecting to "'+cstring+'" '+err
         console.dir err
         console.log 'retrying.....'
         setTimeout @foo, 200
