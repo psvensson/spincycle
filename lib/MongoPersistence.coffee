@@ -5,8 +5,8 @@ defer           = require('node-promise').defer
 
 class MongoPersistence
 
-  if process.env['MONGODB_PORT_28017_TCP_PORT'] then madr = 'mongodb' else madr = '127.0.0.1'
-  mport = process.env['MONGODB_PORT_28017_TCP_PORT'] or '27017'
+  if process.env['MONGODB_PORT_27017_TCP_PORT'] then madr = 'mongodb' else madr = '127.0.0.1'
+  mport = process.env['MONGODB_PORT_27017_TCP_PORT'] or '27017'
 
   constructor: () ->
     @dbs = []
