@@ -29,7 +29,10 @@ class MongoPersistence
         console.log 'MONGO Error connecting to "'+cstring+'" '+err
         console.dir err
         console.log 'retrying.....'
-        setTimeout @foo, 200
+        setTimeout(
+          ()=>
+            @foo(q)
+          2000)
       else
         console.log("---- We are connected ----")
         @db = db
