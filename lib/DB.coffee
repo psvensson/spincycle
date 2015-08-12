@@ -75,9 +75,9 @@ class DB
     q = defer()
     @getDataStore().find(type, property, value).then (result) =>
       if not result
-        console.log 'DB.get find type '+type+', property '+property+', value '+value+' got back '+result
+        console.log 'DB.find type '+type+', property '+property+', value '+value+' got back '+result
       else
-        @lru.set(id, result)
+        @lru.set(result.id, result)
       q.resolve(result)
     return q
 
