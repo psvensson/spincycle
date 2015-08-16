@@ -28,7 +28,7 @@ describe 'SuperModel Tests', ->
     @model=
     [
       {name: 'name', public: true, value: 'name', default: 'yohoo'}
-      {name: 'theFoo', ids: 'theFoo' }
+      {name: 'theFoo', value: 'theFoo', type: 'Foo' }
       {name: 'foos', public: true, array: true, ids: 'foos'}
       {name: 'footable', hashtable: true, ids: 'footable'}
     ]

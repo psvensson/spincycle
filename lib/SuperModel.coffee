@@ -38,7 +38,7 @@ class SuperModel
       @constructor.model.push({ name: 'createdAt',    public: true,   value: 'createdAt' })
       @constructor.model.push({ name: 'modifiedAt',   public: true,   value: 'modifiedAt' })
       @constructor.model.push({ name: 'createdBy',    public: true,   value: 'createdBy' })
-      @updateAllModels()
+      #@updateAllModels()
       SuperModel.oncreatelisteners.forEach (listener) -> listener(@)
 
     @type = @constructor.type
@@ -58,6 +58,7 @@ class SuperModel
     #if debug then console.log 'returning promise from constructor for '+@constructor.type
     return q
 
+  """
   updateAllModels: () ->
   # populate 'aggregate' list object for all_* in OStore so that it can be subscribed to
     obj =
@@ -79,6 +80,8 @@ class SuperModel
           console.log 'creating original all_'+@constructor.type+' list object'
           console.dir obj
         OMgr.storeObject(obj)
+
+  """
 
   getRecord: () =>
     @._getRecord(@, @constructor.model, @record)

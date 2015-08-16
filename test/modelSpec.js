@@ -57,7 +57,8 @@
           "default": 'yohoo'
         }, {
           name: 'theFoo',
-          ids: 'theFoo'
+          value: 'theFoo',
+          type: 'Foo'
         }, {
           name: 'foos',
           "public": true,
