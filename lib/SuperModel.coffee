@@ -95,7 +95,7 @@ class SuperModel
         if debug then console.log 'getRecord accessing property '+k+' of object '+@type+' -> '+me[k]
         rv[k] = me[k]?.id
       else if (v.value and v.value isnt 0) and not v.type
-        if debug then console.log 'direct value '+v.value
+        if debug then console.log 'direct value '+v.value+' me[v.value] = '+(me[v.value])+' record[k] = '+(record[k])
         rv[k] = me[v.value] or record[k]
       else if v.hashtable
         #if debug then console.log 'hashtable '
@@ -119,7 +119,7 @@ class SuperModel
 
   toClient: () =>
     if debug then console.log '---------------------------------------- toClient -----------------------------------------------'
-    if debug then console.dir
+    if debug then console.dir @
     r = @getRecord()
     ra = @.constructor.model
     rv = {}
