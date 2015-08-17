@@ -95,7 +95,7 @@ class SuperModel
         if debug then console.log 'getRecord accessing property '+k+' of object '+@type+' -> '+me[k]
         rv[k] = me[k]?.id
       else if (v.value and v.value isnt 0) and not v.type
-        #if debug then console.log 'direct value '+v.value
+        if debug then console.log 'direct value '+v.value
         rv[k] = me[v.value] or record[k]
       else if v.hashtable
         #if debug then console.log 'hashtable '
@@ -110,7 +110,8 @@ class SuperModel
         marr = me[v.name] or []
         marr.forEach (hv) -> varr.push hv.id
         rv[k] = varr
-
+      else
+        if debug then console.log '**************** AAAUAGHH!!! property '+k+' was not resolved in SuperMOde::_getRecord'
 
     rv.id = @id
     rv.type = @.constructor.type
