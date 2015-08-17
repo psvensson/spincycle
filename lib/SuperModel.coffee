@@ -96,7 +96,8 @@ class SuperModel
         rv[k] = me[k]?.id
       else if (v.value and v.value isnt 0) and not v.type
         if debug then console.log 'direct value '+v.value+' me[v.value] = '+(me[v.value])+' record[k] = '+(record[k])
-        rv[k] = me[v.value] or record[k]
+        rv[k] = me[v.value]
+        if not rv[k] and rv[k] isnt 0 then rv[k] = record[k]
       else if v.hashtable
         #if debug then console.log 'hashtable '
         varr = []
