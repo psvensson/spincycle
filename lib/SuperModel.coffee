@@ -58,31 +58,6 @@ class SuperModel
     #if debug then console.log 'returning promise from constructor for '+@constructor.type
     return q
 
-  """
-  updateAllModels: () ->
-  # populate 'aggregate' list object for all_* in OStore so that it can be subscribed to
-    obj =
-    {
-      id: 'all_'+@constructor.type
-      type: @constructor.type
-      list: [@.id]
-      getRecord: ()->
-        {type: obj.type, id: obj.id, list: obj.list}
-      toClient: ()->
-        obj.getRecord()
-    }
-    OMgr.getObject('all_'+@constructor.type, @constructor.type).then (oo) =>
-      if oo
-        if debug then console.log 'adding '+@constructor.type+' id '+@id+' to all_ list'
-        oo.list.push @id if @id not in oo.list
-      else
-        if debug
-          console.log 'creating original all_'+@constructor.type+' list object'
-          console.dir obj
-        OMgr.storeObject(obj)
-
-  """
-
   getRecord: () =>
     @._getRecord(@, @constructor.model, @record)
 
@@ -181,7 +156,7 @@ class SuperModel
               if debug then console.log 'supermodel creating direct reference of type '+resolveobj.type+', value '+resolveobj.value+' name '+ resolveobj.name + ' id '+@record[resolveobj.value]
               if debug then console.dir @record[resolveobj.value]
               if debug then console.dir @record
-              @resolveObj(resolveobj, @record[resolveobj.value], r, 0)                 # direct object reference by id
+              if @record[resolveobj.value] then @resolveObj(resolveobj, @record[resolveobj.value], r, 0) else @[resolveobj.name] = null     # direct object reference by id
             else
               @[resolveobj.name] = @record[resolveobj.value] or resolveobj.default  # scalar
               r.resolve(@[resolveobj.name])
