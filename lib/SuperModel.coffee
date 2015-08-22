@@ -152,14 +152,18 @@ class SuperModel
           r = defer()
           allpromises.push(r)
           if resolveobj.value
-            if resolveobj.type
+            if resolveobj.type  # direct object reference by id
               if debug then console.log 'supermodel creating direct reference of type '+resolveobj.type+', value '+resolveobj.value+' name '+ resolveobj.name + ' id '+@record[resolveobj.value]
               if debug then console.dir @record[resolveobj.value]
               if debug then console.dir @record
-              if @record[resolveobj.value] then @resolveObj(resolveobj, @record[resolveobj.value], r, 0) else @[resolveobj.name] = null     # direct object reference by id
+              if @record[resolveobj.value]
+                @resolveObj(resolveobj, @record[resolveobj.value], r, 0)
+              else
+                @[resolveobj.name] = null
+                r.resolve(@[resolveobj.name])
             else
               @[resolveobj.name] = @record[resolveobj.value] or resolveobj.default  # scalar
-            r.resolve(@[resolveobj.name])
+              r.resolve(@[resolveobj.name])
           else
             @[resolveobj.name] = [] if resolveobj.array == true
             @[resolveobj.name] = {} if resolveobj.hashtable == true
