@@ -159,7 +159,7 @@ class SuperModel
               if @record[resolveobj.value] then @resolveObj(resolveobj, @record[resolveobj.value], r, 0) else @[resolveobj.name] = null     # direct object reference by id
             else
               @[resolveobj.name] = @record[resolveobj.value] or resolveobj.default  # scalar
-              r.resolve(@[resolveobj.name])
+            r.resolve(@[resolveobj.name])
           else
             @[resolveobj.name] = [] if resolveobj.array == true
             @[resolveobj.name] = {} if resolveobj.hashtable == true
