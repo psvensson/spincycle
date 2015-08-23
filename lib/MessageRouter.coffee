@@ -40,6 +40,7 @@ class MessageRouter
     #@authMgr  = AuthenticationManager
     @objectManager = new ObjectManager(@)
     @objectManager.setup()
+    if @authMgr.setup then @authMgr.setup()
 
     @setup()
 
