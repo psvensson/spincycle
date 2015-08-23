@@ -110,7 +110,7 @@ class ObjectManager
             else
               console.log 'No object found with id '+msg.obj.id
               console.dir objStore.objects.map (o) -> o.type == msg.obj.type
-              msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
+              msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'no such object', payload: msg.obj.id})
       else
         msg.replyFunc({status: e.general.FAILURE, info: 'id parameter in wrong format', payload: null })
     else
@@ -282,7 +282,7 @@ class ObjectManager
               listenerId = objStore.addListenerFor(msg.obj.id, msg.obj.type, (uobj) ->
                 if debug then console.log '--------------------- sending update of object '+msg.obj.id+' type '+msg.obj.type+' to client'
                 toclient = uobj.toClient()
-                console.dir(toclient)
+                if debug then console.dir(toclient)
                 if ClientEndpoints.exists(msg.client)
                   ClientEndpoints.sendToEndpoint(msg.client, {status: e.general.SUCCESS, info: 'OBJECT_UPDATE', payload: toclient })
                 else
@@ -298,7 +298,8 @@ class ObjectManager
             else
               msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.UPDATE_REGISTER_FAIL, payload: msg.obj.id })
           else
-            console.dir obj
+            if debug then console.log 'User mot allowed getting updates (read) object:'
+            if debug then console.dir obj
             msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id })
         , error)
       else
