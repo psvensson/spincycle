@@ -120,7 +120,7 @@ class MongoPersistence
   set: (_type, obj, cb)=>
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>
-      console.log 'Mongo.set called for type '+type+' and id '+obj.id
+      #console.log 'Mongo.set called for type '+type+' and id '+obj.id
       if typeof obj.id == 'object' then console.dir obj
       collection.update {id: obj.id}, obj,{ upsert: true },(err, result, upserted) =>
         if err

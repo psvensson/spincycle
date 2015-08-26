@@ -2,6 +2,8 @@ uuid            = require('node-uuid')
 redis           = require('redis')
 ClientEndpoints = require('./ClientEndpoints')
 
+debug = process.env["DEBUG"]
+
 class RedisMethod
 
   constructor: (messageRouter, app, basePath) ->
@@ -18,11 +20,11 @@ class RedisMethod
     messageRouter.addMethod 'redis', @
 
   onChannelMessage: (channel, message) =>
-    #console.log 'redismethod got channel '+channel+' message '+message
+    if debug then console.log 'redismethod got channel '+channel+' message '+message
     #console.dir channel
     #console.log '-------------------------------------------------------------------'
     msg = JSON.parse(message)
-    console.dir msg
+    if debug then console.dir msg
     clientChannel = msg.channelID
     if clientChannel then ClientEndpoints.registerEndpoint msg.channelID, (msg) ->
       @sendclient.publish(clientChannel, JSON.stringify(msg))

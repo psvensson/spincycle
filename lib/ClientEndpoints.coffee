@@ -1,3 +1,5 @@
+debug = process.env["DEBUG"]
+
 class ClientEndpoints
 
   @endpoints        = []
@@ -5,12 +7,12 @@ class ClientEndpoints
   @onconnectcbs     = []
 
   @registerEndpoint: (address, sendFunc) ->
-    console.log 'registerEndpoint called for address '+address
+    if debug then console.log 'registerEndpoint called for address '+address
     @endpoints[address] = sendFunc
     @onconnectcbs.forEach (cb) => cb(address)
 
   @removeEndpoint: (address) ->
-    console.log 'deleting endpoint '+address
+    if debug then console.log 'deleting endpoint '+address
     delete @endpoints[address]
     @ondisconnectcbs.forEach (cb) => cb(address)
 
