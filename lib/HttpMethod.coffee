@@ -1,6 +1,8 @@
 uuid            = require('node-uuid')
 url             = require('url')
 
+debug = process.env["DEBUG"]
+
 class HttpMethod
 
   @httproutes = []
@@ -17,9 +19,10 @@ class HttpMethod
         message = { client: ip+':'+port, target: req.params.target, messageId: url_parts.messageId || uuid.v4() }
         for p, part of url_parts
           message[p] = part # TODO: Guard against hax0r dataz
+
         message.replyFunc = (reply) ->
           res.json(reply)
-          console.log 'express calling target'
+          if debug then console.log 'HttpMethod calling target '+target
         target(message)
 
     messageRouter.addMethod 'express', @
