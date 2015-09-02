@@ -11,7 +11,7 @@ class HttpMethod
       ip    = req.connection.remoteAddress
       port  = req.connection.remotePort
       #console.log 'express request from '+ip+':'+port+' target is "'+req.params.target+'"'
-      target = HtpMethod.httproutes[req.params.target]
+      target = HttpMethod.httproutes[req.params.target]
       if target
         url_parts = url.parse(req.url, true)
         message = { client: ip+':'+port, target: req.params.target, messageId: url_parts.messageId || uuid.v4() }
