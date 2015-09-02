@@ -29,7 +29,8 @@ class MessageRouter
   debug = process.env["DEBUG"]
 
   constructor: (@authMgr) ->
-    console.log 'messageRouter constructor'
+    pjson = require('./package.json');
+    console.log 'messageRouter constructor. Version - '+pjson.version
     #console.dir @authMgr
     @authMgr.messagerouter = @
     @resolver = new ResolveModule()
