@@ -96,7 +96,7 @@ class ObjectManager
   _getObject: (msg) =>
     if debug then console.log '_getObject called for type '+msg.type
     if msg.type and msg.obj.id
-      if msg.obj.id.indexOf('all_') > -1
+      if ""+msg.obj.id.indexOf('all_') > -1
         @getAggregateObjects(msg)
       else
         @getObjectPullThrough(msg.obj.id, msg.obj.type).then (obj) =>
