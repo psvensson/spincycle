@@ -96,23 +96,20 @@ class ObjectManager
   _getObject: (msg) =>
     if debug then console.log '_getObject called for type '+msg.type
     if msg.type and msg.obj.id
-      if typeof msg.obj.id == 'string'
-        if msg.obj.id.indexOf('all_') > -1
-          @getAggregateObjects(msg)
-        else
-          @getObjectPullThrough(msg.obj.id, msg.obj.type).then (obj) =>
-            if obj
-              if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
-                msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: obj.toClient()})
-              else
-                console.log '_getObject got NOT ALLOWED for user '+msg.user.id+' for '+msg.type+' id '+obj.id
-                msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: msg.obj.id})
-            else
-              console.log 'No object found with id '+msg.obj.id
-              console.dir objStore.objects.map (o) -> o.type == msg.obj.type
-              msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'no such object', payload: msg.obj.id})
+      if msg.obj.id.indexOf('all_') > -1
+        @getAggregateObjects(msg)
       else
-        msg.replyFunc({status: e.general.FAILURE, info: 'id parameter in wrong format', payload: null })
+        @getObjectPullThrough(msg.obj.id, msg.obj.type).then (obj) =>
+          if obj
+            if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
+              msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: obj.toClient()})
+            else
+              console.log '_getObject got NOT ALLOWED for user '+msg.user.id+' for '+msg.type+' id '+obj.id
+              msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: msg.obj.id})
+          else
+            console.log 'No object found with id '+msg.obj.id
+            console.dir objStore.objects.map (o) -> o.type == msg.obj.type
+            msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'no such object', payload: msg.obj.id})
     else
       msg.replyFunc({status: e.general.FAILURE, info: '_getObject missing parameter', payload: null })
 
