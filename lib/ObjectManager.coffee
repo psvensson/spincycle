@@ -55,10 +55,8 @@ class ObjectManager
         msg.obj.createdAt = Date.now()
         msg.obj.createdBy = msg.user.id
         SuperModel.resolver.createObjectFrom(msg.obj).then (o) =>
-          objStore.getObject('all_'+msg.obj.type, msg.obj.type).then (oo) =>
-            objStore.sendAllUpdatesFor(oo, true)
-            o.serialize()
-            msg.replyFunc({status: e.general.SUCCESS, info: 'new '+msg.obj.type, payload: o})
+          o.serialize()
+          msg.replyFunc({status: e.general.SUCCESS, info: 'new '+msg.obj.type, payload: o})
       else
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to create objects of that type', payload: msg.obj.type})
     else
@@ -73,13 +71,7 @@ class ObjectManager
               @populationListeners.forEach (client) =>
                 if ClientEndpoints.exists(client)
                   ClientEndpoints.sendToEndpoint(client, {status: e.general.SUCCESS, info: 'POPULATION_UPDATE', payload: { removed: obj.toClient() } })
-              objStore.getObject('all_'+msg.obj.type, msg.obj.type).then (oo) =>
-                if debug then console.log 'exposed object removed through _delete'+msg.obj.type
-                oo.list = oo.list.filter (id) =>  id != obj.id
-                if debug then console.log 'resulting list is'
-                if debug then console.dir oo.list
                 objStore.removeObject(obj)
-                objStore.sendAllUpdatesFor(oo, true)
               msg.replyFunc({status: e.general.SUCCESS, info: 'delete object', payload: obj.id})
           else
             msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to delete object', payload: msg.obj.id})
