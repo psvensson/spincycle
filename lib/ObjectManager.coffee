@@ -26,7 +26,7 @@ class ObjectManager
     @messageRouter.addTarget('updateObject',          'obj', @onUpdateObject)
     @messageRouter.addTarget('listTypes',             '<noargs>', @onListTypes)
     @messageRouter.addTarget('getModelFor',             'modelname', @onGetModelFor)
-    @messageRouter.addTarget('getAccessTypesFor',             'type', @onGetAccessTypesFor)
+    @messageRouter.addTarget('getAccessTypesFor',             'modelname', @onGetAccessTypesFor)
     @messageRouter.addTarget('registerForPopulationChangesFor', 'type', @onRegisterForPopulationChanges)
 
   registerUpdateObjectHook: (hook) =>
@@ -36,16 +36,16 @@ class ObjectManager
     msg.replyFunc({status: e.general.SUCCESS, info: 'list types', payload: objStore.listTypes()})
 
   onGetAccessTypesFor: (msg) =>
-    if msg.type
+    if msg.modelname
       rv =
-        create: @messageRouter.authMgr.canUserCreateThisObject(msg.type, msg.user)
-        read:   @messageRouter.authMgr.canUserReadFromThisObject(msg.type, msg.user)
-        write:  @messageRouter.authMgr.canUserWriteToThisObject(msg.type, msg.user)
-        list:   @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user)
+        create: @messageRouter.authMgr.canUserCreateThisObject(msg.modelname, msg.user)
+        read:   @messageRouter.authMgr.canUserReadFromThisObject(msg.modelname, msg.user)
+        write:  @messageRouter.authMgr.canUserWriteToThisObject(msg.modelname, msg.user)
+        list:   @messageRouter.authMgr.canUserListTheseObjects(msg.modelname, msg.user)
 
       msg.replyFunc({status: e.general.SUCCESS, info: 'access types for '+msg.type, payload: rv})
     else
-      msg.replyFunc({status: e.general.FAILURE, info: "missing parameter", payload: null})
+      msg.replyFunc({status: e.general.FAILURE, info: "getAccessTypesFor missing parameter", payload: null})
 
   onGetModelFor: (msg) =>
     if msg.modelname
@@ -58,7 +58,7 @@ class ObjectManager
         model.model.forEach (property) -> if property.public then rv.push(property)
         msg.replyFunc({status: e.general.SUCCESS, info: 'get model', payload: rv})
     else
-      msg.replyFunc({status: e.general.FAILURE, info: "missing parameter", payload: null})
+      msg.replyFunc({status: e.general.FAILURE, info: "getModelFor missing parameter", payload: null})
 
   #---------------------------------------------------------------------------------------------------------------------
   _createObject: (msg) =>
