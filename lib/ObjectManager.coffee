@@ -26,6 +26,7 @@ class ObjectManager
     @messageRouter.addTarget('updateObject',          'obj', @onUpdateObject)
     @messageRouter.addTarget('listTypes',             '<noargs>', @onListTypes)
     @messageRouter.addTarget('getModelFor',             'modelname', @onGetModelFor)
+    @messageRouter.addTarget('getAccessTypesFor',             'type', @onGetAccessTypesFor)
     @messageRouter.addTarget('registerForPopulationChangesFor', 'type', @onRegisterForPopulationChanges)
 
   registerUpdateObjectHook: (hook) =>
@@ -33,6 +34,18 @@ class ObjectManager
 
   onListTypes: (msg) =>
     msg.replyFunc({status: e.general.SUCCESS, info: 'list types', payload: objStore.listTypes()})
+
+  onGetAccessTypesFor: (msg) =>
+    if msg.type
+      rv =
+        create: @messageRouter.authMgr.canUserCreateThisObject(msg.type, msg.user)
+        read:   @messageRouter.authMgr.canUserReadFromThisObject(msg.type, msg.user)
+        write:  @messageRouter.authMgr.canUserWriteToThisObject(msg.type, msg.user)
+        list:   @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user)
+
+      msg.replyFunc({status: e.general.SUCCESS, info: 'access types for '+msg.type, payload: rv})
+    else
+      msg.replyFunc({status: e.general.FAILURE, info: "missing parameter", payload: null})
 
   onGetModelFor: (msg) =>
     if msg.modelname
