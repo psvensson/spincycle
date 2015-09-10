@@ -199,7 +199,9 @@ class ObjectManager
         if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
           if debug then console.log 'can write'
           # Make sure to resolve object references in arrays and hashtables
-          @resolveReferences(msg.obj, obj.constructor.model).then (robj)=>
+          for k,v of msg.obj
+            obj[k] = v
+          @resolveReferences(obj, obj.constructor.model).then (robj)=>
             if debug then console.log 'found object'
             #objStore.updateObj(robj)
             if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db. modifiedAt = '+obj.modifiedAt
