@@ -175,6 +175,8 @@ class ObjectManager
       @._listObjects(msg)
 
   getObjectPullThrough: (id, type) =>
+    if debug then console.log 'getObjectPullThrough for id '
+    if debug then console.dir id
     q = defer()
     if not type
       console.log 'Objectmanager::getObjectPullThrough called with null type.'
