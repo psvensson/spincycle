@@ -182,7 +182,7 @@ class ObjectManager
     else
       objStore.getObject(id, type).then (o) =>
         if not o
-          console.log 'did not find object i ostore, getting from db'
+          if debug then console.log 'getObjectPullThrough did not find object type '+type+' id '+id+' in ostore, getting from db'
           DB.get(type, [id]).then (record) =>
             #console.log 'getting record from db'
             #console.dir record
