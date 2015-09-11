@@ -232,17 +232,18 @@ class ObjectManager
         q.resolve(rv)
 
     model.forEach (property) =>
-      #console.log 'going through property '+property.name
+      console.log 'going through array property '+property.name
       if property.array
         resolvedarr = []
         arr = record[property.name] or []
+        if debug then console.dir arr
         acount = arr.length
         if acount == 0
           rv[property.name] = []
           checkFinished()
         else
           arr.forEach (id) =>
-            if debug then console.log 'attempting to get object type '+property.type+' id '+id
+            if debug then console.log 'attempting to get array object type '+property.type+' id '+id
             @getObjectPullThrough(id, property.type).then (o)=>
               #console.log ' we got object '+o
               #console.dir o
@@ -252,6 +253,7 @@ class ObjectManager
                 rv[property.name] = resolvedarr
                 checkFinished()
       else if property.hashtable
+        if debug then console.log 'going through hashtable property '+property.name
         resolvedhash = {}
         harr = record[property.name] or []
         hcount = harr.length
