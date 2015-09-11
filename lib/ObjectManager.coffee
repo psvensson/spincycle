@@ -244,8 +244,9 @@ class ObjectManager
           rv[property.name] = []
           checkFinished()
         else
-          arr.forEach (id) =>
-            if debug then console.log 'attempting to get array object type '+property.type+' id '+id
+          arr.forEach (idorobj) =>
+            if typeof idorobj == 'object' then id = idorobj.id else id = idorobj
+            if debug then console.log 'attempting to get array name '+property.name+' object type '+property.type+' id '+id
             @getObjectPullThrough(id, property.type).then (o)=>
               #console.log ' we got object '+o
               #console.dir o
@@ -257,19 +258,22 @@ class ObjectManager
       else if property.hashtable
         if debug then console.log 'going through hashtable property '+property.name
         resolvedhash = {}
-        harr = record[property.name] or []
-        hcount = harr.length
-        if hcount == 0
-          rv[property.name] = []
-          checkFinished()
+        if record[property.name] and record[property.name].length
+          harr = record[property.name] or []
+          hcount = harr.length
+          if hcount == 0
+            rv[property.name] = []
+            checkFinished()
+          else
+            harr.forEach (id) =>
+              @getObjectPullThrough(id, property.type).then (o)=>
+                resolvedhash[o.name] = o
+                if debug then console.log 'adding hashtable reference '+o.id+' name '+o.name
+                if --hcount == 0
+                  rv[property.name] = resolvedhash
+                  checkFinished()
         else
-          harr.forEach (id) =>
-            @getObjectPullThrough(id, property.type).then (o)=>
-              resolvedhash[o.name] = o
-              if debug then console.log 'adding hashtable reference '+o.id+' name '+o.name
-              if --hcount == 0
-                rv[property.name] = resolvedhash
-                checkFinished()
+          rv[property.name] = record[property.name]
       else
         if debug then console.log 'resolveReference adding direct reference '+property.name
         rv[property.name] = record[property.name]
