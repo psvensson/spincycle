@@ -43,7 +43,7 @@ class ObjectManager
         write:  @messageRouter.authMgr.canUserWriteToThisObject(msg.modelname, msg.user)
         list:   @messageRouter.authMgr.canUserListTheseObjects(msg.modelname, msg.user)
 
-      msg.replyFunc({status: e.general.SUCCESS, info: 'access types for '+msg.type, payload: rv})
+      msg.replyFunc({status: e.general.SUCCESS, info: 'access types for '+msg.modelname, payload: rv})
     else
       msg.replyFunc({status: e.general.FAILURE, info: "getAccessTypesFor missing parameter", payload: null})
 

@@ -114,8 +114,10 @@ class SuperModel
     if not @_serializing
       @_serializing = true
       OMgr.storeObject()
+      delete updatedObj.record if updatedObj
       OMgr.updateObj(updatedObj) if updatedObj
       record = @getRecord()
+      delete record.record if record.record
       if @_rev then record._rev = @_rev
       DB.set(@.constructor.type, record).then () =>
         @_serializing = false
