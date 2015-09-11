@@ -212,8 +212,8 @@ class ObjectManager
         else
           msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.UPDATE_OBJECT_FAIL, payload: msg.obj.id})
       else
-        console.log 'Not object found with id '+msg.obj.id
-        console.dir objStore.objects.map (o) -> o.type == msg.obj.type
+        console.log 'No object of type '+msg.obj.type+' found with id '+msg.obj.id
+        #console.dir objStore.objects.map (o) -> o.type == msg.obj.type
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
     )
 
