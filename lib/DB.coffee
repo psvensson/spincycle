@@ -85,6 +85,8 @@ class DB
   @search: (type, property, value) =>
     q = defer()
     @getDataStore().search(type, property, value).then (results) =>
+      console.log 'DB.search results were..'
+      console.dir results
       if not results
         console.log 'DB.search type '+type+', property '+property+', value '+value+' got back '+results
       else
