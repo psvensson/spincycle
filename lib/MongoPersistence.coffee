@@ -134,7 +134,7 @@ class MongoPersistence
           console.dir err
           q.resolve(null)
         else
-          q.resolve(items or [])
+          q.resolve(items.toArray() or [])
     return q
 
   set: (_type, obj, cb)=>
