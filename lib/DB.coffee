@@ -9,7 +9,10 @@ OStore          = require('./OStore')
 #Roach          = require('./cockroach')
 Couch           = require('./CouchPersistence')
 Mongo           = require('./MongoPersistence')
+ResolveModule   = require('./ResolveModule')
 
+
+resolver  = new ResolveModule()
 debug = process.env["DEBUG"]
 
 class DB
@@ -49,11 +52,22 @@ class DB
       console.log '------ creating original all_'+dbname+' collection objects ---'
       #console.dir OStore
       OStore.storeObject(obj)
-
       promises.push store.getDbFor(dbname)
     all(promises).then (results) =>
       q.resolve(results)
+    return q
 
+  @getOrCreateObjectByRecord: (record) =>
+    q = defer()
+    OStore.getObject(record.id, record.type).then (oo)=>
+      if oo
+        q.resolve(oo)
+      else
+        @get(record.type, [record.id]).then (res)=>
+          if res
+            record = res[0]
+            resolver.createObjectFrom(record).then (ooo) =>
+              q.resolve(ooo)
     return q
 
   @byProviderId: (type, pid) =>
