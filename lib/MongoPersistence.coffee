@@ -134,7 +134,12 @@ class MongoPersistence
           console.dir err
           q.resolve(null)
         else
-          q.resolve(items.toArray() or [])
+          items.toArray (err2, docs)=>
+            if err2
+              console.log 'MONGO search toArray Error: '+err2
+              console.dir err2
+            else
+              q.resolve(docs)
     return q
 
   set: (_type, obj, cb)=>
