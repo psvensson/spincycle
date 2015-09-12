@@ -147,12 +147,15 @@ class ObjectManager
     console.log 'found '+records.length+' objects to return'
     count = records.length
     if debug then console.dir records
-    records.forEach (record) =>
-      @messageRouter.resolver.createObjectFrom(record).then (o) =>
-        if debug then console.log 'resolved object '+o.id+' count = '+count
-        rv.push(o.toClient())
-        if --count == 0
-          msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
+    if count == 0
+      msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
+    else
+      records.forEach (record) =>
+        @messageRouter.resolver.createObjectFrom(record).then (o) =>
+          if debug then console.log 'resolved object '+o.id+' count = '+count
+          rv.push(o.toClient())
+          if --count == 0
+            msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
   #---------------------------------------------------------------------------------------------------------------------
 
   expose: (type) =>
