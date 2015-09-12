@@ -3,8 +3,6 @@ defer           = require('node-promise').defer
 uuid            = require('node-uuid')
 error           = require('./Error').error
 
-DB              = require('./DB')
-
 debug     = process.env["DEBUG"]
 
 class OStore
