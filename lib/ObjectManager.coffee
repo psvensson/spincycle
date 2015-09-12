@@ -135,7 +135,8 @@ class ObjectManager
       else
         #rv = objStore.listObjectsByType(msg.type)
         if msg.query
-          DB.find(msg.type, msq.query.property, msg.query.value).then (records) => @parseList(records, msg)
+          if debug then console.log 'executing query for property '+msq.query.property+', value '+msq.query.value
+          DB.search(msg.type, msq.query.property, msg.query.value).then (records) => @parseList(records, msg)
         else
           DB.all(msg.type, (records) => @parseList(records, msg))
     else
@@ -145,6 +146,7 @@ class ObjectManager
     rv = []
     console.log 'found '+records.length+' objects to return'
     count = records.length
+    if debug then console dir records
     records.forEach (record) =>
       @messageRouter.resolver.createObjectFrom(record).then (o) =>
         if debug then console.log 'resolved object '+o.id+' count = '+count

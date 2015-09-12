@@ -100,7 +100,7 @@ class MongoPersistence
           q.resolve(item)
     return q
 
-    # This is not easily implementable in couch, so now we're diverging
+   # This is not easily implementable in couch, so now we're diverging
   find: (_type, property, value) =>
     console.log 'Mongo find called for type '+_type+' property '+property+' and value '+value
     q = defer()
@@ -115,6 +115,22 @@ class MongoPersistence
           q.resolve(null)
         else
           q.resolve(item)
+    return q
+
+  search: (_type, property, value) =>
+    console.log 'Mongo find called for type '+_type+' property '+property+' and value '+value
+    q = defer()
+    type = _type.toLowerCase()
+    @getDbFor(type).then (collection) =>
+      query = {}
+      query[property] = {$regex: '^'+value}
+      collection.find query, (err, items) =>
+        if err
+          console.log 'MONGO find Error: '+err
+          console.dir err
+          q.resolve(null)
+        else
+          q.resolve(items)
     return q
 
   set: (_type, obj, cb)=>
