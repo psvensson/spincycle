@@ -60,13 +60,16 @@ class DB
   @getOrCreateObjectByRecord: (record) =>
     q = defer()
     OStore.getObject(record.id, record.type).then (oo)=>
+      if debug then console.log 'getOrCreateObjectByRecord OStore returns '+oo
       if oo
         q.resolve(oo)
       else
         @get(record.type, [record.id]).then (res)=>
+          if debug then console.log 'getOrCreateObjectByRecord DB get returns '+res
           if res
             record = res[0]
             resolver.createObjectFrom(record).then (ooo) =>
+              if debug then console.log 'getOrCreateObjectByRecord createFromRecord returns '+ooo
               q.resolve(ooo)
     return q
 
