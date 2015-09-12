@@ -135,7 +135,7 @@ class ObjectManager
       else
         #rv = objStore.listObjectsByType(msg.type)
         if msg.query
-          if debug then console.log 'executing query for property '+msq.query.property+', value '+msq.query.value
+          if debug then console.log 'executing query for property '+msg.query.property+', value '+msg.query.value
           DB.search(msg.type, msg.query.property, msg.query.value).then (records) => @parseList(records, msg)
         else
           DB.all(msg.type, (records) => @parseList(records, msg))
