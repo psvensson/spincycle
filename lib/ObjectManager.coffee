@@ -146,7 +146,7 @@ class ObjectManager
     rv = []
     console.log 'found '+records.length+' objects to return'
     count = records.length
-    if debug then console dir records
+    if debug then console.dir records
     records.forEach (record) =>
       @messageRouter.resolver.createObjectFrom(record).then (o) =>
         if debug then console.log 'resolved object '+o.id+' count = '+count
