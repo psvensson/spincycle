@@ -118,19 +118,21 @@ class MongoPersistence
     return q
 
   search: (_type, property, value) =>
-    console.log 'Mongo find called for type '+_type+' property '+property+' and value '+value
+    console.log 'Mongo search called for type '+_type+' property '+property+' and value '+value
     q = defer()
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>
       query = {}
       query[property] = {$regex: '^'+value}
+      if debug then console.log 'mongo find query is'
+      if debug then console.dir query
       collection.find query, (err, items) =>
         if err
           console.log 'MONGO find Error: '+err
           console.dir err
           q.resolve(null)
         else
-          q.resolve(items)
+          q.resolve(items or [])
     return q
 
   set: (_type, obj, cb)=>
