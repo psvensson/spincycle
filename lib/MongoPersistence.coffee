@@ -125,7 +125,7 @@ class MongoPersistence
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>
       query = {}
-      query[property] = {$regex: '*'+value+'*'}
+      query[property] = {$regex: '^'+value}
       if debug then console.log 'mongo find query is'
       if debug then console.dir query
       collection.find query, (err, items) =>
