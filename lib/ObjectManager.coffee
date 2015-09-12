@@ -134,20 +134,23 @@ class ObjectManager
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to list objects of type '+msg.type, payload: msg.type})
       else
         #rv = objStore.listObjectsByType(msg.type)
-        DB.all(msg.type, (records) =>
-          rv = []
-          console.log 'found '+records.length+' objects to return'
-          count = records.length
-          records.forEach (record) =>
-            @messageRouter.resolver.createObjectFrom(record).then (o) =>
-              if debug then console.log 'resolved object '+o.id+' count = '+count
-              rv.push(o.toClient())
-              if --count == 0
-                msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
-        )
+        if msg.query
+          DB.find(msg.type, msq.query.property, msg.query.value).then (records) => @parseList(records, msg)
+        else
+          DB.all(msg.type, (records) => @parseList(records, msg))
     else
       msg.replyFunc({status: e.general.FAILURE, info: '_listObjects missing parameter', payload: null })
 
+  parseList: (records, msg) =>
+    rv = []
+    console.log 'found '+records.length+' objects to return'
+    count = records.length
+    records.forEach (record) =>
+      @messageRouter.resolver.createObjectFrom(record).then (o) =>
+        if debug then console.log 'resolved object '+o.id+' count = '+count
+        rv.push(o.toClient())
+        if --count == 0
+          msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
   #---------------------------------------------------------------------------------------------------------------------
 
   expose: (type) =>
