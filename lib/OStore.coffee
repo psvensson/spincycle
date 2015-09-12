@@ -3,6 +3,7 @@ defer           = require('node-promise').defer
 uuid            = require('node-uuid')
 error           = require('./Error').error
 ResolveModule   = require('./ResolveModule')
+DB              = require('./DB')
 
 resolver  = new ResolveModule()
 debug     = process.env["DEBUG"]
@@ -51,9 +52,8 @@ class OStore
       if o
         q.resolve(o)
       else
-        resolver.createObjectFrom(record).then (oo) =>
-          q.resolve(oo)
-
+        DB.get(record.type, [record.id]).then (res)=>
+          if res then q.resovle(res) else resolver.createObjectFrom(record).then (oo) => q.resolve(oo)
     return q
 
   @getObject: (id, type) =>
