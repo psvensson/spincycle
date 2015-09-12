@@ -66,6 +66,7 @@ class DB
       else
         @get(record.type, [record.id]).then (res)=>
           if debug then console.log 'getOrCreateObjectByRecord DB get returns '+res
+          if debug then console.dir res
           if res then record = res[0]
           resolver.createObjectFrom(record).then (ooo) =>
             if debug then console.log 'getOrCreateObjectByRecord createFromRecord returns '+ooo
