@@ -66,11 +66,10 @@ class DB
       else
         @get(record.type, [record.id]).then (res)=>
           if debug then console.log 'getOrCreateObjectByRecord DB get returns '+res
-          if res
-            record = res[0]
-            resolver.createObjectFrom(record).then (ooo) =>
-              if debug then console.log 'getOrCreateObjectByRecord createFromRecord returns '+ooo
-              q.resolve(ooo)
+          if res then record = res[0]
+          resolver.createObjectFrom(record).then (ooo) =>
+            if debug then console.log 'getOrCreateObjectByRecord createFromRecord returns '+ooo
+            q.resolve(ooo)
     return q
 
   @byProviderId: (type, pid) =>
