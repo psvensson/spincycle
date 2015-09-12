@@ -84,7 +84,7 @@ class DB
   # search for wildcards for property as a string beginnging with value..
   @search: (type, property, value) =>
     q = defer()
-    @getDataStore().find(type, property, value).then (result) =>
+    @getDataStore().search(type, property, value).then (result) =>
       if not result
         console.log 'DB.find type '+type+', property '+property+', value '+value+' got back '+result
       else

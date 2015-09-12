@@ -128,7 +128,7 @@ class MongoPersistence
       if debug then console.dir query
       collection.find query, (err, items) =>
         if err
-          console.log 'MONGO find Error: '+err
+          console.log 'MONGO search Error: '+err
           console.dir err
           q.resolve(null)
         else
