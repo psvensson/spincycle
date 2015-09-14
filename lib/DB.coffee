@@ -115,6 +115,7 @@ class DB
     if debug then console.log 'DB.get called for type "'+type+'" and ids "'+ids+'"'
     if not ids.length then ids = [ids]
     q = defer()
+    bam = false
     all(ids.map(
       (id) =>
         rv = @lru.get id
@@ -127,10 +128,12 @@ class DB
               console.log 'DB.get for type '+type+' and id '+id+' got back '+result
             else
               @lru.set(id, result)
-            p.resolve(result)
+            if not bam then p.resolve(result)
+            bam = true
           )
         else
-          p.resolve(rv)
+          if not bam then p.resolve(rv)
+          bam = true
         return p
     )).then(
       (result) ->
