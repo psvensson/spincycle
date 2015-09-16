@@ -20,7 +20,7 @@ class RedisMethod
     messageRouter.addMethod 'redis', @
 
   onChannelMessage: (channel, message) =>
-    if debug then console.log 'redismethod got channel '+channel+' message '+message
+    console.log 'redismethod got channel '+channel+' message '+message
     #console.dir channel
     #console.log '-------------------------------------------------------------------'
     msg = JSON.parse(message)
@@ -39,8 +39,8 @@ class RedisMethod
       msg.client    = msg.channelId
       msg.messageId = msg.messageId || uuid.v4()
       msg.replyFunc = (replydata) =>
-        if debug then console.log 'redismethod replying to message '+msg.messageId+' on channel '+msg.channelId
-        if debug then console dir message
+        console.log 'redismethod replying to message '+msg.messageId+' on channel '+msg.channelId
+        console dir message
         replydata.messageId = msg.messageId
         @sendclient.publish(clientChannel, JSON.stringify(replydata))
     else
