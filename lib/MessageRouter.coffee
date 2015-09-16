@@ -62,7 +62,7 @@ class MessageRouter
   # So for example for express you could add a method which makes sure the target name
   # can be reached by the url ../<targetName>
   addMethod: (methodName, method) =>
-    #console.log 'addMethod called for "'+methodName+'"'
+    console.log 'addMethod called for "'+methodName+'"'
     @methods[methodName] = method
     for targetName of @targets
       #console.log 'registering target '+targetName+' on method '+methodName
