@@ -99,7 +99,7 @@ class ObjectManager
     @onUpdateObject(msg)
 
   _getObject: (msg) =>
-    console.log '_getObject called for type '+msg.type
+    if debug then console.log '_getObject called for type '+msg.type
     if msg.type and msg.obj.id
       id = msg.obj.id
       if id.indexOf and id.indexOf('all_') > -1
@@ -183,7 +183,7 @@ class ObjectManager
       @._listObjects(msg)
 
   getObjectPullThrough: (id, type) =>
-    console.log 'getObjectPullThrough for id '+id
+    if debug then console.log 'getObjectPullThrough for id '
     if debug then console.dir id
     q = defer()
     if not type
@@ -192,7 +192,7 @@ class ObjectManager
     else
       objStore.getObject(id, type).then (o) =>
         if not o
-          console.log 'getObjectPullThrough did not find object type '+type+' id '+id+' in ostore, getting from db'
+          if debug then console.log 'getObjectPullThrough did not find object type '+type+' id '+id+' in ostore, getting from db'
           DB.get(type, [id]).then (record) =>
             #console.log 'getting record from db'
             #console.dir record
