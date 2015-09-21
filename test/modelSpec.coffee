@@ -1,5 +1,7 @@
 expect = require('chai').expect
 SuperModel = require('../lib/SuperModel')
+DB = require('../lib/DB')
+
 describe 'SuperModel Tests', ->
   record =
     _rev: 10101020202030303404
@@ -30,10 +32,82 @@ describe 'SuperModel Tests', ->
       {name: 'name', public: true, value: 'name', default: 'yohoo'}
       {name: 'theFoo', value: 'theFoo', type: 'Foo' }
       {name: 'foos', public: true, array: true, ids: 'foos'}
-      {name: 'footable', hashtable: true, ids: 'footable'}
+      {name: 'footable', hashtable: true, ids: 'footable', type: 'Foo'}
     ]
     constructor: (@record={}) ->
       return super
+
+  #-----------------------------------------------------------------------
+
+  postCreateState = -1
+
+  record3 =
+    id:42
+    name: 'xyzzy'
+    shoesize: 42
+
+  record4=
+    id:667
+    name: 'Neihgbor of the beast'
+    hatsize: 42
+
+  record5=
+    id:9
+    name: 'Neihgbor of the beast'
+    shirtsize: 42
+
+  class Baz extends SuperModel
+    @model=
+    [
+      {name: 'name', value: 'name', default:'baz'}
+      {name: 'shoesize', value: 'shoesize', default:'-1'}
+    ]
+    constructor: (@record={}) ->
+      #console.log '      Baz constructor'
+      postCreateState = 3
+      return super
+
+  class Quux extends SuperModel
+    @model=
+    [
+      {name: 'name', value: 'name', default:'baz'}
+      {name: 'hatsize', value: 'hatsize', default:'0'}
+    ]
+    constructor: (@record={}) ->
+      #console.log '  Quux constructor'
+      postCreateState = 2
+      return super
+
+    postCreate: (q) =>
+      #console.log '    Quux postcreate. Creating new Baz manually'
+      postCreateState = 1
+      new Baz(record3).then (baz) =>
+        postCreateState = 4
+        #console.log '    Quux post-Baz creation'
+        q.resolve(@)
+
+  class Ezra extends SuperModel
+    @model=
+      [
+        {name: 'name', value: 'name', default:'baz'}
+        {name: 'shirtsize', value: 'shirtsize', default:'7'}
+        {name: 'thequux', value: 'thequux', type:'Quux'}
+      ]
+    constructor: (@record={}) ->
+      #console.log 'Ezra constructor '
+      postCreateState = 0
+      return super
+
+    postCreate: (q) =>
+      #console.log '  Ezra postcreate. Creating new Quux manually'
+      postCreateStatee = 1
+      new Quux(record4).then (quux) =>
+        @thequux = quux
+        postCreateState = 5
+        #console.log '  Ezra post-Quux creation'
+        q.resolve(@)
+
+  #-------------------------------------------------------------------------
 
   it 'should retain _rev property from record', ()->
     new Foo(record).then (o) ->
@@ -79,3 +153,30 @@ describe 'SuperModel Tests', ->
       #console.dir rv
       expect(rv.footable).to.not.exist
       expect(rv.name).to.exist
+
+  it 'should call postCreate, when defined, in serial order down the references', ()->
+    new Ezra(record5).then (ezra) ->
+      expect(postCreateState).to.equal(5)
+
+  it 'should retain hashtable key name and values after persistence', ()->
+    new Foo(record).then (foo) ->
+      new Bar(record2).then (bar) ->
+        bar.serialize().then () ->
+          DB.get('Bar', [4711]).then (bar_records)->
+            bar_record = bar_records[0]
+            new Bar(bar_record).then (newbar)->
+              same = false
+              keys1 = []
+              keys2 = []
+              vals1 = []
+              vals2 = []
+              for k,v of newbar.footable
+                keys1.push k
+                vals1.push v
+              for kk,vv of bar.footable
+                keys2.push k
+                vals2.push v
+              for k,i in keys1
+                if keys1[i] and keys1[i] != keys2[i] then same = false else same = true
+                if vals1[i] and vals1[i] != vals2[i] then same = false else same = true
+              expect(same).to.equal(true)

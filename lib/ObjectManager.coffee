@@ -210,7 +210,7 @@ class ObjectManager
           if debug then console.log 'can write'
           # Make sure to resolve object references in arrays and hashtables
           for k,v of msg.obj
-            obj[k] = v
+            obj[k] = v if k isnt 'id'
           @resolveReferences(obj, obj.constructor.model).then (robj)=>
             if debug then console.log 'found object'
             #objStore.updateObj(robj)

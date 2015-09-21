@@ -98,7 +98,17 @@ class DB
       q.resolve(result)
     return q
 
-  # search for wildcards for property as a string beginnging with value..
+  @findMany: (type, property, value) =>
+    q = defer()
+    @getDataStore().findMany(type, property, value).then (results) =>
+      if not result
+        console.log 'DB.find type '+type+', property '+property+', value '+value+' got back '+results.length+' results'
+      else
+        results.forEach (result) => @lru.set(result.id, result)
+      q.resolve(results)
+    return q
+
+  # search for wildcards for property as a string beginning with value..
   @search: (type, property, value) =>
     q = defer()
     @getDataStore().search(type, property, value).then (results) =>

@@ -1,6 +1,10 @@
 {
   "name": "spincycle",
+<<<<<<< Updated upstream
   "version": "1.4.81",
+=======
+  "version": "1.4.75",
+>>>>>>> Stashed changes
   "description": "A reactive message router and object manager that lets clients subscribe to object property changes on the server",
   "main": "index.js",
   "directories": {
