@@ -253,6 +253,8 @@ class ObjectManager
           checkFinished()
         else
           arr.forEach (idorobj) =>
+            if debug then console.log 'resolving array'
+            if debug then console.dir arr
             if typeof idorobj == 'object' then id = idorobj.id else id = idorobj
             if debug then console.log 'attempting to get array name '+property.name+' object type '+property.type+' id '+id
             @getObjectPullThrough(id, property.type).then (o)=>
