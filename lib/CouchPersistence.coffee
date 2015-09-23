@@ -93,6 +93,7 @@ class CouchPersistence
                 rv.push value if row.id.indexOf('_') == -1
                 if --count == 0 then cb rv
 
+
   get: (_type, id, cb) =>
     if _type
       type = _type.toLowerCase()
