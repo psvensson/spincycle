@@ -63,8 +63,13 @@ class DB
       if oo
         q.resolve(oo)
       else
-        @get(type, [id]).then (o) =>
-          q.resolve(o)
+        @get(type, [id]).then (records) =>
+          if records and records[0]
+            record = record[0]
+            resolver.createObjectFrom(record).then (ooo) =>
+              q.resolve(ooo)
+          else
+            q.resolve(undefined)
     return q
 
   @getOrCreateObjectByRecord: (record) =>
