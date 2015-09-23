@@ -23,3 +23,4 @@ class EventManager
     return rv
 
 module.exports = EventManager
+

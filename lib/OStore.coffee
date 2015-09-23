@@ -31,6 +31,7 @@ class OStore
       rv.push v
     return rv
 
+
   @storeObject: (obj) =>
     if obj
       OStore.objects[obj.id] = obj

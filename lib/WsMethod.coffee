@@ -51,4 +51,5 @@ class WsMethod
     WsMethod.wsroutes[targetName] = targetFunc
 
 
+
 module.exports = WsMethod
