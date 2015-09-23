@@ -50,6 +50,7 @@ class SuperModel
       @_rev = @record._rev
 
     @loadFromIds(@constructor.model).then( () =>
+      @createdAt = @createdAt or Date.now()
       if @postCreate
         @postCreate(q)
       else
