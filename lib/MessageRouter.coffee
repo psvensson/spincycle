@@ -58,6 +58,7 @@ class MessageRouter
     for name, method of @methods
       method.expose(type)
 
+
   # All messaging method adds their function for registering new paths or whatnot here
   # So for example for express you could add a method which makes sure the target name
   # can be reached by the url ../<targetName>

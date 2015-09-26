@@ -19,6 +19,7 @@ class RedisMethod
     @listenclient.on('message', @onChannelMessage)
     messageRouter.addMethod 'redis', @
 
+
   onChannelMessage: (channel, message) =>
     console.log 'redismethod got channel '+channel+' message '+message
     #console.dir channel
