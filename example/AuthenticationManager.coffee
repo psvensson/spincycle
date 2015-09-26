@@ -19,6 +19,7 @@ class AuthenticationManager
     user = @anonymousUsers[message.client] or
       id: uuid.v4()
     message.user = user
+
     q.resolve(message)
     @anonymousUsers[message.client] = user
     return q
@@ -38,5 +39,5 @@ class AuthenticationManager
   # When a user sends a '_create'+<object_type> message, this method gets called to allow or disallow creating of the object
   canUserListTheseObjects: (type, user) =>
     true # same here
- 
+
 module.exports = AuthenticationManager

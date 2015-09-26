@@ -135,6 +135,26 @@ class MongoPersistence
           q.resolve(cursor.toArray())
     return q
 
+  findQuery: (_type, query) =>
+    console.log 'Mongo findmany called for type '+_type+' property '+property+' and value '+value
+    q = defer()
+    type = _type.toLowerCase()
+    @getDbFor(type).then (collection) =>
+      q = {}
+      q[query.property] = query.value
+      options = {}
+      if query.limit then options.limit = query.limit
+      if query.skip then options.skip = query.skip
+      if query.sort then options.limit = query.sort
+      collection.find query, options, (err, cursor) =>
+        if err
+          console.log 'MONGO findQuery Error: '+err
+          console.dir err
+          q.resolve(null)
+        else
+          q.resolve(cursor.toArray())
+    return q
+
   search: (_type, property, value) =>
     console.log 'Mongo search called for type '+_type+' property '+property+' and value '+value
     q = defer()

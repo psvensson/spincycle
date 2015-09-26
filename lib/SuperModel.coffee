@@ -41,6 +41,8 @@ class SuperModel
       #@updateAllModels()
       SuperModel.oncreatelisteners.forEach (listener) -> listener(@)
 
+    @createdAt = @createdAt or Date.now()
+
     @type = @constructor.type
     q = defer()
 
