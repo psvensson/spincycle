@@ -37,6 +37,16 @@ describe 'SuperModel Tests', ->
     constructor: (@record={}) ->
       return super
 
+  class Fooznaz extends SuperModel
+    @type = 'Fooznaz'
+    @model=
+      [
+        {name: 'name', value: 'name', default:'fooznaz', public: true}
+        {name: 'things', ids: 'things', array: true, type: 'Bar', public: true}
+      ]
+    constructor:(@record={})->
+      return super
+
   #-----------------------------------------------------------------------
 
   postCreateState = -1
@@ -180,3 +190,13 @@ describe 'SuperModel Tests', ->
                 if keys1[i] and keys1[i] != keys2[i] then same = false else same = true
                 if vals1[i] and vals1[i] != vals2[i] then same = false else same = true
               expect(same).to.equal(true)
+
+  it 'should filter out crap values in arrays when updating', ()->
+    new Fooznaz().then (fz) ->
+      record = fz.toClient()
+      record.things.push null
+      record.things.push "null"
+      record.things.push "undefined"
+      record.things.push undefined
+      new Fooznaz(record).then (fz2)->
+        expect(fz2.things.length).to.equal(0)

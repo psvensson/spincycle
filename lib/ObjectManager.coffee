@@ -136,7 +136,10 @@ class ObjectManager
         #rv = objStore.listObjectsByType(msg.type)
         if msg.query
           if debug then console.log 'executing query for property '+msg.query.property+', value '+msg.query.value
-          DB.findMany(msg.type, msg.query.property, msg.query.value).then (records) => @parseList(records, msg)
+          if msg.query.wildcard
+            DB.find(msg.type, msg.query.property, msg.query.value).then (records) => @parseList(records, msg)
+          else
+            DB.findMany(msg.type, msg.query.property, msg.query.value).then (records) => @parseList(records, msg)
         else
           DB.all(msg.type, (records) => @parseList(records, msg))
     else

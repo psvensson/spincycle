@@ -39,6 +39,7 @@ class ResolveModule
             finder.stop()
             cb(rv)
 
+
       finder.on 'end', () ->
 
   createObjectFrom: (record) =>

@@ -52,6 +52,7 @@ class SuperModel
       @_rev = @record._rev
 
     @loadFromIds(@constructor.model).then( () =>
+      @createdAt = @createdAt or Date.now()
       if @postCreate
         @postCreate(q)
       else
@@ -150,6 +151,7 @@ class SuperModel
     else
       model.forEach (robj) =>
         ((resolveobj) =>
+          #if debug then console.log 'resolveobj '+resolveobj.name
           r = defer()
           allpromises.push(r)
           if resolveobj.value
@@ -176,7 +178,9 @@ class SuperModel
             else                                                                    # array or hashtable by array of ids
               if typeof ids is 'string'
                 ids = [ids]
-              #if debug then console.log 'resolveobjds '+resolveobj.name+' ('+(typeof ids)+') ids length are.. '+ids.length
+              ids = ids.filter (ii) ->  ii and ii isnt null and ii isnt "null" and ii isnt "undefined"
+              if debug then console.log 'resolveobjds '+resolveobj.name+' ('+(typeof ids)+') ids length are.. '+ids.length
+              if debug then console.dir ids
               count = ids.length
               if count == 0
                 #if debug then console.log 'no ids for '+resolveobj.name+' so resolving null'
@@ -184,8 +188,8 @@ class SuperModel
               else
                 ids.forEach (_id) =>
                   ((id) =>
-                    #if debug then console.log 'SuperModel loadFromIds trying to get '+resolveobj.name+' with id '+id
-                    @resolveObj(resolveobj, id, r, --count)
+                      if debug then console.log 'SuperModel loadFromIds trying to get '+resolveobj.name+' with id '+id
+                      @resolveObj(resolveobj, id, r, --count)
                   )(_id)
           #if debug then console.log '------- property '+resolveobj.name+' now set to '+@[resolveobj.name]
         )(robj)

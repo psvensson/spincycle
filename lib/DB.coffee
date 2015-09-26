@@ -57,6 +57,21 @@ class DB
       q.resolve(results)
     return q
 
+  @getFromStoreOrDB: (type, id) =>
+    q = defer()
+    OStore.getObject(id, type).then (oo)=>
+      if oo
+        q.resolve(oo)
+      else
+        @get(type, [id]).then (records) =>
+          if records and records[0]
+            record = record[0]
+            resolver.createObjectFrom(record).then (ooo) =>
+              q.resolve(ooo)
+          else
+            q.resolve(undefined)
+    return q
+
   @getOrCreateObjectByRecord: (record) =>
     q = defer()
     OStore.getObject(record.id, record.type).then (oo)=>

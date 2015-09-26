@@ -12,7 +12,7 @@
   DB = require('../lib/DB');
 
   describe('SuperModel Tests', function() {
-    var Bar, Baz, Ezra, Foo, Quux, postCreateState, record, record2, record3, record4, record5;
+    var Bar, Baz, Ezra, Foo, Fooznaz, Quux, postCreateState, record, record2, record3, record4, record5;
     record = {
       _rev: 10101020202030303404,
       id: 17,
@@ -81,6 +81,34 @@
       }
 
       return Bar;
+
+    })(SuperModel);
+    Fooznaz = (function(superClass) {
+      extend(Fooznaz, superClass);
+
+      Fooznaz.type = 'Fooznaz';
+
+      Fooznaz.model = [
+        {
+          name: 'name',
+          value: 'name',
+          "default": 'fooznaz',
+          "public": true
+        }, {
+          name: 'things',
+          ids: 'things',
+          array: true,
+          type: 'Bar',
+          "public": true
+        }
+      ];
+
+      function Fooznaz(record1) {
+        this.record = record1 != null ? record1 : {};
+        return Fooznaz.__super__.constructor.apply(this, arguments);
+      }
+
+      return Fooznaz;
 
     })(SuperModel);
     postCreateState = -1;
@@ -265,7 +293,7 @@
         return expect(postCreateState).to.equal(5);
       });
     });
-    return it('should retain hashtable key name and values after persistence', function() {
+    it('should retain hashtable key name and values after persistence', function() {
       return new Foo(record).then(function(foo) {
         return new Bar(record2).then(function(bar) {
           return bar.serialize().then(function() {
@@ -308,6 +336,18 @@
               });
             });
           });
+        });
+      });
+    });
+    return it('should filter out crap values in arrays when updating', function() {
+      return new Fooznaz().then(function(fz) {
+        record = fz.toClient();
+        record.things.push(null);
+        record.things.push("null");
+        record.things.push("undefined");
+        record.things.push(void 0);
+        return new Fooznaz(record).then(function(fz2) {
+          return expect(fz2.things.length).to.equal(0);
         });
       });
     });
