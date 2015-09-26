@@ -260,6 +260,20 @@
         return expect(bar.footable).to.exist;
       });
     });
+    it('should be able to persist newly added hashtable references and still have them after serializing and reloading from record', function() {
+      return new Bar(record2).then(function(bar) {
+        return new Foo(record).then(function(foo) {
+          bar.footable[foo.name] = foo;
+          foo.serialize();
+          bar.serialize();
+          return DB.get('Bar', [4711]).then(function(newbars) {
+            var newbar;
+            newbar = newbars[0];
+            return expect(newbar.footable).to.exist;
+          });
+        });
+      });
+    });
     it('should get back array of ids from array reference when creating record', function() {
       return new Foo(record).then(function(foo) {
         return new Bar(record2).then(function(bar) {

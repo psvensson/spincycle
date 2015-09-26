@@ -145,6 +145,17 @@ describe 'SuperModel Tests', ->
       #console.dir bar
       expect(bar.footable).to.exist
 
+  it 'should be able to persist newly added hashtable references and still have them after serializing and reloading from record', ()->
+    new Bar(record2).then (bar) ->
+      new Foo(record).then (foo) ->
+        bar.footable[foo.name] = foo
+        foo.serialize()
+        bar.serialize()
+        DB.get('Bar', [4711]).then (newbars) ->
+          newbar = newbars[0]
+          #console.dir newbar
+          expect(newbar.footable).to.exist
+
   it 'should get back array of ids from array reference when creating record', ()->
     new Foo(record).then (foo) ->
       new Bar(record2).then (bar) ->

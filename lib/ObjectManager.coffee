@@ -137,7 +137,7 @@ class ObjectManager
         if msg.query
           if debug then console.log 'executing query for property '+msg.query.property+', value '+msg.query.value
           if msg.query.wildcard
-            DB.find(msg.type, msg.query.property, msg.query.value).then (records) => @parseList(records, msg)
+            DB.search(msg.type, msg.query.property, msg.query.value).then (records) => @parseList(records, msg)
           else if msg.query.limit or msg.query.skip or msg.query.sort
             DB.findQuery(msg.type, msg.query).then (records) => @parseList(records, msg)
           else
