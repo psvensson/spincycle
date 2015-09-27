@@ -26,7 +26,7 @@ class MongoPersistence
 
   foo: (q) =>
     cstring = 'mongodb://'+madr+':'+mport+'/spincycle'
-    MongoClient.connect(cstring, (err, db) =>
+    MongoClient.connect(cstring, {fsync: true}, (err, db) =>
       if err
         console.log 'MONGO Error connecting to "'+cstring+'" '+err
         console.dir err
