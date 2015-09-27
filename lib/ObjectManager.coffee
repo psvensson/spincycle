@@ -53,7 +53,7 @@ class ObjectManager
         if debug then console.log 'onGetModelFor '+msg.modelname+' got back require path '+path
         model = require(path)
         if debug then console.log 'got model resolved to'
-        if debug then console.dir model
+        if debug then console.dir model.model
         rv = []
         model.model.forEach (property) -> if property.public then rv.push(property)
         msg.replyFunc({status: e.general.SUCCESS, info: 'get model', payload: rv})
