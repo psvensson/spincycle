@@ -17,6 +17,7 @@ debug = process.env["DEBUG"]
 
 class DB
 
+  @dburl: 'localhost'
   @lru: LRU()
   @lrudiff: LRU()
 
@@ -25,11 +26,11 @@ class DB
       #@DataStore = new GDS()
       #@DataStore = new Roach()
       if not name
-        @DataStore = new Mongo()
+        @DataStore = new Mongo(DB.dburl)
       else if name == 'couchdb'
-        @DataStore = new Couch()
-      else if name == 'mogodbdb'
-        @DataStore = new Mongo()
+        @DataStore = new Couch(DB.dburl)
+      else if name == 'mongodb'
+        @DataStore = new Mongo(DB.dburl)
       @DataStore.connect()
     return @DataStore
 

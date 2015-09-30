@@ -28,7 +28,8 @@ class MessageRouter
 
   debug = process.env["DEBUG"]
 
-  constructor: (@authMgr) ->
+  constructor: (@authMgr, dburl) ->
+    MessageRouter.DB.dburl = dburl
     pjson = require('../package.json');
     console.log 'messageRouter constructor. Version - '+pjson.version
     #console.dir @authMgr
