@@ -247,7 +247,7 @@ class ObjectManager
         q.resolve(rv)
 
     model.forEach (property) =>
-      console.log 'going through array property '+property.name
+      if debug then console.log 'going through array property '+property.name
       if property.array
         resolvedarr = []
         arr = record[property.name] or []

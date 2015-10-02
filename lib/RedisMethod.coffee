@@ -6,10 +6,10 @@ debug = process.env["DEBUG"]
 
 class RedisMethod
 
-  constructor: (messageRouter, app, basePath) ->
+  constructor: (messageRouter, app, dbUrl) ->
     @redisroutes = []
 
-    rhost = process.env['REDIS_PORT_6379_TCP_ADDR'] or '127.0.0.1'
+    rhost = dbUrl or process.env['REDIS_PORT_6379_TCP_ADDR'] or '127.0.0.1'
     rport = process.env['REDIS_PORT_6379_TCP_PORT'] or '6379'
 
     @listenclient = redis.createClient(rport, rhost)
