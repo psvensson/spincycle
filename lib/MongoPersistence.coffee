@@ -27,20 +27,43 @@ class MongoPersistence
 
   foo: (q) =>
     cstring = 'mongodb://'+madr+':'+mport+'/spincycle'
-    MongoClient.connect(cstring, {fsync: true,  slave_ok: true}, (err, db) =>
-      if err
-        console.log 'MONGO Error connecting to "'+cstring+'" '+err
-        console.dir err
-        console.log 'retrying.....'
-        setTimeout(
-          ()=>
-            @foo(q)
-          2000)
-      else
-        console.log("---- We are connected ----")
-        @db = db
-        q.resolve(db)
-    )
+    repls = process.env['MONGODB_REPLS']
+    if repls
+      replSet = new ReplSet(replSetServers,
+        rs_name: 'rs'
+        ha: true
+        haInterval: 2000
+        reconnectWait: 5000
+        retries: 1000
+        readPreference: Server.READ_SECONDARY
+        poolSize: 4)
+      MongoClient.connect cstring, {replSet: replSet, fsync: true,  slave_ok: true}, (err, db) =>
+        if err
+          console.log 'MONGO Error connecting to "'+cstring+'" '+err
+          console.dir err
+          console.log 'retrying.....'
+          setTimeout(
+            ()=>
+              @foo(q)
+            2000)
+        else
+          console.log("---- We are connected ----")
+          @db = db
+          q.resolve(db)
+    else
+      MongoClient.connect cstring, {fsync: true,  slave_ok: true}, (err, db) =>
+        if err
+          console.log 'MONGO Error connecting to "'+cstring+'" '+err
+          console.dir err
+          console.log 'retrying.....'
+          setTimeout(
+            ()=>
+              @foo(q)
+            2000)
+        else
+          console.log("---- We are connected ----")
+          @db = db
+          q.resolve(db)
 
   getDbFor: (_type) =>
     q = defer()
