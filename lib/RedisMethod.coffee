@@ -9,8 +9,10 @@ class RedisMethod
   constructor: (messageRouter, app, dbUrl) ->
     @redisroutes = []
 
+    if debug then console.log 'RediMethod dbUrl = '+dbUrl
     rhost = dbUrl or process.env['REDIS_PORT_6379_TCP_ADDR'] or '127.0.0.1'
     rport = process.env['REDIS_PORT_6379_TCP_PORT'] or '6379'
+    if debug then console.log 'RedisMethod rhost = '+rhost+', rport = '+rport
 
     @listenclient = redis.createClient(rport, rhost)
     @sendclient = redis.createClient(rport, rhost)
