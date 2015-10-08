@@ -34,13 +34,13 @@ class ResolveModule
             file = file.substring(file.lastIndexOf('/')+1, file.length)
           if file.indexOf('.') > -1
             file = file.substring(0, file.indexOf('.'))
-          if file == name and (origfile.indexOf('.js') or origfile.indexOf('.coffee') > -1) > -1 and origfile.indexOf('.map') == -1
+          if file == name and (origfile.indexOf('.js') > -1 or origfile.indexOf('.coffee') > -1) > -1 and origfile.indexOf('.map') == -1
             rv = origfile
             ResolveModule.modulepathcache[name] = rv
             finder.stop()
             cb(rv)
           else
-            if debug then console.log '-- no match for file '+origfile
+            if debug then console.log '-- no match for file '+origfile+' and name '+name
 
       finder.on 'end', () ->
 
