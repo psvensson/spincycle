@@ -33,7 +33,7 @@ class ResolveModule
           file = file.substring(file.lastIndexOf('/')+1, file.length)
         if file.indexOf('.') > -1
           file = file.substring(0, file.indexOf('.'))
-        if file == name and origfile.indexOf('.js') > -1 and origfile.indexOf('.map') == -1
+        if file == name and (origfile.indexOf('.js') or origfile.indexOf('.coffee') > -1) > -1 and origfile.indexOf('.map') == -1
             rv = origfile
             ResolveModule.modulepathcache[name] = rv
             finder.stop()
@@ -52,7 +52,7 @@ class ResolveModule
       q.resolve(null)
     else
       if not record[0] then record = [record]
-      if debug then console.log 'createObjectFrom got record '+record[0].id+' type '+record[0].type
+      if debug then console.log 'createObjectFrom resolving record with '+record[0].id+' of type '+record[0].type
       @resolve record[0].type, (filename) ->
         if debug then console.log 'resolved module '+record[0].type+" as "+filename
         module = ResolveModule.modulecache[record[0].type] or require(filename.replace('.js', ''))
