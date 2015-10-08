@@ -31,6 +31,7 @@ class MongoPersistence
     rs = process.env['MONGODB_RS']
     if repls
       cstring = 'mongodb://'+repls+'/spincycle?replicaSet='+rs
+      if debug then console.log 'Mongo driver cstring is '+cstring
       MongoClient.connect cstring, {fsync: true,  slave_ok: true}, (err, db) =>
         if err
           console.log 'MONGO Error connecting to "'+cstring+'" '+err
@@ -45,6 +46,7 @@ class MongoPersistence
           @db = db
           q.resolve(db)
     else
+      if debug then console.log 'Mongo driver cstring is '+cstring
       MongoClient.connect cstring, {fsync: true,  slave_ok: true}, (err, db) =>
         if err
           console.log 'MONGO Error connecting to "'+cstring+'" '+err

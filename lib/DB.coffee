@@ -81,9 +81,9 @@ class DB
         q.resolve(oo)
       else
         @get(record.type, [record.id]).then (res)=>
-          if debug then console.log 'getOrCreateObjectByRecord DB get returns '+res
+          if debug then console.log 'getOrCreateObjectByRecord DB load returns '+res
           if debug then console.dir res
-          if res and res[0] then record = res[0]
+          if res then record = res
           resolver.createObjectFrom(record).then (ooo) =>
             if debug then console.log 'getOrCreateObjectByRecord createFromRecord returns '+ooo
             q.resolve(ooo)
