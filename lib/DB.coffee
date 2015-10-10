@@ -40,8 +40,8 @@ class DB
     promises = []
     dblist.forEach (dbname) =>
       if debug then console.log 'attempting to get store for '+dbname
-      OStore.storeObject(obj)
-      promises.push store.getDbFor(dbname)
+      @getDataStore(dbname).then (store) =>
+        promises.push store.getDbFor(dbname)
     all(promises).then (results) =>
       q.resolve(results)
     return q
@@ -54,7 +54,7 @@ class DB
       else
         @get(type, [id]).then (records) =>
           if records and records[0]
-            record = record[0]
+            record = records[0]
             resolver.createObjectFrom(record).then (ooo) =>
               q.resolve(ooo)
           else
