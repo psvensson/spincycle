@@ -88,7 +88,12 @@ class MongoPersistence
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>
       if collection
-        collection.find().toArray (err, items) =>
+        if debug then console.log 'collection is non-null'
+        if debug then console.dir collection
+        res = collection.find()
+        if debug then console.log 'collection.find returns'
+        if debug then console.dir res
+        res.toArray (err, items) =>
           if err
             console.log 'MONGO Error getting all: '+err
             console.dir err
