@@ -34,7 +34,7 @@ class ResolveModule
             file = file.substring(file.lastIndexOf('/')+1, file.length)
           if file.indexOf('.') > -1
             file = file.substring(0, file.indexOf('.'))
-          if file == name and (origfile.indexOf('.js') > -1 or origfile.indexOf('.coffee') > -1) > -1 and origfile.indexOf('.map') == -1
+          if file == name and (origfile.indexOf('.js') > -1 or origfile.indexOf('.coffee') > -1) and origfile.indexOf('.map') == -1 and origfile.indexOf('.dump') == -1
             rv = origfile
             ResolveModule.modulepathcache[name] = rv
             finder.stop()
@@ -47,16 +47,16 @@ class ResolveModule
   createObjectFrom: (record) =>
     q = defer()
     if debug
-      console.log 'createObjectFrom got record '+record
+      console.log 'ResolveModule.createObjectFrom got record '+record
       console.dir record
     if not record or (record[0] and (record[0] == null) or record[0] == 'null')
       #console.log '++++++++++++++!!!!!!!!!!!!!!!!!!! NULL RECORD!!'
       q.resolve(null)
     else
       if not record[0] then record = [record]
-      if debug then console.log 'createObjectFrom resolving record with '+record[0].id+' of type '+record[0].type
+      if debug then console.log 'ResolveModule.createObjectFrom resolving record with '+record[0].id+' of type '+record[0].type
       @resolve record[0].type, (filename) ->
-        if debug then console.log 'resolved module '+record[0].type+" as "+filename
+        if debug then console.log 'ResolveModule resolved module '+record[0].type+" as "+filename
         module = ResolveModule.modulecache[record[0].type] or require(filename.replace('.js', ''))
         ResolveModule.modulecache[record[0].type] = module
         o = Object.create(module.prototype)
