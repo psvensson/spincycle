@@ -40,8 +40,8 @@ class DB
     promises = []
     dblist.forEach (dbname) =>
       if debug then console.log 'attempting to get store for '+dbname
-      @getDataStore(dbname).then (store) =>
-        promises.push store.getDbFor(dbname)
+      store = @getDataStore(dbname)
+      promises.push store.getDbFor(dbname)
     all(promises).then (results) =>
       q.resolve(results)
     return q
