@@ -90,16 +90,17 @@ class MongoPersistence
       if collection
         if debug then console.log 'collection is non-null'
         if debug then console.dir collection
-        res = collection.find({})
-        if debug then console.log 'collection.find returns'
-        if debug then console.dir res
-        res.toArray (err, items) =>
-          if err
-            console.log 'MONGO Error getting all: '+err
-            console.dir err
-            cb(null)
-          else
-            cb (items)
+        collection.find({}).then (err,res) =>
+          if debug then console.log 'collection.find returns err = '+err
+          if debug then console.dir err
+          if debug then console.dir res
+          res.toArray (err, items) =>
+            if err
+              console.log 'MONGO Error getting all: '+err
+              console.dir err
+              cb(null)
+            else
+              cb (items)
       else
         cb (null)
 
