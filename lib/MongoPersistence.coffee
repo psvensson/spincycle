@@ -87,13 +87,17 @@ class MongoPersistence
     if debug then console.log 'Mongo::all called for type '+_type
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>
-      collection.find().toArray (err, items) =>
-        if err
-          console.log 'MONGO Error getting all: '+err
-          console.dir err
-          cb(null)
-        else
-          cb (items)
+      res = collection.find()
+      if res
+        res.toArray (err, items) =>
+          if err
+            console.log 'MONGO Error getting all: '+err
+            console.dir err
+            cb(null)
+          else
+            cb (items)
+      else
+        cb (null)
 
   get: (_type, id, cb) =>
     type = _type.toLowerCase()
