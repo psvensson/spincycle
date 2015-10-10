@@ -40,18 +40,6 @@ class DB
     promises = []
     dblist.forEach (dbname) =>
       if debug then console.log 'attempting to get store for '+dbname
-      obj =
-      {
-        id: 'all_'+dbname
-        type: dbname
-        list: []
-        getRecord: ()->
-          {type: dbname, id: obj.id, list: obj.list}
-        toClient: ()->
-          obj.getRecord()
-      }
-      console.log '------ creating original all_'+dbname+' collection objects ---'
-      #console.dir OStore
       OStore.storeObject(obj)
       promises.push store.getDbFor(dbname)
     all(promises).then (results) =>

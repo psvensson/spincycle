@@ -10,6 +10,8 @@ class MongoPersistence
   if process.env['MONGODB_PORT_27017_TCP_PORT'] then madr = 'mongodb' else madr = '127.0.0.1'
   mport = process.env['MONGODB_PORT_27017_TCP_PORT'] or '27017'
 
+  if debug then console.log 'mongodb adr = '+madr+', port = '+mport
+
   constructor: (@dburl) ->
     if @dburl then madr = @dburl
     @dbs = []
@@ -82,6 +84,7 @@ class MongoPersistence
 
 
   all: (_type, cb)=>
+    if debug then console.log 'Mongo::all called for type '+_type
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>
       collection.find().toArray (err, items) =>
