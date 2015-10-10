@@ -23,7 +23,7 @@ class ResolveModule
       #if debug then console.log 'resolving module '+name+' from cache -> '+rv
       cb(rv)
     else
-      if debug then console.log '.. looking up module '+name
+      #if debug then console.log '.. looking up module '+name
       finder = require('findit')(dirname)
 
       #This listens for files found
@@ -40,7 +40,7 @@ class ResolveModule
             finder.stop()
             cb(rv)
           else
-            if debug then console.log '-- no match for file '+origfile+' and name '+name
+            #if debug then console.log '-- no match for file '+origfile+' and name '+name
 
       finder.on 'end', () ->
 
