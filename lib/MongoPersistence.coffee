@@ -90,7 +90,7 @@ class MongoPersistence
       if collection
         if debug then console.log 'collection is non-null'
         if debug then console.dir collection
-        res = collection.find()
+        res = collection.find({})
         if debug then console.log 'collection.find returns'
         if debug then console.dir res
         res.toArray (err, items) =>
