@@ -34,7 +34,7 @@ class ResolveModule
             file = file.substring(file.lastIndexOf('/')+1, file.length)
           if file.indexOf('.') > -1
             file = file.substring(0, file.indexOf('.'))
-          if process.env['CHECK_COFFEE'] then coffeecheck = origfile.indexOf('.coffee') > -1 else coffeecheck = false
+          if process.env['CHECK_COFFEE'] then coffeecheck = origfile.indexOf('.coffee') > -1 else coffeecheck = origfile.indexOf('.coffee') == -1
           if file == name and (origfile.indexOf('.js') > -1 or coffeecheck and origfile.indexOf('.map') == -1 and origfile.indexOf('.dump') == -1
             rv = origfile
             ResolveModule.modulepathcache[name] = rv
