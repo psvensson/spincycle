@@ -160,13 +160,8 @@ class MongoPersistence
       query[property] = value
       if debug then console.log 'query is '
       if debug then console.dir query
-      collection.find query, (err, res) =>
-        if err
-          console.log 'MONGO findMany Error: '+err
-          console.dir err
-          q.resolve(null)
-        else
-          arr = res
+      collection.find(query).toArray (err, docs)=>
+          arr = docs
           if debug then console.log 'findMany returns '+arr.length+' items'
           q.resolve(arr)
     return q
