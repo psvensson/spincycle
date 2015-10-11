@@ -177,7 +177,7 @@ class DB
     #console.log 'DB.set called for type "'+type+'" and obj "'+obj.id+'"'
     @lru.set(obj.id, obj)
     @getDataStore().set type, obj, (res) ->
-      if cb then cb()
+      if cb then cb(res)
 
   @remove: (obj, cb) =>
     @lru.del obj.id
