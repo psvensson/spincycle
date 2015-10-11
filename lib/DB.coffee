@@ -107,11 +107,12 @@ class DB
   @findMany: (type, property, value) =>
     q = defer()
     @getDataStore().findMany(type, property, value).then (results) =>
-      if not result
+      if not results
         console.log 'DB.find type '+type+', property '+property+', value '+value+' got back '+results.length+' results'
+        q.resolve([])
       else
         results.forEach (result) => @lru.set(result.id, result)
-      q.resolve(results)
+        q.resolve(results)
     return q
 
   @findQuery: (type, query) =>
