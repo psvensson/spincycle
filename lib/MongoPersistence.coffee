@@ -88,6 +88,7 @@ class MongoPersistence
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>
       if collection
+        if debug then console.log 'Mongo.all collection is '+collection
         collection.find {},(err,res) =>
           res.toArray (err, items) =>
             if err
