@@ -109,7 +109,7 @@ class DB
     @getDataStore().findMany(type, property, value).then (results) =>
       if debug then console.log 'DB.findMany results are...'
       if debug then console.dir results
-      if not results
+      if not results or not results.length
         console.log 'DB.find type '+type+', property '+property+', value '+value+' got back '+results.length+' results'
         q.resolve([])
       else
