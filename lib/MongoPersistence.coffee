@@ -137,28 +137,35 @@ class MongoPersistence
     @getDbFor(type).then (collection) =>
       query = {}
       query[property] = value
+      if debug then console.log 'query is '
+      if debug then console.dir query
       collection.findOne query, (err, item) =>
         if err
           console.log 'MONGO find Error: '+err
           console.dir err
           q.resolve(null)
         else
+          if debug then console.log 'find result is '
+          if debug then console.dir item
           q.resolve(item)
     return q
 
   findMany: (_type, property, value) =>
-    console.log 'Mongo findmany called for type '+_type+' property '+property+' and value '+value
+    if debug then console.log 'Mongo findmany called for type '+_type+' property '+property+' and value '+value
     q = defer()
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>
       query = {}
       query[property] = value
+      if debug then console.log 'query is '
+      if debug then console.dir query
       collection.find query, (err, cursor) =>
         if err
           console.log 'MONGO findMany Error: '+err
           console.dir err
           q.resolve(null)
         else
+          if debug then console.log 'findMany returns'
           q.resolve(cursor.toArray())
     return q
 
@@ -211,8 +218,6 @@ class MongoPersistence
       #console.log 'Mongo.set called for type '+type+' and id '+obj.id
       if typeof obj.id == 'object' then console.dir obj
       collection.update {id: obj.id}, obj,{ upsert: true },(err, result, details) =>
-        console.log 'details ='
-        console.dir details
         if err
           console.log 'MONGO set Error: '+err
           console.dir err
