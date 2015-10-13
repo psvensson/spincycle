@@ -72,7 +72,7 @@ class DB
           if debug then console.log 'DB.getOrCreateObjectByRecord DB load returns '+res
           if debug then console.dir res
           if res and res[0]
-            console.log '* found existing record in DB *'
+            console.log 'DB.getOrCreateObjectByRecord found existing record in DB *'
             record = res[0]
           resolver.createObjectFrom(record).then (ooo) =>
             if debug then console.log 'DB.getOrCreateObjectByRecord createFromRecord returns '+ooo
