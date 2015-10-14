@@ -81,9 +81,12 @@ class DB
 
   @byProviderId: (type, pid) =>
     q = defer()
-    store = @getDataStore()
-    store.byProviderId(type, pid).then (res) =>
-      q.resolve(res)
+    if pid
+      store = @getDataStore()
+      store.byProviderId(type, pid).then (res) =>
+        q.resolve(res)
+    else
+      q.resolve(undefined)
     return q
 
   @all: (type, cb) =>
