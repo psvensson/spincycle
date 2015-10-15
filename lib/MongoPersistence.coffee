@@ -34,7 +34,7 @@ class MongoPersistence
     if repls
       cstring = 'mongodb://'+repls+'/spincycle?replicaSet='+rs
       if debug then console.log 'Mongo driver cstring is '+cstring
-      MongoClient.connect cstring, {fsync: true,  slave_ok: true, replSet:{replicaSet: rs}}, (err, db) =>
+      MongoClient.connect cstring, {fsync: true,  slave_ok: true, replSet:{replicaSet: rs, connectWithNoPrimary: true}}, (err, db) =>
         if err
           console.log 'MONGO Error connecting to "'+cstring+'" '+err
           console.dir err
