@@ -77,14 +77,20 @@ class ObjectManager
 
   _deleteObject: (msg) =>
     if msg.obj and msg.obj.type and msg.obj.id
+      console.log 'delete got type'+msg.obj.type+', and id '+msg.obj.id
       objStore.getObject(msg.obj.id, msg.obj.type).then (obj) =>
+        console.log 'got object form objstore -> '+obj
         if obj
           if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
+            console.log 'user could write this object'
             DB.remove obj, (removestatus) =>
+              console.log 'object removed callback'
               @populationListeners.forEach (client) =>
                 if ClientEndpoints.exists(client)
+                  console.log 'updating population changes callback'
                   ClientEndpoints.sendToEndpoint(client, {status: e.general.SUCCESS, info: 'POPULATION_UPDATE', payload: { removed: obj.toClient() } })
               objStore.removeObject(obj)
+              console.log 'object removed from objstore'
               msg.replyFunc({status: e.general.SUCCESS, info: 'delete object', payload: obj.id})
           else
             msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to delete object', payload: msg.obj.id})
