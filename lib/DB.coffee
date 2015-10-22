@@ -97,6 +97,13 @@ class DB
       console.log 'DB.all: All not implemented in underlying persistence logic'
       cb []
 
+  @count: (type) =>
+    q = defer()
+    store = @getDataStore()
+    store.count.then (value)=>
+      q.resolve(value)
+    return q
+
   @find: (type, property, value) =>
     q = defer()
     @getDataStore().find(type, property, value).then (result) =>

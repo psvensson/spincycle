@@ -100,6 +100,24 @@ class MongoPersistence
       else
         cb (null)
 
+  count: (_type)=>
+    if debug then console.log 'Mongo::count called for type '+_type
+    type = _type.toLowerCase()
+    q = defer()
+    @getDbFor(type).then (collection) =>
+      if collection
+        collection.count {},(err,count) =>
+          if err
+            console.log 'MONGO count Error: '+err
+            console.dir err
+            cb(-1)
+          else
+            q.resolve(count)
+      else
+        console.log '!!!!! Mongo.count could not get collection!!!!!!!!  '+collection
+        cb (-1)
+    return q
+
   get: (_type, id, cb) =>
     type = _type.toLowerCase()
     #console.log 'Mongo.get called for type '+type+' and id '+id

@@ -84,7 +84,7 @@ class ObjectManager
               @populationListeners.forEach (client) =>
                 if ClientEndpoints.exists(client)
                   ClientEndpoints.sendToEndpoint(client, {status: e.general.SUCCESS, info: 'POPULATION_UPDATE', payload: { removed: obj.toClient() } })
-                objStore.removeObject(obj)
+              objStore.removeObject(obj)
               msg.replyFunc({status: e.general.SUCCESS, info: 'delete object', payload: obj.id})
           else
             msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to delete object', payload: msg.obj.id})
@@ -147,6 +147,17 @@ class ObjectManager
     else
       msg.replyFunc({status: e.general.FAILURE, info: '_listObjects missing parameter', payload: null })
 
+  _countObjects: (msg) =>
+    console.log 'countObjects called for type '+msg.type
+    if typeof msg.type != 'undefined'
+      if @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user) == no
+        msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to count objects of type '+msg.type, payload: msg.type})
+      else
+        DB.count(msg.type).then (v)=>
+          msg.replyFunc({status: e.general.SUCCESS, info: 'count objects', payload: v})
+    else
+      msg.replyFunc({status: e.general.FAILURE, info: '_listObjects missing parameter', payload: null })
+
   parseList: (records, msg) =>
     rv = []
     console.log 'found '+records.length+' objects to return'
@@ -186,6 +197,10 @@ class ObjectManager
       msg.type = type
       #console.log 'calling _listObjects from WsMethod with type '+type
       @._listObjects(msg)
+
+    @messageRouter.addTarget '_count'+type+'s', '<noargs>', (msg) =>
+      msg.type = type
+      @._countObjects(msg)
 
   getObjectPullThrough: (id, type) =>
     if debug then console.log 'getObjectPullThrough for id '
