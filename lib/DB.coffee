@@ -100,7 +100,7 @@ class DB
   @count: (type) =>
     q = defer()
     store = @getDataStore()
-    store.count.then (value)=>
+    store.count(type).then (value)=>
       q.resolve(value)
     return q
 
