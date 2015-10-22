@@ -76,6 +76,7 @@ class ObjectManager
       msg.replyFunc({status: e.general.FAILURE, info: '_createObject missing parameter', payload: null })
 
   _deleteObject: (msg) =>
+    console.log 'delete called'
     if msg.obj and msg.obj.type and msg.obj.id
       console.log 'delete got type'+msg.obj.type+', and id '+msg.obj.id
       objStore.getObject(msg.obj.id, msg.obj.type).then (obj) =>
