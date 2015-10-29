@@ -1,9 +1,13 @@
-Db = require('mongodb').Db
-Server = require('mongodb').Server
+Db          = require('mongodb').Db
+Server      = require('mongodb').Server
 MongoClient = require('mongodb').MongoClient
-defer           = require('node-promise').defer
+defer       = require('node-promise').defer
+MongoWatch  = require 'mongo-watch'
 
 debug = process.env["DEBUG"]
+
+oplog = undefined
+cursor = undefined
 
 class MongoPersistence
 
@@ -11,6 +15,9 @@ class MongoPersistence
   mport = process.env['MONGODB_PORT_27017_TCP_PORT'] or '27017'
 
   if debug then console.log 'mongodb adr = '+madr+', port = '+mport
+
+  watcher = new MongoWatch {format: 'pretty'}
+
 
   constructor: (@dburl) ->
     if @dburl then madr = @dburl
@@ -44,8 +51,9 @@ class MongoPersistence
               @foo(q)
             2000)
         else
-          console.log("---- We are connected ----")
+          console.log("---- We are connected ---- *")
           @db = db
+          #if not oplog then @setOplogCursor('mongodb://'+repls)
           q.resolve(db)
     else
       if debug then console.log 'Mongo driver cstring is '+cstring
@@ -61,6 +69,7 @@ class MongoPersistence
         else
           console.log("---- We are connected ----")
           @db = db
+          #if not oplog then @setOplogCursor(cstring)
           q.resolve(db)
 
   getDbFor: (_type) =>
@@ -69,19 +78,50 @@ class MongoPersistence
     db = @dbs[type]
     if not db
       @getConnection().then (connection) =>
-        connection.collection(type, (err, collection) =>
+        connection.collection(type, (err, ndb) =>
           if err
             console.log 'MONGO Error getting collection: '+err
             console.dir err
             q.resolve(null)
           else
-            @dbs[type] = collection
-            q.resolve(collection)
+            @dbs[type] = ndb
+
+            watcher.watch 'spincycle.'+type, (event) ->
+              #console.log 'something changed in collection '+type+':', event
+
+            q.resolve(ndb)
         )
     else
       q.resolve(db)
     return q
 
+
+  setOplogCursor: (dburl)=>
+    MongoClient.connect dburl+'/local?authSource=spincycle', (err, db) =>
+      db.collection 'oplog.rs', (err, oplog) ->
+        # Find the highest timestamp
+        oplog.find({}, ts: 1).sort($natural: -1).limit(1).toArray (err, data) ->
+          if err then console.log 'ERROR: '+err
+          console.dir arguments
+          if data and data[0]
+            lastOplogTime = data[0].ts
+            # If there isn't one found, get one from the local clock
+            if lastOplogTime
+              queryForTime = $gt: lastOplogTime
+            else
+              tstamp = new (MongoDB.Timestamp)(0, Math.floor((new Date).getTime() / 1000))
+              queryForTime = $gt: tstamp
+            # Create a cursor for tailing and set it to await data
+            cursor = oplog.find({ ts: queryForTime },
+              tailable: true
+              awaitdata: true
+              oplogReplay: true
+              numberOfRetries: -1)
+            # Wrap that cursor in a Node Stream
+            stream = cursor.stream()
+            # And when data arrives at that stream, print it out
+            stream.on 'data', (oplogdoc) ->
+              console.log 'OPLOG: --- '+oplogdoc
 
   all: (_type, cb)=>
     if debug then console.log 'Mongo::all called for type '+_type
