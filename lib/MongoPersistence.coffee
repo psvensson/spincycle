@@ -188,6 +188,7 @@ class MongoPersistence
           if debug then console.log 'Mongo byProviderId for '+pid+' got back'
           if debug then console.dir item
           q.resolve(item)
+
     return q
 
   # This is not easily implementable in couch, so now we're diverging

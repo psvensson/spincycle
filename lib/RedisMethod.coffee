@@ -23,7 +23,7 @@ class RedisMethod
 
 
   onChannelMessage: (channel, message) =>
-    console.log 'redismethod got channel '+channel+' message '+message
+    if debug then console.log 'redismethod got channel '+channel+' message '+message
     #console.dir channel
     #console.log '-------------------------------------------------------------------'
     msg = JSON.parse(message)
