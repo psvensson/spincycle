@@ -15,8 +15,7 @@ class MongoPersistence
   mport = process.env['MONGODB_PORT_27017_TCP_PORT'] or '27017'
 
   if debug then console.log 'mongodb adr = '+madr+', port = '+mport
-
-  # = new MongoWatch {format: 'pretty'}
+  watcher = new MongoWatch {format: 'pretty'}
 
 
   constructor: (@dburl) ->
@@ -53,7 +52,6 @@ class MongoPersistence
         else
           console.log("---- We are connected ---- *")
           @db = db
-          #if not oplog then @setOplogCursor('mongodb://'+repls)
           q.resolve(db)
     else
       if debug then console.log 'Mongo driver cstring is '+cstring
@@ -69,7 +67,6 @@ class MongoPersistence
         else
           console.log("---- We are connected ----")
           @db = db
-          #if not oplog then @setOplogCursor(cstring)
           q.resolve(db)
 
   getDbFor: (_type) =>
@@ -85,9 +82,10 @@ class MongoPersistence
             q.resolve(null)
           else
             @dbs[type] = ndb
-            #watcher.watch 'spincycle.'+type, (event) ->
-              #console.log 'something changed in collection '+type+':', event
-
+            #-----------------------------------------------------------------
+            watcher.watch 'spincycle.'+type, (event) ->
+              console.log 'something changed in collection '+type+':', event
+            #-----------------------------------------------------------------
             q.resolve(ndb)
         )
     else
