@@ -29,7 +29,7 @@ class DB
       #@DataStore = new GDS()
       #@DataStore = new Roach()
       if not name
-        @DataStore = new Mongo(DB.dburl)
+        @DataStore = new Mongo(DB.dburl, DB)
       else if name == 'couchdb'
         @DataStore = new Couch(DB.dburl)
       else if name == 'mongodb'
