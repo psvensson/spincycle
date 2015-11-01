@@ -21,7 +21,7 @@ class DB
   @lru: LRU()
   @lrudiff: LRU()
 
-  @onUpdate: (record)=>
+  @onUpdated: (record)=>
     OStore.updateObj(record)
 
   @getDataStore: (name) =>
