@@ -2,7 +2,7 @@ Db          = require('mongodb').Db
 Server      = require('mongodb').Server
 MongoClient = require('mongodb').MongoClient
 defer       = require('node-promise').defer
-MongoWatch  = require 'mongo-watch'
+MongoOplog  = require('mongo-oplog');
 
 debug = process.env["DEBUG"]
 
@@ -34,13 +34,13 @@ class MongoPersistence
     return q
 
   foo: (q) =>
-    cstring = 'mongodb://'+madr+':'+mport+'/spincycle'
+    @cstring = 'mongodb://'+madr+':'+mport+'/spincycle'
     repls = process.env['MONGODB_REPLS']
     rs = process.env['MONGODB_RS']
     if repls
-      cstring = 'mongodb://'+repls+'/spincycle?replicaSet='+rs
+      @cstring = 'mongodb://'+repls+'/spincycle?replicaSet='+rs
       if debug then console.log 'Mongo driver cstring is '+cstring
-      MongoClient.connect cstring, {fsync: true,  slave_ok: true, replSet:{replicaSet: rs, connectWithNoPrimary: true}}, (err, db) =>
+      MongoClient.connect @cstring, {fsync: true,  slave_ok: true, replSet:{replicaSet: rs, connectWithNoPrimary: true}}, (err, db) =>
         if err
           console.log 'MONGO Error connecting to "'+cstring+'" '+err
           console.dir err
@@ -59,12 +59,11 @@ class MongoPersistence
             rs.push {host: parts[0], port: parts[1]}
           console.log 'watcher replicas ---->'
           console.dir rs
-          watcher = new MongoWatch {replicaSet: rs, format: 'pretty'}
 
           q.resolve(db)
     else
       if debug then console.log 'Mongo driver cstring is '+cstring
-      MongoClient.connect cstring, {fsync: true,  slave_ok: true}, (err, db) =>
+      MongoClient.connect @cstring, {fsync: true,  slave_ok: true}, (err, db) =>
         if err
           console.log 'MONGO Error connecting to "'+cstring+'" '+err
           console.dir err
@@ -91,10 +90,14 @@ class MongoPersistence
             q.resolve(null)
           else
             @dbs[type] = ndb
-            #-----------------------------------------------------------------
-            watcher.watch 'spincycle.'+type, (event) ->
-              console.log 'something changed in collection '+type+':', event
-            #-----------------------------------------------------------------
+            repls = process.env['MONGODB_REPLS']
+            if repls
+              #-----------------------------------------------------------------
+              oplog = MongoOplog('mongodb://'+repls+'/local', { ns: 'spincycle.'+type }).tail()
+              oplog.on 'insert', (doc) -> console.log('insert '+type+' --> '+doc.op)
+              oplog.on 'update', (doc) -> console.log('update '+type+' --> '+doc.op)
+              oplog.on 'delete', (doc) -> console.log('delete '+type+' --> '+doc.op._id)
+              #-----------------------------------------------------------------
             q.resolve(ndb)
         )
     else
