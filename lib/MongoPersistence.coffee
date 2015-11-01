@@ -94,9 +94,15 @@ class MongoPersistence
             if repls
               #-----------------------------------------------------------------
               oplog = MongoOplog('mongodb://'+repls+'/local', { ns: 'spincycle.'+type }).tail()
-              oplog.on 'insert', (doc) -> console.log('insert '+type+' --> '+doc.op)
-              oplog.on 'update', (doc) -> console.log('update '+type+' --> '+doc.op)
-              oplog.on 'delete', (doc) -> console.log('delete '+type+' --> '+doc.op._id)
+              oplog.on 'insert', (doc) ->
+                console.log('insert '+type+' --> '+doc.op)
+                console.dir doc
+              oplog.on 'update', (doc) ->
+                console.log('update '+type+' --> '+doc.op)
+                console.dir doc
+              oplog.on 'delete', (doc) ->
+                console.log('delete '+type+' --> '+doc.op._id)
+                console.dir doc
               #-----------------------------------------------------------------
             q.resolve(ndb)
         )
