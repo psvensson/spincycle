@@ -15,7 +15,7 @@ class MongoPersistence
   mport = process.env['MONGODB_PORT_27017_TCP_PORT'] or '27017'
 
   if debug then console.log 'mongodb adr = '+madr+', port = '+mport
-  watcher = new MongoWatch {format: 'pretty'}
+  watcher = undefined
 
 
   constructor: (@dburl) ->
@@ -52,6 +52,15 @@ class MongoPersistence
         else
           console.log("---- We are connected ---- *")
           @db = db
+
+          rarr = repls.split ","
+          rarr.forEach (repl) ->
+            parts = repl.split ":"
+            rs.push {host: parts[0], port: parts[1]}
+          console.log 'watcher replicas --->'
+          console.dir rs
+          watcher = new MongoWatch {replicaSet: rs, format: 'pretty'}
+
           q.resolve(db)
     else
       if debug then console.log 'Mongo driver cstring is '+cstring
