@@ -31,7 +31,7 @@ class MessageRouter
   constructor: (@authMgr, dburl) ->
     MessageRouter.DB.dburl = dburl
     pjson = require('../package.json');
-    console.log 'messageRouter constructor. Version - '+pjson.version
+    console.log 'SpinCycle messageRouter constructor. Version - '+pjson.version
     #console.dir @authMgr
     @authMgr.messagerouter = @
     @resolver = new ResolveModule()
