@@ -52,7 +52,7 @@ class MongoPersistence
         else
           console.log("---- We are connected ---- *")
           @db = db
-
+          rs=[]
           rarr = repls.split ","
           rarr.forEach (repl) ->
             parts = repl.split ":"
