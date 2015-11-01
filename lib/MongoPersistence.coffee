@@ -57,7 +57,7 @@ class MongoPersistence
           rarr.forEach (repl) ->
             parts = repl.split ":"
             rs.push {host: parts[0], port: parts[1]}
-          console.log 'watcher replicas --->'
+          console.log 'watcher replicas ---->'
           console.dir rs
           watcher = new MongoWatch {replicaSet: rs, format: 'pretty'}
 
