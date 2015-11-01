@@ -21,6 +21,9 @@ class DB
   @lru: LRU()
   @lrudiff: LRU()
 
+  @onUpdate: (record)=>
+    OStore.updateObj(record)
+
   @getDataStore: (name) =>
     if not @DataStore
       #@DataStore = new GDS()
@@ -30,7 +33,7 @@ class DB
       else if name == 'couchdb'
         @DataStore = new Couch(DB.dburl)
       else if name == 'mongodb'
-        @DataStore = new Mongo(DB.dburl)
+        @DataStore = new Mongo(DB.dburl, DB)
       @DataStore.connect()
     return @DataStore
 
@@ -176,8 +179,6 @@ class DB
         return p
     )).then(
       (result) ->
-        #console.log 'DB.get resolving ->'
-        #console.dir result
         q.resolve(result)
       ,(err) ->
         console.log 'DB.get ERROR: '+err

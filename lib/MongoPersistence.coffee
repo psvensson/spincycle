@@ -18,7 +18,7 @@ class MongoPersistence
   watcher = undefined
 
 
-  constructor: (@dburl) ->
+  constructor: (@dburl, @DB) ->
     if @dburl then madr = @dburl
     @dbs = []
 
@@ -95,11 +95,12 @@ class MongoPersistence
               #-----------------------------------------------------------------
               oplog = MongoOplog('mongodb://'+repls+'/local', { ns: 'spincycle.'+type }).tail()
               oplog.on 'insert', (doc) ->
-                console.log('insert '+type+' --> '+doc.op)
+                console.log('insert '+type+' --> '+doc.op._id)
                 console.dir doc
               oplog.on 'update', (doc) ->
-                console.log('update '+type+' --> '+doc.op)
-                console.dir doc
+                console.log('update '+type+' --> '+doc.op._id)
+                @DB.onUpdated(doc.o)
+                #console.dir doc
               oplog.on 'delete', (doc) ->
                 console.log('delete '+type+' --> '+doc.op._id)
                 console.dir doc
