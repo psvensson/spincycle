@@ -218,7 +218,7 @@ class MongoPersistence
     return q
 
   findQuery: (_type, query) =>
-    console.log 'Mongo findQuery called for type '+_type+' property '+property+' and value '+value
+    console.log 'Mongo findQuery called for type '+_type+' query = '+query
     q = defer()
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>

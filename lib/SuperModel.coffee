@@ -132,7 +132,7 @@ class SuperModel
 
   prettyPrint: (name, value) =>
     rv = value
-    if (name == 'createdAt' or name == 'modifiedAt') and (value and value isnt 0) then rv = new Date(parseInt(value)).toUTCString()
+    #if (name == 'createdAt' or name == 'modifiedAt') and (value and value isnt 0) then rv = new Date(parseInt(value)).toUTCString()
     return rv
 
   unPrettify: (record) =>
