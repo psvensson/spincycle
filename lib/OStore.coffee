@@ -94,7 +94,7 @@ class OStore
 
   @makeClean: (property) ->
     rv = property
-    if property and property.length
+    if property and property isnt null and property isnt "undefined" and property isnt "null" and property.length
       rv = property.filter (item)-> item and item isnt null and item isnt "undefined" and item isnt "null"
     rv
 
