@@ -231,28 +231,33 @@ class ObjectManager
 
   onUpdateObject: (msg) =>
     console.log 'onUpdateObject called for '+msg.obj.type+' - '+msg.obj.id
-    objStore.getObject(msg.obj.id, msg.obj.type).then( (obj) =>
-      if obj
-        if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
-          if debug then console.log 'can write'
-          # Make sure to resolve object references in arrays and hashtables
-          for k,v of msg.obj
-            obj[k] = v if k isnt 'id'
-          @resolveReferences(obj, obj.constructor.model).then (robj)=>
-            if debug then console.log 'found object'
-            #objStore.updateObj(robj)
-            if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db. modifiedAt = '+obj.modifiedAt
-            obj.serialize(robj).then () =>
-              record = obj.getRecord()
-              @updateObjectHooks.forEach (hook) => hook(record)
-              msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
+    if msg.obj and msg.obj.id
+      objStore.getObject(msg.obj.id, msg.obj.type).then( (obj) =>
+        if obj
+          if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
+            if debug then console.log 'can write'
+            # Make sure to resolve object references in arrays and hashtables
+            for k,v of msg.obj
+              obj[k] = v if k isnt 'id'
+            @resolveReferences(obj, obj.constructor.model).then (robj)=>
+              if debug then console.log 'found object'
+              #objStore.updateObj(robj)
+              if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db. modifiedAt = '+obj.modifiedAt
+              obj.serialize(robj).then () =>
+                record = obj.getRecord()
+                @updateObjectHooks.forEach (hook) => hook(record)
+                msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
+          else
+            msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.UPDATE_OBJECT_FAIL, payload: msg.obj.id})
         else
-          msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.UPDATE_OBJECT_FAIL, payload: msg.obj.id})
-      else
-        console.log 'No object of type '+msg.obj.type+' found with id '+msg.obj.id
-        #console.dir objStore.objects.map (o) -> o.type == msg.obj.type
-        msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
-    )
+          console.log 'No object of type '+msg.obj.type+' found with id '+msg.obj.id
+          #console.dir objStore.objects.map (o) -> o.type == msg.obj.type
+          msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
+      )
+    else
+      console.log 'onUpdateObject got wrong or missing parameters'
+      console.dir msg.obj
+      msg.replyFunc({status: e.general.FAILURE, info: 'missing parameter(s) for object update', payload: msg.obj.id})
 
   resolveReferences: (record, model) =>
     if debug then console.log 'resolveReferences model is '
