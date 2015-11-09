@@ -31,7 +31,6 @@ class OStore
       rv.push v
     return rv
 
-
   @storeObject: (obj) =>
     if obj
       OStore.objects[obj.id] = obj
@@ -84,10 +83,11 @@ class OStore
             if debug then console.dir record[pp]
             if obj[pp] != record[pp] or (record[pp] and obj[pp].length and obj[pp].length != record[pp].length)
               clean = @makeClean(record[pp])
-              diff[pp] = clean
-              changed = true
-              obj[pp] = clean
-              console.log 'updating property "'+pp+'" on '+obj.type+' id '+record.id+' to '+record[pp]
+              if clean
+                diff[pp] = clean
+                changed = true
+                obj[pp] = clean
+                console.log 'updating property "'+pp+'" on '+obj.type+' id '+record.id+' to '+record[pp]
 
     OStore.objects[record.id] = obj
     OStore.sendUpdatesFor(obj, changed)
