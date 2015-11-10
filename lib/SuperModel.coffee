@@ -83,7 +83,7 @@ class SuperModel
         for hk, hv of ha
           varr.push hv.id
         rv[k] = varr
-      else if v.array
+      else if v.array and hv
         #if debug then console.log 'direct array'
         varr = []
         marr = me[v.name] or []
