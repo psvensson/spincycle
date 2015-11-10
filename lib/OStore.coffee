@@ -87,7 +87,7 @@ class OStore
                 diff[pp] = clean
                 changed = true
                 obj[pp] = clean
-                console.log 'updating property "'+pp+'" on '+obj.type+' id '+record.id+' to '+record[pp]
+                console.log '* updating property "'+pp+'" on '+obj.type+' id '+record.id+' to '+record[pp]
 
     OStore.objects[record.id] = obj
     OStore.sendUpdatesFor(obj, changed)
