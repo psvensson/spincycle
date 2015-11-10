@@ -83,11 +83,11 @@ class SuperModel
         for hk, hv of ha
           varr.push hv.id
         rv[k] = varr
-      else if v.array and hv
+      else if v.array
         #if debug then console.log 'direct array'
         varr = []
         marr = me[v.name] or []
-        marr.forEach (hv) -> varr.push hv.id
+        marr.forEach (hv) -> if hv then varr.push hv.id
         rv[k] = varr
       else
         if debug then console.log '**************** AAAUAGHH!!! property '+k+' was not resolved in SuperMOde::_getRecord'
