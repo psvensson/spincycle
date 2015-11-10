@@ -93,9 +93,12 @@ class OStore
     OStore.sendUpdatesFor(obj, changed)
 
   @makeClean: (property) ->
-    rv = property
-    if property and property isnt null and property isnt "undefined" and property isnt "null" and property.length
-      rv = property.filter (item)-> item and item isnt null and item isnt "undefined" and item isnt "null"
+    rv = ""
+    if property and property isnt null and property isnt "undefined" and property isnt "null"
+      if property.filter
+        rv = property.filter (item)-> item and item isnt null and item isnt "undefined" and item isnt "null"
+      else
+        rv = property
     rv
 
   @sendUpdatesFor: (obj, changed) =>
