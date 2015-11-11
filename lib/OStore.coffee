@@ -65,32 +65,35 @@ class OStore
     #console.log 'updateObj '+record
     #console.dir record
     obj = OStore.objects[record.id]
-    whitelist = obj.getRecord() #FFS
-    delete whitelist.id
-    diff = {}
-    changed = false;
-    record.modifiedAt = Date.now()
-    for p of whitelist
-      #if debug then console.log 'checking whitelist property '+p
-      for pp of record
-        #if debug then console.log '  comparing to incoming property '+pp
-        if pp is p
-          #if debug then console.log '    match!'
-          if pp not in OStore.blackList
-            if debug then console.log 'not in blacklist. obj prop is'
-            if debug then console.dir obj[pp]
-            if debug then console.log 'record prop is'
-            if debug then console.dir record[pp]
-            if obj[pp] != record[pp] or (record[pp] and obj[pp].length and obj[pp].length != record[pp].length)
-              clean = @makeClean(record[pp])
-              if clean
-                diff[pp] = clean
-                changed = true
-                obj[pp] = clean
-                console.log '** updating property "'+pp+'" on '+obj.type+' id '+record.id+' to '+record[pp]
+    if obj
+      whitelist = obj.getRecord() #FFS
+      delete whitelist.id
+      diff = {}
+      changed = false;
+      record.modifiedAt = Date.now()
+      for p of whitelist
+        #if debug then console.log 'checking whitelist property '+p
+        for pp of record
+          #if debug then console.log '  comparing to incoming property '+pp
+          if pp is p
+            #if debug then console.log '    match!'
+            if pp not in OStore.blackList
+              if debug then console.log 'not in blacklist. obj prop is'
+              if debug then console.dir obj[pp]
+              if debug then console.log 'record prop is'
+              if debug then console.dir record[pp]
+              if obj[pp] != record[pp] or (record[pp] and obj[pp].length and obj[pp].length != record[pp].length)
+                clean = @makeClean(record[pp])
+                if clean
+                  diff[pp] = clean
+                  changed = true
+                  obj[pp] = clean
+                  console.log '** updating property "'+pp+'" on '+obj.type+' id '+record.id+' to '+record[pp]
 
-    OStore.objects[record.id] = obj
-    OStore.sendUpdatesFor(obj, changed)
+      OStore.objects[record.id] = obj
+      OStore.sendUpdatesFor(obj, changed)
+    else
+      console.log 'OStore: tried to update an object which we did not have in cache!'
 
   @makeClean: (property) ->
     rv = ""
