@@ -223,7 +223,7 @@ class MongoPersistence
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>
       q = {}
-      if query.wildcard then q[property] = {$regex: '^'+value} else q[query.property] = query.value
+      if query.wildcard then q[query.property or 'name'] = {$regex: '^'+value} else q[query.property] = query.value
       options = {}
       if query.limit then options.limit = query.limit
       if query.skip then options.skip = query.skip
