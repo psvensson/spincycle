@@ -87,7 +87,10 @@ class SuperModel
         #if debug then console.log 'direct array'
         varr = []
         marr = me[v.name] or []
-        marr.forEach (hv) -> if hv then varr.push hv.id
+        marr.forEach (hv) -> if hv and hv isnt null and hv isnt 'null'
+          if debug then console.log 'adding array element '+hv.id
+          if debug then console.dir hv
+          varr.push hv.id
         rv[k] = varr
       else
         if debug then console.log '**************** AAAUAGHH!!! property '+k+' was not resolved in SuperMOde::_getRecord'

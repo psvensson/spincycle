@@ -248,6 +248,7 @@ class ObjectManager
                 @updateObjectHooks.forEach (hook) => hook(record)
                 msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
           else
+            console.log 'object update fail: could not find any object'
             msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.UPDATE_OBJECT_FAIL, payload: msg.obj.id})
         else
           console.log 'No object of type '+msg.obj.type+' found with id '+msg.obj.id
@@ -278,6 +279,7 @@ class ObjectManager
       if property.array
         resolvedarr = []
         arr = record[property.name] or []
+        arr = arr.filter (el) -> el isnt null and el isnt 'null'
         if debug then console.dir arr
         acount = arr.length
         if acount == 0
