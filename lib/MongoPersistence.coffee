@@ -237,10 +237,8 @@ class MongoPersistence
           console.dir err
           q.resolve(null)
         else
-          console.log 'got cursor'
-          console.dir cursor
           arr = []
-          cursor.each (el) => arr.push el
+          cursor.each (el) -> arr.push el
           console.log 'cursor returns'
           console.dir arr
           if debug then console.log 'findQuery returns '+arr.length+' items'

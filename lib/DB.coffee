@@ -136,7 +136,8 @@ class DB
       if results and results.length and results.length > 0
         console.log ' DB.findQuery got back '
         console.dir results
-        results.forEach (result) => @lru.set(result.id, result)
+        results.forEach (result) =>
+          if result then @lru.set(result.id, result)
       q.resolve(results)
     return q
 
