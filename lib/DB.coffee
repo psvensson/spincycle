@@ -133,9 +133,8 @@ class DB
   @findQuery: (type, query) =>
     q = defer()
     @getDataStore().findQuery(type, query).then (results) =>
-      if not result
-        console.log 'DB.findQuery type '+type+', property '+property+', value '+value+' got back '+results.length+' results'
-      else
+      console.log 'DB.findQuery type '+type+', property '+property+', value '+value+' got back '+results?.length+' results'
+      if results
         results.forEach (result) => @lru.set(result.id, result)
       q.resolve(results)
     return q
