@@ -219,10 +219,12 @@ class MongoPersistence
 
   findQuery: (_type, query) =>
     console.log 'Mongo findQuery called for type '+_type+' query = '+query
+    console.dir query
     q = defer()
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>
       q = {}
+      value = query.value or ""
       if query.wildcard then q[query.property or 'name'] = {$regex: '^'+value} else q[query.property] = query.value
       options = {}
       if query.limit then options.limit = query.limit
