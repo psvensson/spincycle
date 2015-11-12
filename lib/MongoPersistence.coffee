@@ -223,15 +223,18 @@ class MongoPersistence
     q = defer()
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>
+      console.log 'got collection'
       q = {}
       value = query.value or ""
       if query.wildcard then q[query.property or 'name'] = {$regex: '^'+value} else q[query.property] = query.value
       options = {}
+      console.log 'setting options'
       if query.limit then options.limit = query.limit
       if query.skip then options.skip = query.skip
-      if query.sort then options.limit = query.sort
+      if query.sort then options.sort = query.sort
       if debug then console.log 'query is '
       if debug then console.dir query
+      console.log 'calling find'
       collection.find query, options, (err, cursor) =>
         if err
           console.log 'MONGO findQuery Error: '+err
