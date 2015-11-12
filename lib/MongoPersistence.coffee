@@ -241,13 +241,14 @@ class MongoPersistence
           q.resolve(null)
         else
           arr = []
-          cursor.each((err, el) ->
+          cursor.each (err, el) ->
             console.log 'cursor for each element '+el+' err = '+err
-            if el then arr.push el)
-          console.log 'cursor returns'
-          console.dir arr
-          if debug then console.log 'findQuery returns '+arr.length+' items'
-          q.resolve(arr)
+            if el == null
+              cursor.toArray (err, items) =>
+                console.log 'cursor returns'
+                console.dir items
+                if debug then console.log 'findQuery returns '+items.length+' items'
+                q.resolve(items)
     return q
 
   search: (_type, property, value) =>
