@@ -219,6 +219,7 @@ class MongoPersistence
 
   findQuery: (_type, query) =>
     console.log 'Mongo findQuery called for type '+_type
+    if debug then console.dir query
     q = defer()
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>
@@ -231,6 +232,8 @@ class MongoPersistence
       if query.sort then options.sort = query.sort
       if debug then console.log 'query is '
       if debug then console.dir qu
+      if debug then console.log 'options are '
+      if debug then console.dir options
       collection.find qu, options, (err, cursor) =>
         if err
           console.log 'MONGO findQuery Error: '+err
@@ -238,7 +241,9 @@ class MongoPersistence
           q.resolve(null)
         else
           arr = []
-          cursor.each((err, el) -> arr.push el)
+          cursor.each((err, el) ->
+            console.log 'cursor for each element '+el+' err = '+err
+            arr.push el)
           console.log 'cursor returns'
           console.dir arr
           if debug then console.log 'findQuery returns '+arr.length+' items'
