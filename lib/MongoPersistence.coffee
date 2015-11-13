@@ -225,7 +225,7 @@ class MongoPersistence
     @getDbFor(type).then (collection) =>
       value = query.value or ""
       qu = {}
-      if query.wildcard then qu[query.property or 'name'] = {$regex: '^'+value}
+      if query.wildcard then qu[query.property or 'name'] = new RegExp('^'+value)
       options = {}
       if query.limit then options.limit = query.limit
       if query.skip then options.skip = query.skip
