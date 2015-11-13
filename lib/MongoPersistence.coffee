@@ -230,8 +230,8 @@ class MongoPersistence
       if query.limit then options.limit = query.limit
       if query.skip then options.skip = query.skip
       if query.sort then options.sort = query.sort
-      if debug then console.log 'query is '
-      if debug then console.dir qu
+      console.log 'query is '
+      console.dir qu
       if debug then console.log 'options are '
       if debug then console.dir options
       collection.find qu, options, (err, cursor) =>
@@ -245,9 +245,9 @@ class MongoPersistence
             console.log 'cursor for each element '+el+' err = '+err
             if el == null
               cursor.toArray (err, items) =>
-                console.log 'cursor returns'
-                console.dir items
-                if debug then console.log 'findQuery returns '+items.length+' items'
+                if debug then console.log 'cursor returns'
+                if debug then console.dir items
+                console.log 'findQuery returns '+items.length+' items'
                 q.resolve(items)
     return q
 

@@ -134,8 +134,8 @@ class DB
     q = defer()
     @getDataStore().findQuery(type, query).then (results) =>
       if results and results.length and results.length > 0
-        console.log ' DB.findQuery got back '
-        console.dir results
+        #if debug then console.log ' DB.findQuery got back '
+        #if debug then console.dir results
         results.forEach (result) =>
           if result then @lru.set(result.id, result)
       q.resolve(results)
