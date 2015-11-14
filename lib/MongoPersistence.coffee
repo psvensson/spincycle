@@ -16,7 +16,7 @@ class MongoPersistence
 
   if debug then console.log 'mongodb adr = '+madr+', port = '+mport
   watcher = undefined
-
+  @getConnection()
 
   constructor: (@dburl, @DB) ->
     if @dburl then madr = @dburl
