@@ -56,7 +56,7 @@ class MongoPersistence
               @foo(q)
             2000)
         else
-          console.log("---- We are connected ---- *")
+          console.log("---- We are connected ----  *")
           @db = db
           rs=[]
           rarr = repls.split ","
