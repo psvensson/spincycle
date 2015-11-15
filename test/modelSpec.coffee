@@ -2,7 +2,11 @@ expect = require('chai').expect
 SuperModel = require('../lib/SuperModel')
 DB = require('../lib/DB')
 
-describe 'SuperModel Tests', ->
+describe 'Spincycle Model Tests', ->
+
+  before (done)->
+    DB.createDatabases(['foo']).then () -> done()
+
   record =
     _rev: 10101020202030303404
     id: 17

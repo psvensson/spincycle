@@ -11,8 +11,13 @@
 
   DB = require('../lib/DB');
 
-  describe('SuperModel Tests', function() {
+  describe('Spincycle Model Tests', function() {
     var Bar, Baz, Ezra, Foo, Fooznaz, Quux, postCreateState, record, record2, record3, record4, record5;
+    before(function(done) {
+      return DB.createDatabases(['foo']).then(function() {
+        return done();
+      });
+    });
     record = {
       _rev: 10101020202030303404,
       id: 17,

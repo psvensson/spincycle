@@ -25,6 +25,8 @@ class DB
     OStore.updateObj(record)
 
   @getDataStore: (name) =>
+    #console.log 'DB.getDataStore called '
+    q = defer()
     if not @DataStore
       #@DataStore = new GDS()
       #@DataStore = new Roach()
@@ -34,19 +36,28 @@ class DB
         @DataStore = new Couch(DB.dburl)
       else if name == 'mongodb'
         @DataStore = new Mongo(DB.dburl, DB)
-      @DataStore.connect()
-    return @DataStore
+      @DataStore.connect().then (ds)=>
+        @DataStore = ds
+        #console.log 'DB got back datastore'
+        q.resolve(ds)
+    else
+      q.resolve(@DataStore)
+    return q
 
   @createDatabases:(dblist) =>
-    store = @getDataStore()
     q = defer()
-    promises = []
-    dblist.forEach (dbname) =>
-      if debug then console.log 'attempting to get store for '+dbname
-      store = @getDataStore(dbname)
-      promises.push store.getDbFor(dbname)
-    all(promises).then (results) =>
-      q.resolve(results)
+    #console.log 'createDatabases called'
+    @getDataStore().then (store)=>
+      #console.log 'DB.createDatabases got back store'
+      promises = []
+      first = dblist.pop()
+      promises.push store
+      dblist.forEach (dbname) =>
+        #if debug then console.log 'attempting to get store for '+dbname
+        @getDataStore(dbname).then (store)=>
+          promises.push store.getDbFor(dbname)
+      all(promises).then (results) =>
+        q.resolve(results)
     return q
 
   @getFromStoreOrDB: (type, id) =>
@@ -85,31 +96,31 @@ class DB
   @byProviderId: (type, pid) =>
     q = defer()
     if pid
-      store = @getDataStore()
-      store.byProviderId(type, pid).then (res) =>
-        q.resolve(res)
+      @getDataStore().then (store)=>
+        store.byProviderId(type, pid).then (res) =>
+          q.resolve(res)
     else
       q.resolve(undefined)
     return q
 
   @all: (type, cb) =>
-    store = @getDataStore()
-    if store.all
-      store.all(type, cb)
-    else
-      console.log 'DB.all: All not implemented in underlying persistence logic'
-      cb []
+    @getDataStore().then (store)=>
+      if store.all
+        store.all(type, cb)
+      else
+        console.log 'DB.all: All not implemented in underlying persistence logic'
+        cb []
 
   @count: (type) =>
     q = defer()
-    store = @getDataStore()
-    store.count(type).then (value)=>
-      q.resolve(value)
+    @getDataStore().then (store)=>
+      store.count(type).then (value)=>
+        q.resolve(value)
     return q
 
   @find: (type, property, value) =>
     q = defer()
-    @getDataStore().find(type, property, value).then (result) =>
+    @getDataStore().then (store) => store.find(type, property, value).then (result) =>
       if not result
         console.log 'DB.find type '+type+', property '+property+', value '+value+' got back '+result
       else
@@ -119,7 +130,7 @@ class DB
 
   @findMany: (type, property, value) =>
     q = defer()
-    @getDataStore().findMany(type, property, value).then (results) =>
+    @getDataStore().then (store) => store.findMany(type, property, value).then (results) =>
       if debug then console.log 'DB.findMany results are..'
       if debug then console.dir results
       if not results or not results.length
@@ -132,7 +143,7 @@ class DB
 
   @findQuery: (type, query) =>
     q = defer()
-    @getDataStore().findQuery(type, query).then (results) =>
+    @getDataStore().then (store)=> store.findQuery(type, query).then (results) =>
       if results and results.length and results.length > 0
         #if debug then console.log ' DB.findQuery got back '
         #if debug then console.dir results
@@ -144,7 +155,7 @@ class DB
   # search for wildcards for property as a string beginning with value..
   @search: (type, property, value) =>
     q = defer()
-    @getDataStore().search(type, property, value).then (results) =>
+    @getDataStore().then (store)=> store.search(type, property, value).then (results) =>
       console.log 'DB.search results were..'
       console.dir results
       if not results
@@ -166,7 +177,7 @@ class DB
         #console.log 'DB found in lru: '+rv
         if not rv
           #if debug then console.log ' attempting to use datastore for '
-          @getDataStore().get(type, id, (result) =>
+          @getDataStore().then (store)=> store.get(type, id, (result) =>
             if not result
               console.log 'DB.get for type '+type+' and id '+id+' got back '+result
             else
@@ -191,12 +202,12 @@ class DB
   @set: (type, obj, cb) =>
     #console.log 'DB.set called for type "'+type+'" and obj "'+obj.id+'"'
     @lru.set(obj.id, obj)
-    @getDataStore().set type, obj, (res) ->
+    @getDataStore().then (store)=> store.set type, obj, (res) ->
       if cb then cb(res)
 
   @remove: (obj, cb) =>
     @lru.del obj.id
-    @getDataStore().remove obj.type, obj, (res) ->
+    @getDataStore().then (store)=> store.remove obj.type, obj, (res) ->
       if cb then cb(res)
 
 

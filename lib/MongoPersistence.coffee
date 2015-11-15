@@ -19,14 +19,18 @@ class MongoPersistence
 
 
   constructor: (@dburl, @DB) ->
-    if @dburl then madr = @dburl
     @dbs = []
-    @getConnection()
 
   connect: ()=>
-    console.log 'Mongo connect called'
+    q = defer()
+    #console.log 'Mongo connect called'
+    @getConnection().then () =>
+      console.log '-----Mongo initialized'
+      q.resolve(@)
+    return q
 
   getConnection: () =>
+    #console.log 'getconnection called. db = '+@db
     q = defer()
     if @db
       q.resolve(@db)
@@ -35,13 +39,14 @@ class MongoPersistence
     return q
 
   foo: (q) =>
+    #console.log 'foo called'
     @cstring = 'mongodb://'+madr+':'+mport+'/spincycle'
     repls = process.env['MONGODB_REPLS']
     rs = process.env['MONGODB_RS']
     if repls
       @cstring = 'mongodb://'+repls+'/spincycle?replicaSet='+rs
       if debug then console.log 'Mongo driver cstring is '+@cstring
-      MongoClient.connect @cstring, {fsync: true,  slave_ok: true, replSet:{replicaSet: rs, connectWithNoPrimary: true}}, (err, db) =>
+      MongoClient.connect @cstring, {fsync: true, slave_ok: true, replSet:{replicaSet: rs, connectWithNoPrimary: true}}, (err, db) =>
         if err
           console.log 'MONGO Error connecting to "'+@cstring+'" '+err
           console.dir err
@@ -60,7 +65,6 @@ class MongoPersistence
             rs.push {host: parts[0], port: parts[1]}
           console.log 'watcher replicas ---->'
           console.dir rs
-
           q.resolve(db)
     else
       if debug then console.log 'Mongo driver cstring is '+@cstring
@@ -84,6 +88,7 @@ class MongoPersistence
     db = @dbs[type]
     if not db
       @getConnection().then (connection) =>
+        #console.log 'getDbFor for '+_type+' got connection'
         connection.collection(type, (err, ndb) =>
           if err
             console.log 'MONGO Error getting collection: '+err
@@ -106,6 +111,7 @@ class MongoPersistence
                 console.log('delete '+type+' --> '+doc.op._id)
                 console.dir doc
               #-----------------------------------------------------------------
+            #console.log 'getDbFor resolving db'
             q.resolve(ndb)
         )
     else
@@ -149,7 +155,7 @@ class MongoPersistence
 
   get: (_type, id, cb) =>
     type = _type.toLowerCase()
-    #console.log 'Mongo.get called for type '+type+' and id '+id
+    if debug then console.log 'Mongo.get called for type '+type+' and id '+id
     if typeof id == 'object'
       console.log 'Mongo.get got an object as id instead of string !!!!! '
       #console.dir id
@@ -289,6 +295,7 @@ class MongoPersistence
           cb(result)
 
   remove: (_type, obj, cb) =>
+    consoloe.log 'Mongo.remove called'
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>
       collection.remove {id: obj.id}, {w:1}, (err, numberOfRemovedDocs) =>
