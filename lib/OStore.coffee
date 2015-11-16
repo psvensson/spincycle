@@ -39,9 +39,7 @@ class OStore
       objs[obj.id] = obj
       OStore.objectsByType[obj.type] = objs
       #console.log 'storeObject storing '+obj.id+' with rev '+obj.rev+" and _rev "+obj._rev
-      list = OStore.listeners[obj.id] or []
-      for lid, listener of list
-        listener(obj)
+      @sendUpdatesFor(obj)
 
   @getObject: (id, type) =>
     q = defer()
