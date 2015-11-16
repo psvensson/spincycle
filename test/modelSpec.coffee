@@ -2,10 +2,15 @@ expect = require('chai').expect
 SuperModel = require('../lib/SuperModel')
 DB = require('../lib/DB')
 
+DB.createDatabases(['foo','Level','Zone','Game','Tile','Entity','Player']).then () ->
+  console.log '++++++++++++++++++++++++++++++++++++spec dbs created'
+
+
 describe 'Spincycle Model Tests', ->
 
   before (done)->
-    DB.createDatabases(['foo']).then () -> done()
+    console.log ' ------------------------------------- before called'
+
 
   record =
     _rev: 10101020202030303404

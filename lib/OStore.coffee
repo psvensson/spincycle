@@ -60,7 +60,7 @@ class OStore
       if objs[obj.id] then delete objs[obj.id]
       OStore.objectsByType[obj.type] = obj
 
-  @updateObj = (record) ->
+  @updateObj = (record, force) ->
     if debug then console.log '+ oStore.updateObj called for obj '+record.id
     #console.log 'updateObj '+record
     #console.dir record
@@ -82,7 +82,7 @@ class OStore
               if debug then console.dir obj[pp]
               if debug then console.log 'record prop is'
               if debug then console.dir record[pp]
-              if obj[pp] != record[pp] or (record[pp] and obj[pp].length and obj[pp].length != record[pp].length)
+              if obj[pp] != record[pp] or (record[pp] and obj[pp].length and obj[pp].length != record[pp].length) or force == true
                 clean = @makeClean(record[pp])
                 if clean
                   diff[pp] = clean
