@@ -41,7 +41,11 @@ class RedisMethod
     if target
       msg.client    = msg.channelId
       msg.messageId = msg.messageId || uuid.v4()
-      msg.replyFunc = (replydata) =>
+      msg.replyFunc = (_replydata) =>
+        if not _replydata.payload
+          replydata = {status: 'SUCCESS', info: 'reply', payload: _replydata}
+        else
+          replydata = _replydata
         if debug then console.log 'redismethod replying to message '+msg.messageId+' on channel '+msg.channelId
         if debug then console.dir message
         replydata.messageId = msg.messageId

@@ -11,12 +11,14 @@
 
   DB = require('../lib/DB');
 
+  DB.createDatabases(['foo', 'Level', 'Zone', 'Game', 'Tile', 'Entity', 'Player']).then(function() {
+    return console.log('++++++++++++++++++++++++++++++++++++spec dbs created');
+  });
+
   describe('Spincycle Model Tests', function() {
     var Bar, Baz, Ezra, Foo, Fooznaz, Quux, postCreateState, record, record2, record3, record4, record5;
     before(function(done) {
-      return DB.createDatabases(['foo']).then(function() {
-        return done();
-      });
+      return console.log(' ------------------------------------- before called');
     });
     record = {
       _rev: 10101020202030303404,
