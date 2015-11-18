@@ -43,11 +43,14 @@ class RedisMethod
       msg.messageId = msg.messageId || uuid.v4()
       msg.replyFunc = (_replydata) =>
         if not _replydata.payload
+          if debug then console.log 'message lacked payload, so creating proper message object with payload around it..'
           replydata = {status: 'SUCCESS', info: 'reply', payload: _replydata}
         else
           replydata = _replydata
         if debug then console.log 'redismethod replying to message '+msg.messageId+' on channel '+msg.channelId
         if debug then console.dir message
+        if debug then console.log '---------------------replydata is-------------------------'
+        if debug then console.dir replydata
         replydata.messageId = msg.messageId
         @sendclient.publish(clientChannel, JSON.stringify(replydata))
       target(msg)
