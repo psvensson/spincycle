@@ -30,15 +30,12 @@ class DB
     if not @DataStore
       #@DataStore = new GDS()
       #@DataStore = new Roach()
-      if not name
-        @DataStore = new Mongo(DB.dburl, DB)
-      else if name == 'couchdb'
-        @DataStore = new Couch(DB.dburl)
-      else if name == 'mongodb'
-        @DataStore = new Mongo(DB.dburl, DB)
+      if not name then @DataStore = new Mongo(DB.dburl, DB)
+      else if name == 'couchdb' then @DataStore = new Couch(DB.dburl)
+      else if name == 'mongodb' then @DataStore = new Mongo(DB.dburl, DB)
       @DataStore.connect().then (ds)=>
         @DataStore = ds
-        #console.log 'DB got back datastore'
+        console.log 'DB got back datastore'
         q.resolve(ds)
     else
       q.resolve(@DataStore)
