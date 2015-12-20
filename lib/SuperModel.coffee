@@ -70,7 +70,7 @@ class SuperModel
     model.forEach (v) ->
       k = v.name
       if (v.value and v.value isnt 0) and v.type # direct object reference
-        if debug then console.log 'getRecord accessing property '+k+' of object '+@type+' -> '+me[k]
+        #if debug then console.log 'getRecord accessing property '+k+' of object '+@type+' -> '+me[k]
         rv[k] = me[k]?.id
       else if (v.value and v.value isnt 0) and not v.type
         #if debug then console.log 'direct value '+v.value+' me[v.value] = '+(me[v.value])+' record[k] = '+(record[k])
@@ -88,8 +88,8 @@ class SuperModel
         varr = []
         marr = me[v.name] or []
         marr.forEach (hv) -> if hv and hv isnt null and hv isnt 'null'
-          if debug then console.log 'adding array element '+hv.id
-          if debug then console.dir hv
+          #if debug then console.log 'adding array element '+hv.id
+          #if debug then console.dir hv
           varr.push hv.id
         rv[k] = varr
       else
