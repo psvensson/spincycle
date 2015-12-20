@@ -341,7 +341,7 @@ class ObjectManager
             listenerId = objStore.addListenerFor(msg.obj.id, msg.obj.type, (uobj) ->
               if debug then console.log '--------------------- sending update of object '+msg.obj.id+' type '+msg.obj.type+' to client'
               toclient = uobj.toClient()
-              if debug then console.dir(toclient)
+              #if debug then console.dir(toclient)
               if ClientEndpoints.exists(msg.client)
                 ClientEndpoints.sendToEndpoint(msg.client, {status: e.general.SUCCESS, info: 'OBJECT_UPDATE', payload: toclient })
               else
