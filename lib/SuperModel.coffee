@@ -100,8 +100,8 @@ class SuperModel
     return rv
 
   toClient: () =>
-    if debug then console.log '---------------------------------------- toClient -----------------------------------------------'
-    if debug then console.dir @
+    #if debug then console.log '---------------------------------------- toClient -----------------------------------------------'
+    #if debug then console.dir @
     r = @getRecord()
     ra = @.constructor.model
     rv = {}
@@ -109,7 +109,7 @@ class SuperModel
       ra.forEach (el) =>
         if el.name == k and k != 'record' and el.public
           res = @prettyPrint(k, v)
-          if debug then console.log 'toClient '+k+' -> '+res
+          #if debug then console.log 'toClient '+k+' -> '+res
           rv[k] = res
     rv.id = @id
     rv.type = @.constructor.type
