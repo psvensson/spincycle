@@ -12,6 +12,7 @@ class OStore
   @listeners:     []
   @objectsByType: []
   @blackList:     ['id', 'createdAt', 'createdBy', 'updatedAt', 'admin']
+  @outstandingUpates = []
 
   @listObjectsByType: (type) =>
     rv = []
@@ -89,7 +90,9 @@ class OStore
                   if debug then console.log '** updating property "'+pp+'" on '+obj.type+' id '+record.id+' to '+record[pp]
 
       OStore.objects[record.id] = obj
-      OStore.sendUpdatesFor(obj, changed)
+      if not @outstandingUpates[obj.id]
+        @outstandingUpates[obj.id] = obj
+        OStore.sendUpdatesFor(obj, changed)
     else
       console.log 'OStore: tried to update an object which we did not have in cache!'
 
@@ -107,6 +110,7 @@ class OStore
     if changed
       for lid of listeners
         listeners[lid](obj)
+    delete @outstandingUpates[obj.id]
 
   @sendAllUpdatesFor: (obj, changed) =>
     sendobj = {id: obj.id, type:obj.type, list:[], toClient: () -> {id: obj.id, type:obj.type, list:sendobj.list}}

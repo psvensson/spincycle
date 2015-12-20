@@ -331,10 +331,9 @@ class ObjectManager
   #---------------------------------------------------------------------------------------------------------------------
 
   onRegisterForUpdatesOn: (msg) =>
-    if debug then console.dir msg
+    #if debug then console.dir msg
     if msg.obj or not msg.obj.id or not msg.obj.type
       if debug then console.log 'onRegisterForUpdatesOn called for '+msg.obj.type+' '+msg.obj.id
-
       objStore.getObject(msg.obj.id, msg.obj.type).then( (obj) =>
         if obj && obj.id
           if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
