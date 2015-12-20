@@ -1,16 +1,15 @@
 expect = require('chai').expect
 SuperModel = require('../lib/SuperModel')
 DB = require('../lib/DB')
-
-DB.createDatabases(['foo','Level','Zone','Game','Tile','Entity','Player']).then () ->
-  console.log '++++++++++++++++++++++++++++++++++++spec dbs created'
-
+OStore = require('../lib/OStore')
 
 describe 'Spincycle Model Tests', ->
 
   before (done)->
     console.log ' ------------------------------------- before called'
-
+    DB.createDatabases(['foo','Level','Zone','Game','Tile','Entity','Player']).then () ->
+    console.log '++++++++++++++++++++++++++++++++++++spec dbs created'
+    done()
 
   record =
     _rev: 10101020202030303404
@@ -60,17 +59,17 @@ describe 'Spincycle Model Tests', ->
 
   postCreateState = -1
 
-  record3 =
+  @record3 =
     id:42
     name: 'xyzzy'
     shoesize: 42
 
-  record4=
+  @record4=
     id:667
     name: 'Neihgbor of the beast'
     hatsize: 42
 
-  record5=
+  @record5=
     id:9
     name: 'Neihgbor of the beast'
     shirtsize: 42
@@ -100,7 +99,7 @@ describe 'Spincycle Model Tests', ->
     postCreate: (q) =>
       #console.log '    Quux postcreate. Creating new Baz manually'
       postCreateState = 1
-      new Baz(record3).then (baz) =>
+      new Baz(@record3).then (baz) =>
         postCreateState = 4
         #console.log '    Quux post-Baz creation'
         q.resolve(@)
@@ -120,7 +119,7 @@ describe 'Spincycle Model Tests', ->
     postCreate: (q) =>
       #console.log '  Ezra postcreate. Creating new Quux manually'
       postCreateStatee = 1
-      new Quux(record4).then (quux) =>
+      new Quux(@record4).then (quux) =>
         @thequux = quux
         postCreateState = 5
         #console.log '  Ezra post-Quux creation'
@@ -185,7 +184,7 @@ describe 'Spincycle Model Tests', ->
       expect(rv.name).to.exist
 
   it 'should call postCreate, when defined, in serial order down the references', ()->
-    new Ezra(record5).then (ezra) ->
+    new Ezra(@record5).then (ezra) ->
       expect(postCreateState).to.equal(5)
 
   it 'should retain hashtable key name and values after persistence', ()->
@@ -220,3 +219,20 @@ describe 'Spincycle Model Tests', ->
       record.things.push undefined
       new Fooznaz(record).then (fz2)->
         expect(fz2.things.length).to.equal(0)
+
+  it 'should only end one update even when storeObject is called multiple times on short notice', (done)->
+    count = 0
+    new Foo(record).then (foo) ->
+      OStore.storeObject(foo)
+      OStore.addListenerFor(record.id, record.type, ()->
+        count++
+        #console.log 'reply for updates on object '+foo.id+', count = '+count
+      )
+      foo.name = 'foo1'
+      OStore.storeObject(foo)
+      foo.name = 'foo2'
+      OStore.storeObject(foo)
+      setTimeout(()->
+        expect(count).to.equal(1)
+        done()
+      ,150)

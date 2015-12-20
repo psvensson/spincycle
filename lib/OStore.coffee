@@ -13,6 +13,7 @@ class OStore
   @objectsByType: []
   @blackList:     ['id', 'createdAt', 'createdBy', 'updatedAt', 'admin']
   @outstandingUpates = []
+  @updateQueue = []
 
   @listObjectsByType: (type) =>
     rv = []
@@ -39,7 +40,7 @@ class OStore
       objs = OStore.objectsByType[obj.type] or []
       objs[obj.id] = obj
       OStore.objectsByType[obj.type] = objs
-      #console.log 'storeObject storing '+obj.id+' with rev '+obj.rev+" and _rev "+obj._rev
+      if debug then console.log 'storeObject storing '+obj.id+' with rev '+obj.rev+" and _rev "+obj._rev
       @sendUpdatesFor(obj, true)
 
   @getObject: (id, type) =>
@@ -90,8 +91,8 @@ class OStore
                   if debug then console.log '** updating property "'+pp+'" on '+obj.type+' id '+record.id+' to '+record[pp]
 
       OStore.objects[record.id] = obj
-      if not @outstandingUpates[obj.id]
-        @outstandingUpates[obj.id] = obj
+      if not OStore.outstandingUpates[obj.id]
+        OStore.outstandingUpates[obj.id] = obj
         OStore.sendUpdatesFor(obj, changed)
     else
       console.log 'OStore: tried to update an object which we did not have in cache!'
@@ -106,11 +107,12 @@ class OStore
     rv
 
   @sendUpdatesFor: (obj, changed) =>
-    listeners = OStore.listeners[obj.id] or []
-    if changed
-      for lid of listeners
-        listeners[lid](obj)
-    delete @outstandingUpates[obj.id]
+    #console.log 'sendUpdatesFor called for obj '+obj.id+' changed = '+changed+', OStore.outstandingUpates[obj.id] = '+OStore.outstandingUpates[obj.id]
+    if not OStore.outstandingUpates[obj.id] and changed
+      OStore.outstandingUpates[obj.id] = obj
+      #console.log 'adding obj to updateQueue..'
+      #console.dir obj
+      OStore.updateQueue.push obj
 
   @sendAllUpdatesFor: (obj, changed) =>
     sendobj = {id: obj.id, type:obj.type, list:[], toClient: () -> {id: obj.id, type:obj.type, list:sendobj.list}}
@@ -121,19 +123,17 @@ class OStore
         #if debug then console.dir o
         sendobj.list.push o.toClient()
         if --count == 0
-          listeners = OStore.listeners[obj.id] or []
           if changed
-            for lid of listeners
-              listeners[lid](sendobj)
+            OStore.updateQueue.push sendobj
 
   @addListenerFor:(id, type, cb) =>
-    console.log 'OStore::addListenerFor called with type:'+type+' id '+id
+    #console.log 'OStore::addListenerFor called with type:'+type+' id '+id
     list = OStore.listeners[id] or []
     listenerId = uuid.v4()
     list[listenerId] = cb
     OStore.listeners[id] = list
-    console.log 'listeners list is now'
-    console.dir OStore.listeners[id]
+    #console.log 'listeners list is now'
+    #console.dir OStore.listeners[id]
     #@getObject(id, type).then((result) ->
     #  cb(result)
     #, error)
@@ -149,5 +149,30 @@ class OStore
     if debug then console.log 'removing listener for object '+id
     if debug then console.log 'listeners list is now'
     if debug then console.dir OStore.listeners[id]
+
+  @sendAtInterval: () =>
+    #console.log '-------------------------------------------------------sendAtInterval called '
+    #console.dir OStore.updateQueue
+    if OStore.updateQueue.length > 0
+      #console.log 'queue length = '+OStore.updateQueue.length
+      l = if OStore.updateQueue.length > 100 then 100 else OStore.updateQueue.length
+      count = 0
+      while count < l
+        count++
+        obj = OStore.updateQueue.shift()
+        last = obj._lastUpdate or 0
+        diff = Date.now() - last
+        obj._lastUpdate = Date.now()
+        if(diff > 100)
+          #console.dir OStore.listeners
+          listeners = OStore.listeners[obj.id] or []
+          for lid of listeners
+            #console.log 'sending to listener '+lid+' -> '+listeners[lid]
+            listeners[lid](obj)
+          delete OStore.outstandingUpates[obj.id]
+      #console.log 'queue length after send = '+OStore.updateQueue.length
+    setTimeout(@sendAtInterval,100)
+
+  @sendAtInterval()
 
 module.exports = OStore
