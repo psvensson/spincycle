@@ -21,10 +21,8 @@ class WsMethod
       # when the client emits 'message', this listens and executes
       socket.on "message", (datastring) ->
         console.log 'got new message "'+datastring+'" ['+(typeof datastring)+']'
-
         if typeof datastring == "string"
           data = JSON.parse(datastring)
-
         else
           #console.dir datastring
           data = datastring # TODO: Guard against hax0r dataz
@@ -36,7 +34,7 @@ class WsMethod
           socket.emit('message', replydata)
 
         fn = WsMethod.wsroutes[data.target]
-        fn?(data)
+        fn(data)
 
       # when the user disconnects.. perform this
       socket.on "disconnect", ->
