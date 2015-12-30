@@ -1,14 +1,24 @@
-expect = require('chai').expect
-SuperModel = require('../lib/SuperModel')
-DB = require('../lib/DB')
-OStore = require('../lib/OStore')
+expect          = require('chai').expect
+SuperModel      = require('../lib/SuperModel')
+DB              = require('../lib/DB')
+OStore          = require('../lib/OStore')
+
+AuthenticationManager = require('../example/AuthenticationManager')
+express         = require("express")
+app             = express()
+SpinCycle       = require('../lib/MessageRouter')
 
 describe 'Spincycle Model Tests', ->
+
+  authMgr = undefined
+  messageRouter = undefined
 
   before (done)->
     console.log ' ------------------------------------- before called'
     DB.createDatabases(['foo','Level','Zone','Game','Tile','Entity','Player']).then () ->
     console.log '++++++++++++++++++++++++++++++++++++spec dbs created'
+    authMgr         = new AuthenticationManager()
+    messageRouter   = new SpinCycle(authMgr)
     done()
 
   record =
@@ -236,3 +246,13 @@ describe 'Spincycle Model Tests', ->
         expect(count).to.equal(1)
         done()
       ,150)
+
+  it 'should always return an array from listObjects', ()->
+    msg =
+      type: 'Foo'
+      user:
+        isAdmin: true
+      replyFunc: (reply)->
+        console.log 'reply for _listObject was'
+        console.dir reply
+    messageRouter.objectManager._listObjects(msg)
