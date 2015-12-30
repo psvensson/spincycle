@@ -87,6 +87,7 @@ class MessageRouter
   routeMessage: (message) =>
     fn = @targets[message.target]
     if debug then console.log 'routeMessage called for "'+message.target+'"'
+    if debug then console.dir @targets
     if fn
       @authMgr.decorateMessageWithUser(message).then( (m)->
         if not m.user
