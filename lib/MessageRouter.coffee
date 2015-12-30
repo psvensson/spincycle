@@ -71,11 +71,11 @@ class MessageRouter
       method.registrationFunc(targetName, @routeMessage)
 
   addTarget: (targetName, args, targetFunc) =>
-    console.log 'adding route target for "'+targetName+'" args = '+args+' targetFunc is '+targetFunc
+    if debug then console.log 'adding route target for "'+targetName+'" args = '+args+' targetFunc is '+targetFunc
     @targets[targetName] = targetFunc
     @args[targetName] = args
     for name,method of @methods
-      if debug then console.log 'registering target '+targetName+' on method '+name+' -> '+method
+      console.log 'registering target '+targetName+' on method '+name
       if method.registrationFunc
         method.registrationFunc(targetName, @routeMessage)
       else
