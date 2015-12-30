@@ -74,11 +74,14 @@ class MessageRouter
     if debug then console.log 'adding route target for "'+targetName+'" args = '+args+' targetFunc is '+targetFunc
     @targets[targetName] = targetFunc
     @args[targetName] = args
-    if debug then console.log '----------------methods-------------------'
-    if debug then console.dir @methods
     for name,method of @methods
       if debug then console.log 'registering target '+targetName+' on method '+name+' -> '+method
-      if method.registrationFunc then method.registrationFunc(targetName, @routeMessage)
+      if method.registrationFunc
+        method.registrationFunc(targetName, @routeMessage)
+      else
+        console.log 'Spincycle did NOT find target for '+targetName
+        console.log '----------------methods-------------------'
+        console.dir @methods
 
   removeTarget: (targetName) =>
     @targets[targetName] = null
