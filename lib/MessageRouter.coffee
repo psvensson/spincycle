@@ -67,13 +67,15 @@ class MessageRouter
     console.log 'addMethod called for "'+methodName+'"'
     @methods[methodName] = method
     for targetName of @targets
-      if debug then console.log 'registering target '+targetName+' on method '+methodName
+      if debug then console.log 'registering target '+targetName+' on method '+methodName+
       method.registrationFunc(targetName, @routeMessage)
 
   addTarget: (targetName, args, targetFunc) =>
     if debug then console.log 'adding route target for "'+targetName+'" args = '+args+' targetFunc is '+targetFunc
     @targets[targetName] = targetFunc
     @args[targetName] = args
+    if debug then console.log '----------------methods-------------------'
+    if debug then console.dir @methods
     for name, method of @methods
       if debug then console.log 'registering target '+targetName+' on method '+method
       method.registrationFunc(targetName, @routeMessage)
