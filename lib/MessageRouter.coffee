@@ -78,7 +78,7 @@ class MessageRouter
     if debug then console.dir @methods
     for name,method of @methods
       if debug then console.log 'registering target '+targetName+' on method '+name+' -> '+method
-      method.registrationFunc(targetName, @routeMessage)
+      if method.registrationFunc then method.registrationFunc(targetName, @routeMessage)
 
   removeTarget: (targetName) =>
     @targets[targetName] = null
