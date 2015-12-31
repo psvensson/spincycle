@@ -40,7 +40,7 @@ class OStore
       objs = OStore.objectsByType[obj.type] or []
       objs[obj.id] = obj
       OStore.objectsByType[obj.type] = objs
-      if debug then console.log 'storeObject storing '+obj.id+' with rev '+obj.rev+" and _rev "+obj._rev
+      #if debug then console.log 'storeObject storing '+obj.id+' with rev '+obj.rev+" and _rev "+obj._rev
       @sendUpdatesFor(obj, true)
 
   @getObject: (id, type) =>
@@ -108,7 +108,7 @@ class OStore
     rv
 
   @sendUpdatesFor: (obj, changed) =>
-    #if debug then console.log 'sendUpdatesFor called for obj '+obj.id+' changed = '+changed+', OStore.outstandingUpates[obj.id] = '+OStore.outstandingUpates[obj.id]
+    if debug then console.log 'sendUpdatesFor called for obj '+obj.id+' changed = '+changed+', OStore.outstandingUpates[obj.id] = '+OStore.outstandingUpates[obj.id]
     if not OStore.outstandingUpates[obj.id] and changed
       OStore.outstandingUpates[obj.id] = obj
       #
