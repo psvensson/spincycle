@@ -108,7 +108,7 @@ class OStore
     rv
 
   @sendUpdatesFor: (obj, changed) =>
-    if debug then console.log 'sendUpdatesFor called for obj '+obj.id+' changed = '+changed+', OStore.outstandingUpates[obj.id] = '+OStore.outstandingUpates[obj.id]+' anyone is loistening == '+OStore.anyoneIsListening(obj.id)
+    if debug then console.log 'sendUpdatesFor called for obj '+obj.id+' changed = '+changed+', OStore.outstandingUpates[obj.id] = '+OStore.outstandingUpates[obj.id]+' anyone is listening == '+OStore.anyoneIsListening(obj.id)
     if not OStore.outstandingUpates[obj.id] and changed and OStore.anyoneIsListening(obj.id)
       OStore.outstandingUpates[obj.id] = obj
       #
@@ -129,7 +129,7 @@ class OStore
             if OStore.anyoneIsListening(sendobj.id) then OStore.updateQueue.push sendobj
 
   @anyoneIsListening:(id)=>
-    OStore.listeners[id] && OStore.listeners[id].length
+    OStore.listeners[id] && OStore.listeners[id].length > 0
 
   @addListenerFor:(id, type, cb) =>
     #console.log 'OStore::addListenerFor called with type:'+type+' id '+id
