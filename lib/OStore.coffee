@@ -154,7 +154,7 @@ class OStore
     #console.log '-------------------------------------------------------sendAtInterval called '
     #console.dir OStore.updateQueue
     if OStore.updateQueue.length > 0
-      #console.log 'queue length = '+OStore.updateQueue.length
+      console.log 'queue length = '+OStore.updateQueue.length
       l = if OStore.updateQueue.length > 100 then 100 else OStore.updateQueue.length
       count = 0
       while count < l
@@ -167,10 +167,10 @@ class OStore
           #console.dir OStore.listeners
           listeners = OStore.listeners[obj.id] or []
           for lid of listeners
-            #console.log 'sending to listener '+lid+' -> '+listeners[lid]
+            console.log 'sending to listener '+lid+' -> '+listeners[lid]
             listeners[lid](obj)
           delete OStore.outstandingUpates[obj.id]
-      #console.log 'queue length after send = '+OStore.updateQueue.length
+      console.log 'queue length after send = '+OStore.updateQueue.length
     setTimeout(@sendAtInterval,100)
 
   @sendAtInterval()
