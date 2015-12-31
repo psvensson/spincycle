@@ -109,13 +109,12 @@ class OStore
 
   @sendUpdatesFor: (obj, changed) =>
     if debug then console.log 'sendUpdatesFor called for obj '+obj.id+' changed = '+changed+', OStore.outstandingUpates[obj.id] = '+OStore.outstandingUpates[obj.id]
-    if not OStore.outstandingUpates[obj.id] and changed
+    if not OStore.outstandingUpates[obj.id] and changed and OStore.anyoneIsListening(obj.id)
       OStore.outstandingUpates[obj.id] = obj
       #
       #console.dir obj
-      if OStore.anyoneIsListening(obj.id)
-        if debug then console.log 'adding obj to updateQueue..'
-        OStore.updateQueue.push obj
+      if debug then console.log 'adding obj to updateQueue..'
+      OStore.updateQueue.push obj
 
   @sendAllUpdatesFor: (obj, changed) =>
     sendobj = {id: obj.id, type:obj.type, list:[], toClient: () -> {id: obj.id, type:obj.type, list:sendobj.list}}
