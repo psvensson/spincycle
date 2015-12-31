@@ -108,7 +108,7 @@ class OStore
     rv
 
   @sendUpdatesFor: (obj, changed) =>
-    if debug then console.log 'sendUpdatesFor called for obj '+obj.id+' changed = '+changed+', OStore.outstandingUpates[obj.id] = '+OStore.outstandingUpates[obj.id]
+    if debug then console.log 'sendUpdatesFor called for obj '+obj.id+' changed = '+changed+', OStore.outstandingUpates[obj.id] = '+OStore.outstandingUpates[obj.id]+' anyone is loistening == '+OStore.anyoneIsListening(obj.id)
     if not OStore.outstandingUpates[obj.id] and changed and OStore.anyoneIsListening(obj.id)
       OStore.outstandingUpates[obj.id] = obj
       #
