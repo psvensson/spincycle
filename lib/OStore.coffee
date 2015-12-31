@@ -91,9 +91,10 @@ class OStore
                   if debug then console.log '** updating property "'+pp+'" on '+obj.type+' id '+record.id+' to '+record[pp]
 
       OStore.objects[record.id] = obj
-      if not OStore.outstandingUpates[obj.id]
-        OStore.outstandingUpates[obj.id] = obj
-        OStore.sendUpdatesFor(obj, changed)
+      if OStore.listeners[obj.id].length
+        if not OStore.outstandingUpates[obj.id]
+          OStore.outstandingUpates[obj.id] = obj
+          OStore.sendUpdatesFor(obj, changed)
     else
       console.log 'OStore: tried to update an object which we did not have in cache!'
 
@@ -112,7 +113,7 @@ class OStore
       OStore.outstandingUpates[obj.id] = obj
       #console.log 'adding obj to updateQueue..'
       #console.dir obj
-      OStore.updateQueue.push obj
+      if OStore.listeners[obj.id].length then OStore.updateQueue.push obj
 
   @sendAllUpdatesFor: (obj, changed) =>
     sendobj = {id: obj.id, type:obj.type, list:[], toClient: () -> {id: obj.id, type:obj.type, list:sendobj.list}}
@@ -124,7 +125,7 @@ class OStore
         sendobj.list.push o.toClient()
         if --count == 0
           if changed
-            OStore.updateQueue.push sendobj
+            if OStore.listeners[obj.id].length then OStore.updateQueue.push sendobj
 
   @addListenerFor:(id, type, cb) =>
     #console.log 'OStore::addListenerFor called with type:'+type+' id '+id
