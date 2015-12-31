@@ -91,7 +91,7 @@ class OStore
                   if debug then console.log '** updating property "'+pp+'" on '+obj.type+' id '+record.id+' to '+record[pp]
 
       OStore.objects[record.id] = obj
-      if OStore.listeners[obj.id].length
+      if OStore.anyoneIsListening(obj.id)
         if not OStore.outstandingUpates[obj.id]
           OStore.outstandingUpates[obj.id] = obj
           OStore.sendUpdatesFor(obj, changed)
@@ -113,7 +113,7 @@ class OStore
       OStore.outstandingUpates[obj.id] = obj
       #console.log 'adding obj to updateQueue..'
       #console.dir obj
-      if OStore.listeners[obj.id].length then OStore.updateQueue.push obj
+      if OStore.anyoneIsListening(obj.id) then OStore.updateQueue.push obj
 
   @sendAllUpdatesFor: (obj, changed) =>
     sendobj = {id: obj.id, type:obj.type, list:[], toClient: () -> {id: obj.id, type:obj.type, list:sendobj.list}}
@@ -125,7 +125,10 @@ class OStore
         sendobj.list.push o.toClient()
         if --count == 0
           if changed
-            if OStore.listeners[obj.id].length then OStore.updateQueue.push sendobj
+            if OStore.anyoneIsListening(sendobj.id) then OStore.updateQueue.push sendobj
+
+  @anyoneIsListening:(id)=>
+    OStore.listeners[id] && OStore.listeners[id].length
 
   @addListenerFor:(id, type, cb) =>
     #console.log 'OStore::addListenerFor called with type:'+type+' id '+id
