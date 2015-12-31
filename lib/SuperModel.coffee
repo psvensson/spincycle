@@ -143,7 +143,7 @@ class SuperModel
     record
 
   loadFromIds:(model) =>
-    if debug then console.log '------------------------------------------------> loadfromIds called for '+@.constructor.type+' '+@id+' '+model.length+' properties'
+    #if debug then console.log '------------------------------------------------> loadfromIds called for '+@.constructor.type+' '+@id+' '+model.length+' properties'
     alldone = defer()
     allpromises = []
     if(not model or model.length == 0)
@@ -182,8 +182,8 @@ class SuperModel
               if typeof ids is 'string'
                 ids = [ids]
               ids = ids.filter (ii) ->  ii and ii isnt null and ii isnt "null" and ii isnt "undefined"
-              if debug then console.log 'resolveobjds '+resolveobj.name+' ('+(typeof ids)+') ids length are.. '+ids.length
-              if debug then console.dir ids
+              #if debug then console.log 'resolveobjds '+resolveobj.name+' ('+(typeof ids)+') ids length are.. '+ids.length
+              #if debug then console.dir ids
               count = ids.length
               if count == 0
                 #if debug then console.log 'no ids for '+resolveobj.name+' so resolving null'
@@ -191,14 +191,14 @@ class SuperModel
               else
                 ids.forEach (_id) =>
                   ((id) =>
-                      if debug then console.log 'SuperModel loadFromIds trying to get '+resolveobj.name+' with id '+id
+                      #if debug then console.log 'SuperModel loadFromIds trying to get '+resolveobj.name+' with id '+id
                       @resolveObj(resolveobj, id, r, --count)
                   )(_id)
           #if debug then console.log '------- property '+resolveobj.name+' now set to '+@[resolveobj.name]
         )(robj)
 
     all(allpromises, error).then( (results) =>
-      if debug then console.log '<------------------------------------------------ loadfromIds done for '+@.constructor.type+' '+@id+' '+model.length+' properties'
+      #if debug then console.log '<------------------------------------------------ loadfromIds done for '+@.constructor.type+' '+@id+' '+model.length+' properties'
       alldone.resolve(results)
     ,error)
     return alldone
