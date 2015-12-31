@@ -129,7 +129,11 @@ class OStore
             if OStore.anyoneIsListening(sendobj.id) then OStore.updateQueue.push sendobj
 
   @anyoneIsListening:(id)=>
-    OStore.listeners[id] && OStore.listeners[id].length > 0
+    rv = false
+    if OStore.listeners[id]
+      for l of OStore.listeners[id].length
+        rv = true
+    rv
 
   @addListenerFor:(id, type, cb) =>
     #console.log 'OStore::addListenerFor called with type:'+type+' id '+id
