@@ -386,11 +386,15 @@
       });
     });
     it('should only end one update even when storeObject is called multiple times on short notice', function(done) {
-      var count;
+      var count, record6;
       count = 0;
-      return new Foo(record).then(function(foo) {
+      record6 = {
+        id: 'abc123',
+        name: 'Bolars'
+      };
+      return new Foo(record6).then(function(foo) {
         OStore.storeObject(foo);
-        OStore.addListenerFor(record.id, record.type, function() {
+        OStore.addListenerFor(foo.id, foo.type, function() {
           return count++;
         });
         foo.name = 'foo1';

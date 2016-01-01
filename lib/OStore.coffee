@@ -130,8 +130,9 @@ class OStore
 
   @anyoneIsListening:(id)=>
     rv = false
-    if OStore.listeners[id]
-      for l of OStore.listeners[id].length
+    larr = OStore.listeners[id]
+    if larr
+      for l of larr
         rv = true
     rv
 
@@ -139,6 +140,7 @@ class OStore
     #console.log 'OStore::addListenerFor called with type:'+type+' id '+id
     list = OStore.listeners[id] or []
     listenerId = uuid.v4()
+    #console.log 'listener id = '+listenerId
     list[listenerId] = cb
     OStore.listeners[id] = list
     #console.log 'listeners list is now'
@@ -164,7 +166,7 @@ class OStore
     #console.dir OStore.updateQueue
     if OStore.updateQueue.length > 0
       if debug then console.log 'OStore.sendAtInterval queue length = '+OStore.updateQueue.length
-      l = if OStore.updateQueue.length > 100 then 100 else OStore.updateQueue.length
+      l = OStore.updateQueue.length
       count = 0
       while count < l
         count++
@@ -176,7 +178,7 @@ class OStore
           listeners[lid](obj)
         delete OStore.outstandingUpates[obj.id]
       if debug then console.log 'queue length after send = '+OStore.updateQueue.length
-    setTimeout(@sendAtInterval,100)
+    setTimeout(@sendAtInterval,50)
 
   @sendAtInterval()
 

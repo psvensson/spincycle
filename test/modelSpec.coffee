@@ -84,6 +84,7 @@ describe 'Spincycle Model Tests', ->
     name: 'Neihgbor of the beast'
     shirtsize: 42
 
+
   class Baz extends SuperModel
     @model=
     [
@@ -232,9 +233,12 @@ describe 'Spincycle Model Tests', ->
 
   it 'should only end one update even when storeObject is called multiple times on short notice', (done)->
     count = 0
-    new Foo(record).then (foo) ->
+    record6=
+      id: 'abc123'
+      name: 'Bolars'
+    new Foo(record6).then (foo) ->
       OStore.storeObject(foo)
-      OStore.addListenerFor(record.id, record.type, ()->
+      OStore.addListenerFor(foo.id, foo.type, ()->
         count++
         #console.log 'reply for updates on object '+foo.id+', count = '+count
       )

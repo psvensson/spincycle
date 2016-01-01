@@ -90,7 +90,10 @@ class SuperModel
         marr.forEach (hv) -> if hv and hv isnt null and hv isnt 'null'
           #if debug then console.log 'adding array element '+hv.id
           #if debug then console.dir hv
-          varr.push hv.id
+          if model.storedirectly
+            varr.push hv.getRecord()
+          else
+            varr.push hv.id
         rv[k] = varr
       else
         if debug then console.log '**************** AAAUAGHH!!! property '+k+' was not resolved in SuperMOde::_getRecord'
@@ -189,11 +192,15 @@ class SuperModel
                 #if debug then console.log 'no ids for '+resolveobj.name+' so resolving null'
                 r.resolve(null)
               else
-                ids.forEach (_id) =>
-                  ((id) =>
-                      #if debug then console.log 'SuperModel loadFromIds trying to get '+resolveobj.name+' with id '+id
-                      @resolveObj(resolveobj, id, r, --count)
-                  )(_id)
+                  ids.forEach (_id) =>
+                    ((id) =>
+                      --count
+                      if resolveobj.storedirectly
+                        @createObjectFromRecord(r, resolveobj, count, id)
+                      else
+                        #if debug then console.log 'SuperModel loadFromIds trying to get '+resolveobj.name+' with id '+id
+                        @resolveObj(resolveobj, id, r, count)
+                    )(_id)
           #if debug then console.log '------- property '+resolveobj.name+' now set to '+@[resolveobj.name]
         )(robj)
 
@@ -217,17 +224,21 @@ class SuperModel
           if not record
             #console.log 'SuperModel::loadFromIds got back null record from DB for type '+resolveobj.type+' and id '+id
             if count == 0 then r.resolve(null)
-          else SuperModel.resolver.createObjectFrom(record).then( (obj) =>
-            if not obj
-              console.log ' Hmm. Missing object reference. Sad Face.'
-              if count == 0 then r.resolve(null)
-            else
-              #if debug then console.log 'object '+resolveobj.name+' type '+resolveobj.type+' created: '+obj.id
-              @insertObj(resolveobj, obj)
-              if count == 0 then r.resolve(obj)
-          , error)
+          else @createObjectFromRecord(r, resolveobj, count, record)
         , error)
     , error)
+
+  createObjectFromRecord: (r, resolveobj, count, record)=>
+    SuperModel.resolver.createObjectFrom(record).then( (obj) =>
+      if not obj
+        console.log ' Hmm. Missing object reference. Sad Face.'
+        if count == 0 then r.resolve(null)
+      else
+        #if debug then console.log 'object '+resolveobj.name+' type '+resolveobj.type+' created: '+obj.id
+        @insertObj(resolveobj, obj)
+        if count == 0 then r.resolve(obj)
+    , error)
+
 
   insertObj: (ro, o) =>
     if ro.array == true
