@@ -81,7 +81,10 @@ class SuperModel
         varr = []
         ha = me[v.name] or []
         for hk, hv of ha
-          varr.push hv.id
+          if model.storedirectly
+            varr.push hv.getRecord()
+          else
+            varr.push hv.id
         rv[k] = varr
       else if v.array
         #if debug then console.log 'direct array'
