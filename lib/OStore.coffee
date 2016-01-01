@@ -163,23 +163,19 @@ class OStore
     #console.log '-------------------------------------------------------sendAtInterval called '
     #console.dir OStore.updateQueue
     if OStore.updateQueue.length > 0
-      console.log 'queue length = '+OStore.updateQueue.length
+      if debug then console.log 'OStore.sendAtInterval queue length = '+OStore.updateQueue.length
       l = if OStore.updateQueue.length > 100 then 100 else OStore.updateQueue.length
       count = 0
       while count < l
         count++
         obj = OStore.updateQueue.shift()
-        last = obj._lastUpdate or 0
-        diff = Date.now() - last
-        obj._lastUpdate = Date.now()
-        if(diff > 100)
-          #console.dir OStore.listeners
-          listeners = OStore.listeners[obj.id] or []
-          for lid of listeners
-            console.log 'sending to listener '+lid+' -> '+listeners[lid]
-            listeners[lid](obj)
-          delete OStore.outstandingUpates[obj.id]
-      console.log 'queue length after send = '+OStore.updateQueue.length
+        #console.dir OStore.listeners
+        listeners = OStore.listeners[obj.id] or []
+        for lid of listeners
+          if debug then console.log 'sending to listener '+lid+' -> '+listeners[lid]
+          listeners[lid](obj)
+        delete OStore.outstandingUpates[obj.id]
+      if debug then console.log 'queue length after send = '+OStore.updateQueue.length
     setTimeout(@sendAtInterval,100)
 
   @sendAtInterval()
