@@ -12,7 +12,6 @@ class OStore
   @listeners:     []
   @objectsByType: []
   @blackList:     ['id', 'createdAt', 'createdBy', 'updatedAt', 'admin']
-  @outstandingUpates = []
   @updateQueue = []
 
   @listObjectsByType: (type) =>
@@ -91,10 +90,7 @@ class OStore
                   if debug then console.log '** updating property "'+pp+'" on '+obj.type+' id '+record.id+' to '+record[pp]
 
       OStore.objects[record.id] = obj
-      if OStore.anyoneIsListening(obj.id)
-        if not OStore.outstandingUpates[obj.id]
-          OStore.outstandingUpates[obj.id] = obj
-          OStore.sendUpdatesFor(obj, changed)
+      if OStore.anyoneIsListening(obj.id) then OStore.sendUpdatesFor(obj, changed)
     else
       console.log 'OStore: tried to update an object which we did not have in cache!'
 
@@ -108,9 +104,8 @@ class OStore
     rv
 
   @sendUpdatesFor: (obj, changed) =>
-    if debug then console.log 'sendUpdatesFor called for obj '+obj.id+' changed = '+changed+', OStore.outstandingUpates[obj.id] = '+OStore.outstandingUpates[obj.id]+' anyone is listening == '+OStore.anyoneIsListening(obj.id)
-    if not OStore.outstandingUpates[obj.id] and changed and OStore.anyoneIsListening(obj.id)
-      OStore.outstandingUpates[obj.id] = obj
+    if debug then console.log 'sendUpdatesFor called for obj '+obj.id+' changed = '+changed+', anyone is listening == '+OStore.anyoneIsListening(obj.id)
+    if changed and OStore.anyoneIsListening(obj.id)
       #
       #console.dir obj
       if debug then console.log 'adding obj to updateQueue..'
@@ -176,7 +171,7 @@ class OStore
         for lid of listeners
           if debug then console.log 'sending to listener '+lid+' -> '+listeners[lid]
           listeners[lid](obj)
-        delete OStore.outstandingUpates[obj.id]
+
       if debug then console.log 'queue length after send = '+OStore.updateQueue.length
     setTimeout(@sendAtInterval,50)
 
