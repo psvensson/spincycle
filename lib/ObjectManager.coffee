@@ -67,6 +67,7 @@ class ObjectManager
         #console.dir msg
         msg.obj.createdAt = Date.now()
         msg.obj.createdBy = msg.user.id
+        console.log 'objmgr.createObject called'
         SuperModel.resolver.createObjectFrom(msg.obj).then (o) =>
           o.serialize()
           msg.replyFunc({status: e.general.SUCCESS, info: 'new '+msg.obj.type, payload: o})
@@ -135,7 +136,7 @@ class ObjectManager
       msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: obj})
 
   _listObjects: (msg) =>
-    console.log 'listObjects called for type '+msg.type
+    #console.log 'listObjects called for type '+msg.type
     if typeof msg.type != 'undefined'
       if @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user) == no
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to list objects of type '+msg.type, payload: msg.type})
@@ -167,7 +168,7 @@ class ObjectManager
 
   parseList: (records, msg) =>
     rv = []
-    console.log 'found '+records.length+' objects to return'
+    #console.log 'found '+records.length+' objects to return'
     count = records.length
     if debug then console.dir records
     if count == 0

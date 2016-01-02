@@ -1,5 +1,6 @@
 expect          = require('chai').expect
 SuperModel      = require('../lib/SuperModel')
+ResolveModule   = require('../lib/ResolveModule')
 DB              = require('../lib/DB')
 OStore          = require('../lib/OStore')
 
@@ -22,15 +23,40 @@ describe 'Spincycle Model Tests', ->
     done()
 
   record =
-    _rev: 10101020202030303404
+    _rev: 99101020202030303404
     id: 17
+    name: 'foo'
+
+  f1record =
+    _rev: 'f10101020202030303404'
+    id: 'f117'
+    name: 'foo'
+
+  f2record =
+    _rev: 'f20101020202030303404'
+    id: 'f217'
+    name: 'foo'
+
+  f3record =
+    _rev: 'f30101020202030303404'
+    id: 'f317'
+    name: 'foo'
+
+  f4record =
+    _rev: 'f40101020202030303404'
+    id: 'f417'
+    name: 'foo'
+
+  f5record =
+    _rev: 'f50101020202030303404'
+    id: 'f517'
     name: 'foo'
 
   record2 =
     _rev: 77788877788899900099
     id: 4711
     name: 'xyzzy'
-    theFoo: [17]
+    theFoo: 17
     foos: [17]
     footable: [17]
 
@@ -40,6 +66,17 @@ describe 'Spincycle Model Tests', ->
     [
       {name: 'name', value: 'name', default:'foo'}
     ]
+    constructor:(@record={})->
+      return super
+
+  ResolveModule.modulecache['Foo'] = Foo
+
+  class DFoo extends SuperModel
+    @type = 'DFoo'
+    @model=
+      [
+        {name: 'name', value: 'name', default:'foo'}
+      ]
     constructor:(@record={})->
       return super
 
@@ -55,6 +92,8 @@ describe 'Spincycle Model Tests', ->
     constructor: (@record={}) ->
       return super
 
+  ResolveModule.modulecache['Bar'] = Bar
+
   class Fooznaz extends SuperModel
     @type = 'Fooznaz'
     @model=
@@ -63,6 +102,18 @@ describe 'Spincycle Model Tests', ->
         {name: 'things', ids: 'things', array: true, type: 'Bar', public: true}
       ]
     constructor:(@record={})->
+      return super
+
+  class DirectBar extends SuperModel
+    @type = 'DirectBar'
+    @model=
+      [
+        {name: 'name', public: true, value: 'name', default: 'directyohoo'}
+        {name: 'theFoo', value: 'theFoo', type: 'DFoo', storedirectly: true }
+        {name: 'foos', public: true, type: 'DFoo', array: true, ids: 'foos', storedirectly: true}
+        {name: 'footable', hashtable: true, ids: 'footable', type: 'DFoo', storedirectly: true}
+      ]
+    constructor: (@record={}) ->
       return super
 
   #-----------------------------------------------------------------------
@@ -143,21 +194,22 @@ describe 'Spincycle Model Tests', ->
       expect(o._rev).to.equal(record._rev)
 
   it 'should get back basic values when creating record', ()->
-    new Foo(record).then (o) ->
+    new Foo(f1record).then (o) ->
       rv = o.getRecord()
       expect(rv.name).to.equal(record.name)
 
   it 'should get resolve direct reference values from record', ()->
-    new Foo(record).then (foo) ->
+    new Foo(f2record).then (foo) ->
       new Bar(record2).then (bar) ->
         #console.dir bar
         expect(bar.theFoo).to.exist
 
   it 'should get back id from direct reference when creating record', ()->
-    new Foo(record).then (foo) ->
+    new Foo(f1record).then (foo) ->
+      OStore.storeObject(foo)
       new Bar(record2).then (bar) ->
         rv = bar.getRecord()
-        expect(rv.theFoo).to.equal(17)
+        expect(rv.theFoo).to.equal(record.id)
 
   it 'should be able to create a hashtable property from record', ()->
     new Bar(record2).then (bar) ->
@@ -166,7 +218,9 @@ describe 'Spincycle Model Tests', ->
 
   it 'should be able to persist newly added hashtable references and still have them after serializing and reloading from record', ()->
     new Bar(record2).then (bar) ->
-      new Foo(record).then (foo) ->
+      OStore.storeObject(bar)
+      new Foo(f4record).then (foo) ->
+        OStore.storeObject(foo)
         bar.footable[foo.name] = foo
         foo.serialize()
         bar.serialize()
@@ -176,11 +230,14 @@ describe 'Spincycle Model Tests', ->
           expect(newbar.footable).to.exist
 
   it 'should get back array of ids from array reference when creating record', ()->
-    new Foo(record).then (foo) ->
+    new Foo(f5record).then (afoo) ->
+      OStore.storeObject(afoo)
       new Bar(record2).then (bar) ->
+        OStore.storeObject(bar)
         c = 10
         for i in [1..10]
           new Foo().then (foo) ->
+            OStore.storeObject(foo)
             bar.foos.push(foo)
             if --c == 0
               rv = bar.getRecord()
@@ -200,7 +257,9 @@ describe 'Spincycle Model Tests', ->
 
   it 'should retain hashtable key name and values after persistence', ()->
     new Foo(record).then (foo) ->
+      OStore.storeObject(foo)
       new Bar(record2).then (bar) ->
+        OStore.storeObject(bar)
         bar.serialize().then () ->
           DB.get('Bar', [4711]).then (bar_records)->
             bar_record = bar_records[0]
@@ -231,6 +290,7 @@ describe 'Spincycle Model Tests', ->
       new Fooznaz(record).then (fz2)->
         expect(fz2.things.length).to.equal(0)
 
+  """
   it 'should only end one update even when storeObject is called multiple times on short notice', (done)->
     count = 0
     record6=
@@ -250,13 +310,46 @@ describe 'Spincycle Model Tests', ->
         expect(count).to.equal(1)
         done()
       ,150)
+  """
 
-  it 'should always return an array from listObjects', ()->
+  it 'should always return an array from listObjects', (done)->
     msg =
       type: 'Foo'
       user:
         isAdmin: true
       replyFunc: (reply)->
-        console.log 'reply for _listObject was'
-        console.dir reply
+        #console.log 'reply for _listObject was'
+        #console.dir reply
+        expect(reply.payload.length).to.equal(1)
+        done()
     messageRouter.objectManager._listObjects(msg)
+
+
+  it 'should include whole objects when using storedirectly', (done)->
+    #console.log '------------------------------------------------trying to make a foo'
+    record7=
+      id: 'aaa3'
+      type: 'DFoo'
+      name: 'BolarsKolars'
+    ResolveModule.modulecache['DFoo'] = DFoo
+    ResolveModule.modulecache['DirectBar'] = DirectBar
+    new DFoo(record7).then (dfoo) ->
+      #console.dir(dfoo)
+      #console.log 'trying to make a dbar'
+      new DirectBar().then (dbar) ->
+
+        dbar.theFoo = dfoo
+        dbar.foos.push dfoo
+        dbar.footable[dfoo.name] = dfoo
+        #console.log 'trying to serialize dbar'
+        dbar.serialize().then () ->
+          #console.log 'trying to recreate dbar'
+          DB.get('DirectBar', [dbar.id]).then (dbar_records)->
+            #console.log 'created new directbar!'
+            #console.dir dbar_records
+            bar_record = dbar_records[0]
+            new DirectBar(bar_record).then (newdbar)->
+              #console.log 'new direct bar-----------------------------'
+              #console.dir newdbar
+              expect(newdbar.theFoo.name).to.equal(dfoo.name)
+              done()

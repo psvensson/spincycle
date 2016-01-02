@@ -35,7 +35,7 @@ class DB
       else if name == 'mongodb' then @DataStore = new Mongo(DB.dburl, DB)
       @DataStore.connect().then (ds)=>
         @DataStore = ds
-        console.log 'DB got back datastore'
+        #console.log 'DB got back datastore'
         q.resolve(ds)
     else
       q.resolve(@DataStore)
@@ -58,6 +58,7 @@ class DB
     return q
 
   @getFromStoreOrDB: (type, id) =>
+    console.log 'DB.getFromStoreOrDb called for '+type+' id '+id
     q = defer()
     OStore.getObject(id, type).then (oo)=>
       if oo
@@ -173,7 +174,8 @@ class DB
         p = defer()
         #console.log 'DB found in lru: '+rv
         if not rv
-          #if debug then console.log ' attempting to use datastore for '
+          #if debug then console.log ' attempting to use datastore for type '+type+' and id '+id+' typeof = '+(typeof id)
+          if (typeof id == 'object') then xyzzy()
           @getDataStore().then (store)=> store.get(type, id, (result) =>
             if not result
               console.log 'DB.get for type '+type+' and id '+id+' got back '+result
@@ -198,6 +200,7 @@ class DB
 
   @set: (type, obj, cb) =>
     #console.log 'DB.set called for type "'+type+'" and obj "'+obj.id+'"'
+    #console.dir obj
     @lru.set(obj.id, obj)
     @getDataStore().then (store)=> store.set type, obj, (res) ->
       if cb then cb(res)

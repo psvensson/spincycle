@@ -17,6 +17,7 @@ debug = process.env["DEBUG"]
 class SuperModel
 
   SuperModel.resolver = resolver
+  SuperModel.prototype.resolver = resolver
   SuperModel.oncreatelisteners = []
   SuperModel.onCreate = (cb)->
     SuperModel.oncreatelisteners.push cb
@@ -56,22 +57,27 @@ class SuperModel
       if @postCreate
         @postCreate(q)
       else
+        #if debug then console.log '-- done resolving constructor for '+@constructor.type
         q.resolve(@)
     , error)
-    #if debug then console.log 'returning promise from constructor for '+@constructor.type
     return q
 
   getRecord: () =>
     @._getRecord(@, @constructor.model, @record)
 
   _getRecord: (me, model, record) ->
+    #console.log '_getRecord for '+me.type+' id '+me.id
     rv = {}
     rv._rev = @_rev if @_rev
-    model.forEach (v) ->
+    model.forEach (v) =>
       k = v.name
       if (v.value and v.value isnt 0) and v.type # direct object reference
-        #if debug then console.log 'getRecord accessing property '+k+' of object '+@type+' -> '+me[k]
-        rv[k] = me[k]?.id
+        if debug then console.log 'getRecord accessing property '+k+' of object '+@type+' -> '+me[k]
+        if me[k]
+          if v.storedirectly
+            rv[k] = me[k]._getRecord(me[k], me[k].constructor.model, me[k].record)
+          else
+            rv[k] = me[k].id
       else if (v.value and v.value isnt 0) and not v.type
         #if debug then console.log 'direct value '+v.value+' me[v.value] = '+(me[v.value])+' record[k] = '+(record[k])
         rv[k] = me[v.value]
@@ -81,28 +87,29 @@ class SuperModel
         varr = []
         ha = me[v.name] or []
         for hk, hv of ha
-          if model.storedirectly
-            varr.push hv.getRecord()
+          if v.storedirectly
+            varr.push hv._getRecord(hv, hv.constructor.model, hv.record)
           else
+            #console.log '====================== array prop id is '+hv.id+' typeof '+(typeof hv.id)
             varr.push hv.id
         rv[k] = varr
       else if v.array
         #if debug then console.log 'direct array'
         varr = []
         marr = me[v.name] or []
-        marr.forEach (hv) -> if hv and hv isnt null and hv isnt 'null'
-          #if debug then console.log 'adding array element '+hv.id
-          #if debug then console.dir hv
-          if model.storedirectly
-            varr.push hv.getRecord()
+        marr.forEach (av) -> if av and av isnt null and av isnt 'null'
+          if v.storedirectly
+            varr.push av._getRecord(av, av.constructor.model, av.record)
           else
-            varr.push hv.id
+            #console.log '====================== hashtable prop id is '+av.id+' typeof '+(typeof av.id)
+            varr.push av.id
         rv[k] = varr
       else
         if debug then console.log '**************** AAAUAGHH!!! property '+k+' was not resolved in SuperMOde::_getRecord'
 
     rv.id = @id
     rv.type = @.constructor.type
+    #console.log 'record done for '+me.type
     return rv
 
   toClient: () =>
@@ -132,9 +139,9 @@ class SuperModel
       delete record.record if record.record
       if @_rev then record._rev = @_rev
       DB.set(@.constructor.type, record).then () =>
+        if debug then console.log ' * serialized and persisted '+@type+" id "+@id
         @_serializing = false
         q.resolve(@)
-      #if debug then console.log ' * serializing '+@type+" id "+@id
     else
       q.resolve(@)
     return q
@@ -168,11 +175,18 @@ class SuperModel
               #if debug then console.log 'supermodel creating direct reference of type '+resolveobj.type+', value '+resolveobj.value+' name '+ resolveobj.name + ' id '+@record['id']
               #if debug then console.dir @record[resolveobj.value]
               #if debug then console.dir @record
-              if @record[resolveobj.value]
-                @resolveObj(resolveobj, @record[resolveobj.value], r, 0)
+              if resolveobj.storedirectly
+                #console.log '** storedirectly creating direct reference object immediately. ro value is '+resolveobj.value
+                #console.dir @record
+                #console.log 'value is...'
+                #console.dir @record[resolveobj.value]
+                @createObjectFromRecord(r, resolveobj, 0, @record[resolveobj.value])
               else
-                @[resolveobj.name] = null
-                r.resolve(@[resolveobj.name])
+                if @record[resolveobj.value]
+                  @resolveObj(resolveobj, @record[resolveobj.value], r, 0)
+                else
+                  @[resolveobj.name] = null
+                  r.resolve(@[resolveobj.name])
             else
               @[resolveobj.name] = @record[resolveobj.value] or resolveobj.default  # scalar
               r.resolve(@[resolveobj.name])
@@ -188,17 +202,18 @@ class SuperModel
               if typeof ids is 'string'
                 ids = [ids]
               ids = ids.filter (ii) ->  ii and ii isnt null and ii isnt "null" and ii isnt "undefined"
-              #if debug then console.log 'resolveobjds '+resolveobj.name+' ('+(typeof ids)+') ids length are.. '+ids.length
+              #if debug then console.log 'resolveobjids '+resolveobj.name+' ('+(typeof ids)+') ids length are.. '+ids.length
               #if debug then console.dir ids
               count = ids.length
               if count == 0
-                #if debug then console.log 'no ids for '+resolveobj.name+' so resolving null'
+                if debug then console.log 'no ids for '+resolveobj.name+' so resolving null'
                 r.resolve(null)
               else
                   ids.forEach (_id) =>
                     ((id) =>
                       --count
                       if resolveobj.storedirectly
+                        #console.log '** storedirectly creating array or hash object immediately..'
                         @createObjectFromRecord(r, resolveobj, count, id)
                       else
                         #if debug then console.log 'SuperModel loadFromIds trying to get '+resolveobj.name+' with id '+id
@@ -214,30 +229,39 @@ class SuperModel
     return alldone
 
   resolveObj: (resolveobj, id, r, count) =>
+    #console.log '************************************* resolveObj called in '+@type+' for id '+id+' typeof '+(typeof id)
+    #console.dir id
     OMgr.getObject(id, resolveobj.type).then( (oo) =>
       if oo
-        #if debug then console.log 'found existing instance of '+resolveobj.name+' type '+resolveobj.type+' in OStore'
+        if debug then console.log 'found existing instance of '+resolveobj.name+' type '+resolveobj.type+' in OStore'
         @insertObj(resolveobj, oo)
         if count == 0
-          #if debug then console.log 'resolving '+resolveobj.name+' type '+resolveobj.type+' immediately'
+          if debug then console.log 'resolving '+resolveobj.name+' type '+resolveobj.type+' immediately'
           r.resolve(oo)
       else
-        #if debug then console.log 'did not find obj '+resolveobj.name+' ['+id+'] of type '+resolveobj.type+' in OStore. Getting from DB...'
+        if debug then console.log 'did not find obj '+resolveobj.name+' ['+id+'] of type '+resolveobj.type+' in OStore. Getting from DB. typeof of id prop is '+(typeof id)
         DB.get(resolveobj.type, [id]).then( (record) =>
           if not record
-            #console.log 'SuperModel::loadFromIds got back null record from DB for type '+resolveobj.type+' and id '+id
+            console.log 'SuperModel::loadFromIds got back null record from DB for type '+resolveobj.type+' and id '+id
             if count == 0 then r.resolve(null)
-          else @createObjectFromRecord(r, resolveobj, count, record)
+          else
+            console.log '** resolveObj no obj found and no record'
+            @createObjectFromRecord(r, resolveobj, count, record)
         , error)
     , error)
 
   createObjectFromRecord: (r, resolveobj, count, record)=>
+    #console.log '################################## supermodel createObjectFromRecord called'
+    #console.dir resolveobj
+    #console.log 'record.....'
+    #console.dir record
     SuperModel.resolver.createObjectFrom(record).then( (obj) =>
       if not obj
-        console.log ' Hmm. Missing object reference. Sad Face.'
+        #console.log ' Hmm. Missing object reference. Sad Face.'
+        #console.dir record
         if count == 0 then r.resolve(null)
       else
-        #if debug then console.log 'object '+resolveobj.name+' type '+resolveobj.type+' created: '+obj.id
+        if debug then console.log 'object '+resolveobj.name+' type '+resolveobj.type+' created: '+obj.id
         @insertObj(resolveobj, obj)
         if count == 0 then r.resolve(obj)
     , error)

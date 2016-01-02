@@ -155,10 +155,10 @@ class MongoPersistence
 
   get: (_type, id, cb) =>
     type = _type.toLowerCase()
-    #if debug then console.log 'Mongo.get called for type '+type+' and id '+id
+    #console.log '--------------------- Mongo.get called for type '+type+' and id '+id
     if typeof id == 'object'
       console.log 'Mongo.get got an object as id instead of string !!!!! '
-      #console.dir id
+      console.dir id
       cb(null)
     @getDbFor(type).then (collection) =>
       collection.findOne {id: id}, (err, item) =>
