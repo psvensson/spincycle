@@ -122,7 +122,6 @@ class ObjectManager
               msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: id})
           else
             console.log 'No object found with id '+id
-            console.dir objStore.objects.map (o) -> o.type == msg.obj.type
             msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'no such object', payload: msg.obj.id})
     else
       msg.replyFunc({status: e.general.FAILURE, info: '_getObject missing parameter', payload: null })
