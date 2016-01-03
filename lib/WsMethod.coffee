@@ -34,7 +34,7 @@ class WsMethod
           socket.emit('message', replydata)
 
         fn = WsMethod.wsroutes[data.target]
-        fn(data)
+        if fn then fn(data) else console.log '*********** Could not find registered target for '+data.target
 
       # when the user disconnects.. perform this
       socket.on "disconnect", ->

@@ -245,7 +245,7 @@ class SuperModel
             console.log 'SuperModel::loadFromIds got back null record from DB for type '+resolveobj.type+' and id '+id
             if count == 0 then r.resolve(null)
           else
-            console.log '** resolveObj no obj found and no record'
+            if debug then console.log '** resolveObj no obj found and no record for id '+id
             @createObjectFromRecord(r, resolveobj, count, record)
         , error)
     , error)
