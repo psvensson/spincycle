@@ -113,7 +113,7 @@ class ObjectManager
       if id.indexOf and id.indexOf('all_') > -1
         @getAggregateObjects(msg)
       else
-        @getObjectPullThrough(id, msg.obj.type).then (obj) =>
+        @getObjectPullThrough(id, msg.type).then (obj) =>
           if obj
             if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
               msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: obj.toClient()})
