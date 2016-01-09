@@ -72,7 +72,7 @@ class SuperModel
     model.forEach (v) =>
       k = v.name
       if (v.value and v.value isnt 0) and v.type # direct object reference
-        if debug then console.log 'getRecord accessing property '+k+' of object '+@type+' -> '+me[k]
+        #if debug then console.log 'getRecord accessing property '+k+' of object '+@type+' -> '+me[k]
         if me[k]
           if v.storedirectly
             rv[k] = me[k]._getRecord(me[k], me[k].constructor.model, me[k].record)
