@@ -83,7 +83,7 @@ class SuperModel
         rv[k] = me[v.value]
         if not rv[k] and rv[k] isnt 0 then rv[k] = record[k]
       else if v.hashtable
-        #if debug then console.log 'hashtable '
+        #if debug then console.log 'hashtable '§
         varr = []
         ha = me[v.name] or []
         for hk, hv of ha
@@ -94,10 +94,12 @@ class SuperModel
             varr.push hv.id
         rv[k] = varr
       else if v.array
-        #if debug then console.log 'direct array'
+        if debug then console.log 'direct array'
         varr = []
         marr = me[v.name] or []
         marr.forEach (av) -> if av and av isnt null and av isnt 'null'
+          if debug then console.log 'storing '
+          if debug then console.dir av
           if v.storedirectly
             varr.push av._getRecord(av, av.constructor.model, av.record)
           else
