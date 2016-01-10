@@ -175,15 +175,19 @@ class DB
         #console.log 'DB found in lru: '+rv
         if not rv
           #if debug then console.log ' attempting to use datastore for type '+type+' and id '+id+' typeof = '+(typeof id)
-          if (typeof id == 'object') then xyzzy()
-          @getDataStore().then (store)=> store.get(type, id, (result) =>
-            if not result
-              console.log 'DB.get for type '+type+' and id '+id+' got back '+result
-            else
-              @lru.set(id, result)
-            if not bam then p.resolve(result)
-            bam = true
-          )
+          if (typeof id == 'object')
+            console.log 'DB.get was served an object instead of an id!!!'
+            console.dir id
+            q.resolve(null)
+          else
+            @getDataStore().then (store)=> store.get(type, id, (result) =>
+              if not result
+                console.log 'DB.get for type '+type+' and id '+id+' got back '+result
+              else
+                @lru.set(id, result)
+              if not bam then p.resolve(result)
+              bam = true
+            )
         else
           if not bam then p.resolve(rv)
           bam = true

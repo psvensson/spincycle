@@ -295,7 +295,7 @@ class MongoPersistence
           cb(result)
 
   remove: (_type, obj, cb) =>
-    consoloe.log 'Mongo.remove called'
+    console.log 'Mongo.remove called'
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>
       collection.remove {id: obj.id}, {w:1}, (err, numberOfRemovedDocs) =>
