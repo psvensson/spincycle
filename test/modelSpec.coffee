@@ -290,28 +290,6 @@ describe 'Spincycle Model Tests', ->
       new Fooznaz(record).then (fz2)->
         expect(fz2.things.length).to.equal(0)
 
-  """
-  it 'should only end one update even when storeObject is called multiple times on short notice', (done)->
-    count = 0
-    record6=
-      id: 'abc123'
-      name: 'Bolars'
-    new Foo(record6).then (foo) ->
-      OStore.storeObject(foo)
-      OStore.addListenerFor(foo.id, foo.type, ()->
-        count++
-        #console.log 'reply for updates on object '+foo.id+', count = '+count
-      )
-      foo.name = 'foo1'
-      OStore.storeObject(foo)
-      foo.name = 'foo2'
-      OStore.storeObject(foo)
-      setTimeout(()->
-        expect(count).to.equal(1)
-        done()
-      ,150)
-  """
-
   it 'should always return an array from listObjects', (done)->
     msg =
       type: 'Foo'
@@ -320,7 +298,7 @@ describe 'Spincycle Model Tests', ->
       replyFunc: (reply)->
         #console.log 'reply for _listObject was'
         #console.dir reply
-        expect(reply.payload.length).to.equal(1)
+        expect(reply.payload.length).to.gt(0)
         done()
     messageRouter.objectManager._listObjects(msg)
 
@@ -353,3 +331,18 @@ describe 'Spincycle Model Tests', ->
               #console.dir newdbar
               expect(newdbar.theFoo.name).to.equal(dfoo.name)
               done()
+
+  it 'should be able to do a search on a property', (done)->
+    record7=
+      id: 'bbb456'
+      type: 'DFoo'
+      name: 'BolarsKolars'
+    ResolveModule.modulecache['DFoo'] = DFoo
+    new DFoo(record7).then (dfoo) ->
+      dfoo.serialize()
+      query = {sort:'name', property: 'name', value: 'BolarsKolars'}
+      DB.findQuery('DFoo', query).then (records) =>
+        #console.log 'findQuery got records.'
+        #console.dir records
+        expect(records.length).to.equal(1)
+        done()

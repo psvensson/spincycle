@@ -232,13 +232,14 @@ class MongoPersistence
     @getDbFor(type).then (collection) =>
       value = query.value or ""
       qu = {}
+      qu[query.property] = query.value
       if query.wildcard then qu[query.property or 'name'] = new RegExp('^'+value)
       options = {}
       if query.limit then options.limit = query.limit
       if query.skip then options.skip = query.skip
       if query.sort then options.sort = query.sort
-      console.log 'query is '
-      console.dir qu
+      if debug then console.log 'query is '
+      if debug then console.dir qu
       if debug then console.log 'options are '
       if debug then console.dir options
       collection.find qu, options, (err, cursor) =>
@@ -249,12 +250,10 @@ class MongoPersistence
         else
           arr = []
           cursor.each (err, el) ->
-            console.log 'cursor for each element '+el+' err = '+err
             if el == null
               cursor.toArray (err, items) =>
                 if debug then console.log 'cursor returns'
                 if debug then console.dir items
-                console.log 'findQuery returns '+items.length+' items'
                 q.resolve(items)
     return q
 

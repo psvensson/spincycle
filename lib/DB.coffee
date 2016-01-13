@@ -168,6 +168,7 @@ class DB
     if not ids.length then ids = [ids]
     q = defer()
     bam = false
+
     all(ids.map(
       (id) =>
         rv = @lru.get id
