@@ -524,7 +524,7 @@
         });
       });
     });
-    return it('should be able to do a search on a property', function(done) {
+    it('should be able to do a search on a property', function(done) {
       var record7;
       record7 = {
         id: 'bbb456',
@@ -543,6 +543,32 @@
         return DB.findQuery('DFoo', query).then((function(_this) {
           return function(records) {
             expect(records.length).to.equal(1);
+            return done();
+          };
+        })(this));
+      });
+    });
+    return it('should not get any results when searching on the wrong property', function(done) {
+      var record7;
+      record7 = {
+        id: 'bbb456',
+        type: 'DFoo',
+        name: 'BolarsKolars2'
+      };
+      ResolveModule.modulecache['DFoo'] = DFoo;
+      return new DFoo(record7).then(function(dfoo) {
+        var query;
+        dfoo.serialize();
+        query = {
+          sort: 'name',
+          property: 'id',
+          value: 'BolarsKolars2'
+        };
+        return DB.findQuery('DFoo', query).then((function(_this) {
+          return function(records) {
+            console.log('findQuery got records.');
+            console.dir(records);
+            expect(records.length).to.equal(0);
             return done();
           };
         })(this));

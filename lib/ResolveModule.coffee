@@ -47,24 +47,24 @@ class ResolveModule
 
   createObjectFrom: (record) =>
     q = defer()
-    if debug then console.log '----------------ResolveModule.createObjectFrom got record '+record
-    if debug then console.dir record
+    #if debug then console.log '----------------ResolveModule.createObjectFrom got record '+record
+    #if debug then console.dir record
     if not record or (record[0] and (record[0] == null) or record[0] == 'null')
       #console.log '++++++++++++++!!!!!!!!!!!!!!!!!!! NULL RECORD!!'
       q.resolve(null)
     else
       if not record[0] then record = [record]
-      if debug then console.log 'ResolveModule.createObjectFrom resolving record with id '+record[0].id+' of type '+record[0].type
+      #if debug then console.log 'ResolveModule.createObjectFrom resolving record with id '+record[0].id+' of type '+record[0].type
       module = ResolveModule.modulecache[record[0].type]
       if module
-        if debug then console.log 'createObjectFrom found existing module for '+record[0].type
+        #if debug then console.log 'createObjectFrom found existing module for '+record[0].type
         o = Object.create(module.prototype)
         o._rev = record._rev
         o.constructor(record[0])
         q.resolve(o)
       else
         @resolve record[0].type, (filename) ->
-          if debug then console.log 'ResolveModule resolved module '+record[0].type+" as "+filename
+          #if debug then console.log 'ResolveModule resolved module '+record[0].type+" as "+filename
           #console.dir record
           module = ResolveModule.modulecache[record[0].type] or require(filename.replace('.js', ''))
           ResolveModule.modulecache[record[0].type] = module

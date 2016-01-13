@@ -346,3 +346,18 @@ describe 'Spincycle Model Tests', ->
         #console.dir records
         expect(records.length).to.equal(1)
         done()
+
+  it 'should not get any results when searching on the wrong property', (done)->
+    record7=
+      id: 'bbb456'
+      type: 'DFoo'
+      name: 'BolarsKolars2'
+    ResolveModule.modulecache['DFoo'] = DFoo
+    new DFoo(record7).then (dfoo) ->
+      dfoo.serialize()
+      query = {sort:'name', property: 'id', value: 'BolarsKolars2'}
+      DB.findQuery('DFoo', query).then (records) =>
+        console.log 'findQuery got records.'
+        console.dir records
+        expect(records.length).to.equal(0)
+        done()

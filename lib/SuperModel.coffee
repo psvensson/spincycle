@@ -94,12 +94,9 @@ class SuperModel
             varr.push hv.id
         rv[k] = varr
       else if v.array
-        if debug then console.log 'direct array'
         varr = []
         marr = me[v.name] or []
         marr.forEach (av) -> if av and av isnt null and av isnt 'null'
-          if debug then console.log 'storing '
-          if debug then console.dir av
           if v.storedirectly
             varr.push av._getRecord(av, av.constructor.model, av.record)
           else

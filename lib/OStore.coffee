@@ -77,10 +77,6 @@ class OStore
           if pp is p
             #if debug then console.log '    match!'
             if pp not in OStore.blackList
-              if debug then console.log 'not in blacklist. obj prop is'
-              if debug then console.dir obj[pp]
-              if debug then console.log 'record prop is'
-              if debug then console.dir record[pp]
               if obj[pp] != record[pp] or (record[pp] and obj[pp].length and obj[pp].length != record[pp].length) or force == true
                 clean = @makeClean(record[pp])
                 if clean
