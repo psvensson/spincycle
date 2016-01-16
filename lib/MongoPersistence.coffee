@@ -218,7 +218,7 @@ class MongoPersistence
     value = _value or ""
     if value
       value = value.toString()
-      value = value.replace(/[^\w\s]/gi, '')
+      value = value.replace(/[^\w\s@.]/gi, '')
     if debug then console.log 'Mongo findmany called for type '+_type+' property '+property+' and value '+value
     q = defer()
     type = _type.toLowerCase()
@@ -227,10 +227,13 @@ class MongoPersistence
       query[property] = value
       if debug then console.log 'query is '
       if debug then console.dir query
-      collection.find(query).toArray (err, docs)=>
-          arr = docs
-          if debug then console.log 'findMany returns '+arr.length+' items'
-          q.resolve(arr)
+      collection.find(query).toArray (err, cursor)=>
+        cursor.each (err, el) ->
+          if el == null
+            cursor.toArray (err, items) =>
+              if debug then console.log 'findmany cursor returns'
+              if debug then console.dir items
+              q.resolve(items)
     return q
 
   findQuery: (_type, query) =>
@@ -242,7 +245,7 @@ class MongoPersistence
       value = query.value or ""
       if value
         value = value.toString()
-        value = value.replace(/[^\w\s]/gi, '')
+        value = value.replace(/[^\w\s@.]/gi, '')
       qu = {}
       qu[query.property] = value
       if query.wildcard then qu[query.property or 'name'] = new RegExp('^'+value+'.')
@@ -264,12 +267,16 @@ class MongoPersistence
           cursor.each (err, el) ->
             if el == null
               cursor.toArray (err, items) =>
-                if debug then console.log 'cursor returns'
+                if debug then console.log 'findQuery cursor returns'
                 if debug then console.dir items
                 q.resolve(items)
     return q
 
-  search: (_type, property, value) =>
+  search: (_type, property, _value) =>
+    value = _value or ""
+    if value
+      value = value.toString()
+      value = value.replace(/[^\w\s@.]/gi, '')
     console.log 'Mongo search called for type '+_type+' property '+property+' and value '+value
     q = defer()
     type = _type.toLowerCase()
