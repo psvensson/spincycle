@@ -191,7 +191,7 @@ class MongoPersistence
     value = _value or ""
     if value
       value = value.toString()
-      value = value.replace(/[^\w\s]/gi, '')
+      value = value.replace(/[^\w\s@.]/gi, '')
     if debug then console.log 'Mongo find called for type '+_type+' property '+property+' and value '+value
     q = defer()
     type = _type.toLowerCase()
@@ -208,7 +208,7 @@ class MongoPersistence
         else
           if debug then console.log 'find result is '
           if debug then console.dir item
-          if not item[property] == value
+          if not item or item[property] isnt value
             q.resolve(null)
           else
             q.resolve(item)
