@@ -597,7 +597,7 @@
         })(this));
       });
     });
-    return it('should be able to get two hits on a wildcard property', function(done) {
+    it('should be able to get two hits on a wildcard property', function(done) {
       var record10, record9;
       record9 = {
         id: 'bbb4567',
@@ -628,6 +628,31 @@
             };
           })(this));
         });
+      });
+    });
+    return it('should not bomb on searches with wildcard characters', function(done) {
+      var record11;
+      record11 = {
+        id: 'bb3356',
+        type: 'DFoo',
+        name: 'ArnelarsKolars'
+      };
+      ResolveModule.modulecache['DFoo'] = DFoo;
+      return new DFoo(record11).then(function(dfoo) {
+        var query;
+        dfoo.serialize();
+        query = {
+          sort: 'name',
+          property: 'name',
+          value: 'Ar*',
+          wildcard: true
+        };
+        return DB.findQuery('DFoo', query).then((function(_this) {
+          return function(records) {
+            expect(records.length).to.equal(1);
+            return done();
+          };
+        })(this));
       });
     });
   });

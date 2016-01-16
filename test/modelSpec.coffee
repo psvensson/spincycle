@@ -389,3 +389,16 @@ describe 'Spincycle Model Tests', ->
         DB.findQuery('DFoo', query).then (records) =>
           expect(records.length).to.equal(2)
           done()
+
+  it 'should not bomb on searches with wildcard characters', (done)->
+    record11=
+      id: 'bb3356'
+      type: 'DFoo'
+      name: 'ArnelarsKolars'
+    ResolveModule.modulecache['DFoo'] = DFoo
+    new DFoo(record11).then (dfoo) ->
+      dfoo.serialize()
+      query = {sort:'name', property: 'name', value: 'Ar*', wildcard: true}
+      DB.findQuery('DFoo', query).then (records) =>
+        expect(records.length).to.equal(1)
+        done()
