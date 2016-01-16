@@ -31,6 +31,8 @@ class WsMethod
         data.messageId = data.messageId || uuid.v4()
         data.replyFunc = (replydata) ->
           replydata.messageId = data.messageId
+          if debug then console.log 'replyFunc replying with'
+          if debug then console.dir replydata
           socket.emit('message', replydata)
 
         fn = WsMethod.wsroutes[data.target]
