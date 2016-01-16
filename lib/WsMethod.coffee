@@ -2,6 +2,8 @@ IO              = require("socket.io")
 uuid            = require('node-uuid')
 ClientEndpoints = require('./ClientEndpoints')
 
+debug = process.env["DEBUG"]
+
 class WsMethod
 
   @wsroutes = []
