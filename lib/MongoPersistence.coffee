@@ -227,7 +227,7 @@ class MongoPersistence
       query[property] = value
       if debug then console.log 'query is '
       if debug then console.dir query
-      collection.find(query).toArray (err, cursor)=>
+      collection.find query, (err, cursor)=>
         if err
           console.log 'MONGO findQuery Error: '+err
           console.dir err
