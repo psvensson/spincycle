@@ -370,3 +370,22 @@ describe 'Spincycle Model Tests', ->
       DB.findQuery('DFoo', query).then (records) =>
         expect(records.length).to.equal(1)
         done()
+
+  it 'should be able to get two hits on a wildcard property', (done)->
+    record9=
+      id: 'bbb4567'
+      type: 'DFoo'
+      name: 'Myfflan sKolars'
+    record10=
+      id: 'bbb45677'
+      type: 'DFoo'
+      name: 'MyhmetBolarsKolars'
+    ResolveModule.modulecache['DFoo'] = DFoo
+    new DFoo(record9).then (dfoo1) ->
+      dfoo1.serialize()
+      new DFoo(record10).then (dfoo2) ->
+        dfoo2.serialize()
+        query = {sort:'name', property: 'name', value: 'My', wildcard: true}
+        DB.findQuery('DFoo', query).then (records) =>
+          expect(records.length).to.equal(2)
+          done()

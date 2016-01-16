@@ -572,7 +572,7 @@
         })(this));
       });
     });
-    return it('should not be able to search on a wildcard property', function(done) {
+    it('should not be able to search on a wildcard property', function(done) {
       var record8;
       record8 = {
         id: 'bbb456',
@@ -595,6 +595,39 @@
             return done();
           };
         })(this));
+      });
+    });
+    return it('should be able to get two hits on a wildcard property', function(done) {
+      var record10, record9;
+      record9 = {
+        id: 'bbb4567',
+        type: 'DFoo',
+        name: 'Myfflan sKolars'
+      };
+      record10 = {
+        id: 'bbb45677',
+        type: 'DFoo',
+        name: 'MyhmetBolarsKolars'
+      };
+      ResolveModule.modulecache['DFoo'] = DFoo;
+      return new DFoo(record9).then(function(dfoo1) {
+        dfoo1.serialize();
+        return new DFoo(record10).then(function(dfoo2) {
+          var query;
+          dfoo2.serialize();
+          query = {
+            sort: 'name',
+            property: 'name',
+            value: 'My',
+            wildcard: true
+          };
+          return DB.findQuery('DFoo', query).then((function(_this) {
+            return function(records) {
+              expect(records.length).to.equal(2);
+              return done();
+            };
+          })(this));
+        });
       });
     });
   });

@@ -225,7 +225,7 @@ class MongoPersistence
     return q
 
   findQuery: (_type, query) =>
-    console.log 'Mongo findQuery called for type '+_type
+    if debug then console.log 'Mongo findQuery called for type '+_type
     if debug then console.dir query
     q = defer()
     type = _type.toLowerCase()
@@ -235,7 +235,7 @@ class MongoPersistence
       qu[query.property] = query.value
       if query.wildcard then qu[query.property or 'name'] = new RegExp('^'+value+'.')
       options = {}
-      if query.limit then options.limit = query.limit
+      if query.limit then options.limit = query.limit else options.limit = 10
       if query.skip then options.skip = query.skip
       if query.sort then options.sort = query.sort
       if debug then console.log 'query is '
