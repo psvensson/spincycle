@@ -412,6 +412,18 @@ describe 'Spincycle Model Tests', ->
     new DFoo(record12).then (dfoo) ->
       dfoo.serialize()
       query = {sort:'name', property: 'id', value: '[Object object]'}
-      DB.findQuery('DFoo', query).then (records) =>
+      DB.findMany('DFoo', query).then (records) =>
         expect(records.length).to.equal(0)
+        done()
+
+  it 'should be able to do specific searches', (done)->
+    record12=
+      id: 'b44rrb3356'
+      type: 'DFoo'
+      name: 'AlohaMixnelarsKolars'
+    ResolveModule.modulecache['DFoo'] = DFoo
+    new DFoo(record12).then (dfoo) ->
+      dfoo.serialize()
+      DB.findMany('DFoo', 'id', 'b44rrb3356').then (records) =>
+        expect(records.length).to.equal(1)
         done()

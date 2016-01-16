@@ -655,7 +655,7 @@
         })(this));
       });
     });
-    return it('should not bomb on specific searches with faulty values', function(done) {
+    it('should not bomb on specific searches with faulty values', function(done) {
       var record12;
       record12 = {
         id: 'b44b3356',
@@ -671,9 +671,27 @@
           property: 'id',
           value: '[Object object]'
         };
-        return DB.findQuery('DFoo', query).then((function(_this) {
+        return DB.findMany('DFoo', query).then((function(_this) {
           return function(records) {
             expect(records.length).to.equal(0);
+            return done();
+          };
+        })(this));
+      });
+    });
+    return it('should be able to do specific searches', function(done) {
+      var record12;
+      record12 = {
+        id: 'b44rrb3356',
+        type: 'DFoo',
+        name: 'AlohaMixnelarsKolars'
+      };
+      ResolveModule.modulecache['DFoo'] = DFoo;
+      return new DFoo(record12).then(function(dfoo) {
+        dfoo.serialize();
+        return DB.findMany('DFoo', 'id', 'b44rrb3356').then((function(_this) {
+          return function(records) {
+            expect(records.length).to.equal(1);
             return done();
           };
         })(this));

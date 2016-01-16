@@ -191,7 +191,7 @@ class MongoPersistence
     value = _value or ""
     if value
       value = value.toString()
-      value = value.replace(/[^\w\s@.]/gi, '')
+      value = value.replace(/[^\w\s@.-]/gi, '')
     if debug then console.log 'Mongo find called for type '+_type+' property '+property+' and value '+value
     q = defer()
     type = _type.toLowerCase()
@@ -215,10 +215,11 @@ class MongoPersistence
     return q
 
   findMany: (_type, property, _value) =>
+    console.log '_value is '+_value
     value = _value or ""
     if value
       value = value.toString()
-      value = value.replace(/[^\w\s@.]/gi, '')
+      value = value.replace(/[^\w\s@.-]/gi, '')
     if debug then console.log 'Mongo findmany called for type '+_type+' property '+property+' and value '+value
     q = defer()
     type = _type.toLowerCase()
@@ -253,7 +254,7 @@ class MongoPersistence
       value = query.value or ""
       if value
         value = value.toString()
-        value = value.replace(/[^\w\s@.]/gi, '')
+        value = value.replace(/[^\w\s@.-]/gi, '')
       qu = {}
       qu[query.property] = value
       if query.wildcard then qu[query.property or 'name'] = new RegExp('^'+value+'.')
