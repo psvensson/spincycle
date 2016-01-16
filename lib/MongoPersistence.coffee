@@ -215,7 +215,6 @@ class MongoPersistence
     return q
 
   findMany: (_type, property, _value) =>
-    console.log '_value is '+_value
     value = _value or ""
     if value
       value = value.toString()

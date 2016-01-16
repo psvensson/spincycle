@@ -92,7 +92,21 @@ describe 'Spincycle Model Tests', ->
     constructor: (@record={}) ->
       return super
 
+  class HashBar extends SuperModel
+    @type = 'HashBar'
+    @model=
+      [
+        {name: 'name', public: true, value: 'name', default: 'yohoo'}
+        {name: 'theFoo', value: 'theFoo', type: 'Foo' }
+        {name: 'foos', public: true, array: true, ids: 'foos'}
+        {name: 'footable', hashtable: true, ids: 'footable', type: 'Foo', keyproperty: 'id'}
+      ]
+    constructor: (@record={}) ->
+      return super
+
+
   ResolveModule.modulecache['Bar'] = Bar
+  ResolveModule.modulecache['HashBar'] = HashBar
 
   class Fooznaz extends SuperModel
     @type = 'Fooznaz'
@@ -228,6 +242,25 @@ describe 'Spincycle Model Tests', ->
           newbar = newbars[0]
           #console.dir newbar
           expect(newbar.footable).to.exist
+
+  it 'should be able to use custom properties for hashtable keys', ()->
+    record222 =
+      _rev: 71299900099
+      id: 174711
+      name: 'BAR xyzzy'
+      theFoo: 17
+      foos: [17]
+    new HashBar(record222).then (bar) ->
+      OStore.storeObject(bar)
+      new Foo(f4record).then (foo) ->
+        OStore.storeObject(foo)
+        bar.footable[foo.id] = foo
+        foo.serialize()
+        bar.serialize()
+        DB.get('HashBar', [174711]).then (newbars) ->
+          newbar = newbars[0]
+          new HashBar(newbar).then (nbobj) ->
+            expect(nbobj.footable[foo.id]).to.equal(foo)
 
   it 'should get back array of ids from array reference when creating record', ()->
     new Foo(f5record).then (afoo) ->

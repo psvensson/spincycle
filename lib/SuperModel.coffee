@@ -83,7 +83,7 @@ class SuperModel
         rv[k] = me[v.value]
         if not rv[k] and rv[k] isnt 0 then rv[k] = record[k]
       else if v.hashtable
-        #if debug then console.log 'hashtable '§
+        #if debug then console.log 'hashtable '
         varr = []
         ha = me[v.name] or []
         for hk, hv of ha
@@ -271,8 +271,9 @@ class SuperModel
       #if debug then console.log 'inserting obj '+ro.type+' as array'
       @[ro.name].push(o)
     else if ro.hashtable == true
-      #if debug then console.log 'inserting obj '+ro.type+' as hashtable'
-      @[ro.name][o.name] = o
+      if debug then console.log 'inserting obj '+ro.type+' as hashtable'
+      if ro.keyproperty then property = ro.keyproperty else property = 'name'
+      @[ro.name][o[property]] = o
     else
       #if debug then console.log 'inserting obj '+ro.type+' as direct reference'
       @[ro.name] = o

@@ -24,7 +24,7 @@
   SpinCycle = require('../lib/MessageRouter');
 
   describe('Spincycle Model Tests', function() {
-    var Bar, Baz, DFoo, DirectBar, Ezra, Foo, Fooznaz, Quux, authMgr, f1record, f2record, f3record, f4record, f5record, messageRouter, postCreateState, record, record2;
+    var Bar, Baz, DFoo, DirectBar, Ezra, Foo, Fooznaz, HashBar, Quux, authMgr, f1record, f2record, f3record, f4record, f5record, messageRouter, postCreateState, record, record2;
     authMgr = void 0;
     messageRouter = void 0;
     before(function(done) {
@@ -152,7 +152,45 @@
       return Bar;
 
     })(SuperModel);
+    HashBar = (function(_super) {
+      __extends(HashBar, _super);
+
+      HashBar.type = 'HashBar';
+
+      HashBar.model = [
+        {
+          name: 'name',
+          "public": true,
+          value: 'name',
+          "default": 'yohoo'
+        }, {
+          name: 'theFoo',
+          value: 'theFoo',
+          type: 'Foo'
+        }, {
+          name: 'foos',
+          "public": true,
+          array: true,
+          ids: 'foos'
+        }, {
+          name: 'footable',
+          hashtable: true,
+          ids: 'footable',
+          type: 'Foo',
+          keyproperty: 'id'
+        }
+      ];
+
+      function HashBar(record) {
+        this.record = record != null ? record : {};
+        return HashBar.__super__.constructor.apply(this, arguments);
+      }
+
+      return HashBar;
+
+    })(SuperModel);
     ResolveModule.modulecache['Bar'] = Bar;
+    ResolveModule.modulecache['HashBar'] = HashBar;
     Fooznaz = (function(_super) {
       __extends(Fooznaz, _super);
 
@@ -383,6 +421,32 @@
             var newbar;
             newbar = newbars[0];
             return expect(newbar.footable).to.exist;
+          });
+        });
+      });
+    });
+    it('should be able to use custom properties for hashtable keys', function() {
+      var record222;
+      record222 = {
+        _rev: 71299900099,
+        id: 174711,
+        name: 'BAR xyzzy',
+        theFoo: 17,
+        foos: [17]
+      };
+      return new HashBar(record222).then(function(bar) {
+        OStore.storeObject(bar);
+        return new Foo(f4record).then(function(foo) {
+          OStore.storeObject(foo);
+          bar.footable[foo.id] = foo;
+          foo.serialize();
+          bar.serialize();
+          return DB.get('HashBar', [174711]).then(function(newbars) {
+            var newbar;
+            newbar = newbars[0];
+            return new HashBar(newbar).then(function(nbobj) {
+              return expect(nbobj.footable[foo.id]).to.equal(foo);
+            });
           });
         });
       });
