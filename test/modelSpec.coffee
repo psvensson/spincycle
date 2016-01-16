@@ -342,8 +342,6 @@ describe 'Spincycle Model Tests', ->
       dfoo.serialize()
       query = {sort:'name', property: 'name', value: 'BolarsKolars'}
       DB.findQuery('DFoo', query).then (records) =>
-        #console.log 'findQuery got records.'
-        #console.dir records
         expect(records.length).to.equal(1)
         done()
 
@@ -357,7 +355,18 @@ describe 'Spincycle Model Tests', ->
       dfoo.serialize()
       query = {sort:'name', property: 'id', value: 'BolarsKolars2'}
       DB.findQuery('DFoo', query).then (records) =>
-        console.log 'findQuery got records.'
-        console.dir records
         expect(records.length).to.equal(0)
+        done()
+
+  it 'should not be able to search on a wildcard property', (done)->
+    record8=
+      id: 'bbb456'
+      type: 'DFoo'
+      name: 'MehmetBolarsKolars'
+    ResolveModule.modulecache['DFoo'] = DFoo
+    new DFoo(record8).then (dfoo) ->
+      dfoo.serialize()
+      query = {sort:'name', property: 'name', value: 'Meh', wildcard: true}
+      DB.findQuery('DFoo', query).then (records) =>
+        expect(records.length).to.equal(1)
         done()

@@ -548,7 +548,7 @@
         })(this));
       });
     });
-    return it('should not get any results when searching on the wrong property', function(done) {
+    it('should not get any results when searching on the wrong property', function(done) {
       var record7;
       record7 = {
         id: 'bbb456',
@@ -566,9 +566,32 @@
         };
         return DB.findQuery('DFoo', query).then((function(_this) {
           return function(records) {
-            console.log('findQuery got records.');
-            console.dir(records);
             expect(records.length).to.equal(0);
+            return done();
+          };
+        })(this));
+      });
+    });
+    return it('should not be able to search on a wildcard property', function(done) {
+      var record8;
+      record8 = {
+        id: 'bbb456',
+        type: 'DFoo',
+        name: 'MehmetBolarsKolars'
+      };
+      ResolveModule.modulecache['DFoo'] = DFoo;
+      return new DFoo(record8).then(function(dfoo) {
+        var query;
+        dfoo.serialize();
+        query = {
+          sort: 'name',
+          property: 'name',
+          value: 'Meh',
+          wildcard: true
+        };
+        return DB.findQuery('DFoo', query).then((function(_this) {
+          return function(records) {
+            expect(records.length).to.equal(1);
             return done();
           };
         })(this));

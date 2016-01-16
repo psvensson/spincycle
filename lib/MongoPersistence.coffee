@@ -233,7 +233,7 @@ class MongoPersistence
       value = query.value or ""
       qu = {}
       qu[query.property] = query.value
-      if query.wildcard then qu[query.property or 'name'] = new RegExp('/'+value+'/')
+      if query.wildcard then qu[query.property or 'name'] = new RegExp('^'+value+'.')
       options = {}
       if query.limit then options.limit = query.limit
       if query.skip then options.skip = query.skip
