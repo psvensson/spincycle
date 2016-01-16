@@ -188,15 +188,15 @@ class MongoPersistence
 
   # This is not easily implementable in couch, so now we're diverging
   find: (_type, property, _value) =>
+    value = _value or ""
+    if value
+      value = value.toString()
+      value = value.replace(/[^\w\s]/gi, '')
     if debug then console.log 'Mongo find called for type '+_type+' property '+property+' and value '+value
     q = defer()
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>
       query = {}
-      value = _value or ""
-      if value
-        value = value.toString()
-        value = value.replace(/[^\w\s]/gi, '')
       query[property] = value
       if debug then console.log 'query is '
       if debug then console.dir query
@@ -214,15 +214,15 @@ class MongoPersistence
     return q
 
   findMany: (_type, property, _value) =>
+    value = _value or ""
+    if value
+      value = value.toString()
+      value = value.replace(/[^\w\s]/gi, '')
     if debug then console.log 'Mongo findmany called for type '+_type+' property '+property+' and value '+value
     q = defer()
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>
       query = {}
-      value = _value or ""
-      if value
-        value = value.toString()
-        value = value.replace(/[^\w\s]/gi, '')
       query[property] = value
       if debug then console.log 'query is '
       if debug then console.dir query
