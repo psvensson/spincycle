@@ -205,12 +205,13 @@ class MongoPersistence
           console.log 'MONGO find Error: '+err
           console.dir err
           q.resolve(null)
-        else if not item[property] == value
-          q.resolve(null)
         else
           if debug then console.log 'find result is '
           if debug then console.dir item
-          q.resolve(item)
+          if not item[property] == value
+            q.resolve(null)
+          else
+            q.resolve(item)
     return q
 
   findMany: (_type, property, _value) =>
