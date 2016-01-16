@@ -146,7 +146,10 @@ class ObjectManager
           #if msg.query.wildcard
           #  DB.search(msg.type, msg.query.property, msg.query.value).then (records) => @parseList(records, msg)
           if msg.query.limit or msg.query.skip or msg.query.sort or msg.query.wildcard
-            DB.findQuery(msg.type, msg.query).then (records) => @parseList(records, msg)
+            if msg.query.value
+              DB.findQuery(msg.type, msg.query).then (records) => @parseList(records, msg)
+            else
+              DB.all(msg.type, (records) => @parseList(records, msg))
           else
             DB.findMany(msg.type, msg.query.property, msg.query.value).then (records) => @parseList(records, msg)
         else
