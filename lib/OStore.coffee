@@ -39,7 +39,7 @@ class OStore
       objs = OStore.objectsByType[obj.type] or []
       objs[obj.id] = obj
       OStore.objectsByType[obj.type] = objs
-      #if debug then console.log 'storeObject storing '+obj.id+' with rev '+obj.rev+" and _rev "+obj._rev
+      if debug then console.log 'storeObject storing '+obj.id+' with rev '+obj.rev+" and _rev "+obj._rev
       @sendUpdatesFor(obj, true)
 
   @getObject: (id, type) =>
@@ -100,7 +100,7 @@ class OStore
     rv
 
   @sendUpdatesFor: (obj, changed) =>
-    #if debug then console.log 'sendUpdatesFor called for obj '+obj.id+' changed = '+changed+', anyone is listening == '+OStore.anyoneIsListening(obj.id)
+    if debug then console.log 'sendUpdatesFor called for obj '+obj.id+' changed = '+changed+', anyone is listening == '+OStore.anyoneIsListening(obj.id)
     if changed and OStore.anyoneIsListening(obj.id)
       #
       #console.dir obj
@@ -153,7 +153,7 @@ class OStore
     if debug then console.dir OStore.listeners[id]
 
   @sendAtInterval: () =>
-    #console.log '-------------------------------------------------------sendAtInterval called '
+    console.log '-------------------------------------------------------sendAtInterval called '
     #console.dir OStore.updateQueue
     if OStore.updateQueue.length > 0
       if debug then console.log 'OStore.sendAtInterval queue length = '+OStore.updateQueue.length
