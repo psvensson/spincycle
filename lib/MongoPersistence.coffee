@@ -228,15 +228,15 @@ class MongoPersistence
       if debug then console.log 'query is '
       if debug then console.dir query
       collection.find(query).toArray (err, cursor)=>
-        cursor.each (err, el) ->
-          if el == null
-            if cursor
+        if cursor
+          cursor.each (err, el) ->
+            if el == null
               cursor.toArray (err, items) =>
                 if debug then console.log 'findmany cursor returns'
                 if debug then console.dir items
                 q.resolve(items)
-            else
-              q.resolve(null)
+        else
+          q.resolve(null)
     return q
 
   findQuery: (_type, query) =>
