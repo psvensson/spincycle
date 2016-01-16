@@ -231,7 +231,7 @@ class MongoPersistence
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>
       value = query.value or ""
-      value = value.replace(/[^\w\s]/gi, '')
+      if value then value = value.replace(/[^\w\s]/gi, '')
       qu = {}
       qu[query.property] = value
       if query.wildcard then qu[query.property or 'name'] = new RegExp('^'+value+'.')
