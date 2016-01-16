@@ -630,7 +630,7 @@
         });
       });
     });
-    return it('should not bomb on searches with wildcard characters', function(done) {
+    it('should not bomb on searches with wildcard characters', function(done) {
       var record11;
       record11 = {
         id: 'bb3356',
@@ -650,6 +650,30 @@
         return DB.findQuery('DFoo', query).then((function(_this) {
           return function(records) {
             expect(records.length).to.equal(1);
+            return done();
+          };
+        })(this));
+      });
+    });
+    return it('should not bomb on specific searches with faulty values', function(done) {
+      var record12;
+      record12 = {
+        id: 'b44b3356',
+        type: 'DFoo',
+        name: 'MixnelarsKolars'
+      };
+      ResolveModule.modulecache['DFoo'] = DFoo;
+      return new DFoo(record12).then(function(dfoo) {
+        var query;
+        dfoo.serialize();
+        query = {
+          sort: 'name',
+          property: 'id',
+          value: '[Object object]'
+        };
+        return DB.findQuery('DFoo', query).then((function(_this) {
+          return function(records) {
+            expect(records.length).to.equal(0);
             return done();
           };
         })(this));

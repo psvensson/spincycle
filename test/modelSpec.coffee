@@ -402,3 +402,16 @@ describe 'Spincycle Model Tests', ->
       DB.findQuery('DFoo', query).then (records) =>
         expect(records.length).to.equal(1)
         done()
+
+  it 'should not bomb on specific searches with faulty values', (done)->
+    record12=
+      id: 'b44b3356'
+      type: 'DFoo'
+      name: 'MixnelarsKolars'
+    ResolveModule.modulecache['DFoo'] = DFoo
+    new DFoo(record12).then (dfoo) ->
+      dfoo.serialize()
+      query = {sort:'name', property: 'id', value: '[Object object]'}
+      DB.findQuery('DFoo', query).then (records) =>
+        expect(records.length).to.equal(0)
+        done()
