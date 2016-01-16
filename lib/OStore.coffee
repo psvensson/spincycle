@@ -153,7 +153,7 @@ class OStore
     if debug then console.dir OStore.listeners[id]
 
   @sendAtInterval: () =>
-    console.log '-------------------------------------------------------sendAtInterval called '
+    #console.log '-------------------------------------------------------sendAtInterval called '
     #console.dir OStore.updateQueue
     if OStore.updateQueue.length > 0
       if debug then console.log 'OStore.sendAtInterval queue length = '+OStore.updateQueue.length
