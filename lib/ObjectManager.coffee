@@ -177,11 +177,17 @@ class ObjectManager
       msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
     else
       records.forEach (record) =>
-        @messageRouter.resolver.createObjectFrom(record).then (o) =>
-          if debug then console.log 'resolved object '+o.id+' count = '+count
-          rv.push(o.toClient())
-          if --count == 0
-            msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
+        objStore.getObject(record.id, record.type).then (oo) =>
+          if oo
+            rv.push(oo.toClient())
+            if --count == 0
+              msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
+          else
+            @messageRouter.resolver.createObjectFrom(record).then (o) =>
+              if debug then console.log 'resolved object '+o.id+' count = '+count
+              rv.push(o.toClient())
+              if --count == 0
+                msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
   #---------------------------------------------------------------------------------------------------------------------
 
   expose: (type) =>
