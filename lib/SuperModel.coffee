@@ -244,7 +244,7 @@ class SuperModel
             console.log 'SuperModel::loadFromIds got back null record from DB for type '+resolveobj.type+' and id '+id
             if count == 0 then r.resolve(null)
           else
-            if debug then console.log '** resolveObj no obj found and no record for id '+id
+            #if debug then console.log '** resolveObj no obj found and no record for id '+id
             @createObjectFromRecord(r, resolveobj, count, record)
         , error)
     , error)
@@ -260,7 +260,7 @@ class SuperModel
         #console.dir record
         if count == 0 then r.resolve(null)
       else
-        if debug then console.log 'object '+resolveobj.name+' type '+resolveobj.type+' created: '+obj.id
+        #if debug then console.log 'object '+resolveobj.name+' type '+resolveobj.type+' created: '+obj.id
         @insertObj(resolveobj, obj)
         if count == 0 then r.resolve(obj)
     , error)
@@ -271,7 +271,7 @@ class SuperModel
       #if debug then console.log 'inserting obj '+ro.type+' as array'
       @[ro.name].push(o)
     else if ro.hashtable == true
-      if debug then console.log 'inserting obj '+ro.type+' as hashtable'
+      #if debug then console.log 'inserting obj '+ro.type+' as hashtable'
       if ro.keyproperty then property = ro.keyproperty else property = 'name'
       @[ro.name][o[property]] = o
     else
