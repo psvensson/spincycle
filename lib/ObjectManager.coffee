@@ -254,6 +254,7 @@ class ObjectManager
             @resolveReferences(obj, obj.constructor.model).then (robj)=>
               if debug then console.log 'found object'
               #objStore.updateObj(robj)
+              objStore[robj.id] = robj
               if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db. modifiedAt = '+obj.modifiedAt
               obj.serialize(robj).then () =>
                 record = obj.getRecord()
