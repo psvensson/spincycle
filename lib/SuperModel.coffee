@@ -70,6 +70,8 @@ class SuperModel
     rv = {}
     rv._rev = @_rev if @_rev
     model.forEach (v) =>
+      if debug then console.log 'getRecord resolving value '+v.name
+      if debug then console.dir v
       k = v.name
       if (v.value and v.value isnt 0) and v.type # direct object reference
         #if debug then console.log 'getRecord accessing property '+k+' of object '+@type+' -> '+me[k]
