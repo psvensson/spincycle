@@ -267,6 +267,7 @@ class SuperModel
 
 
   insertObj: (ro, o) =>
+    OMgr.storeObject(o)
     if ro.array == true
       #if debug then console.log 'inserting obj '+ro.type+' as array'
       @[ro.name].push(o)
