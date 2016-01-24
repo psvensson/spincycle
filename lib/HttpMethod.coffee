@@ -18,7 +18,7 @@ class HttpMethod
       if target
         url_parts = url.parse(req.url, true)
         message = { client: ip+':'+port, target: req.query.target, messageId: url_parts.messageId || uuid.v4() }
-        for p, part of url_parts
+        for p, part of req.query
           message[p] = part # TODO: Guard against hax0r dataz
         console.log 'message is now'
         console.dir message
