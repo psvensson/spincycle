@@ -9,7 +9,7 @@ class HttpMethod
 
   constructor: (messageRouter, app, basePath) ->
 
-    app.get basePath+':target', (req, res) ->
+    app.get basePath, (req, res) ->
       ip    = req.connection.remoteAddress
       port  = req.connection.remotePort
       #console.log 'express request from '+ip+':'+port+' target is "'+req.params.target+'"'
