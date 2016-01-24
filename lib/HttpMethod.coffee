@@ -13,6 +13,7 @@ class HttpMethod
       ip    = req.connection.remoteAddress
       port  = req.connection.remotePort
       console.log 'express request from '+ip+':'+port+' target is "'+req.params.target+'"'
+      console.dir req.params
       target = HttpMethod.httproutes[req.params.target]
       if target
         url_parts = url.parse(req.url, true)
