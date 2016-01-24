@@ -8,11 +8,11 @@ class HttpMethod
   @httproutes = []
 
   constructor: (messageRouter, app, basePath) ->
-
+    console.log 'HttpMethod called for path '+basePath
     app.get basePath, (req, res) ->
       ip    = req.connection.remoteAddress
       port  = req.connection.remotePort
-      #console.log 'express request from '+ip+':'+port+' target is "'+req.params.target+'"'
+      console.log 'express request from '+ip+':'+port+' target is "'+req.params.target+'"'
       target = HttpMethod.httproutes[req.params.target]
       if target
         url_parts = url.parse(req.url, true)
@@ -29,7 +29,7 @@ class HttpMethod
 
 
   registrationFunc: (targetName, targetFunc) ->
-    #console.log 'express registering http route for target '+targetName
+    console.log 'express registering http route for target '+targetName
     HttpMethod.httproutes[targetName] = targetFunc
 
 
