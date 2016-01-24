@@ -20,7 +20,8 @@ class HttpMethod
         message = { client: ip+':'+port, target: req.query.target, messageId: url_parts.messageId || uuid.v4() }
         for p, part of url_parts
           message[p] = part # TODO: Guard against hax0r dataz
-
+        console.log 'message is now'
+        console.dir message
         message.replyFunc = (reply) ->
           res.json(reply)
           if debug then console.log 'HttpMethod calling target '+target
