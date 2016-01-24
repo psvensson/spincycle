@@ -12,12 +12,12 @@ class HttpMethod
     app.get basePath, (req, res) ->
       ip    = req.connection.remoteAddress
       port  = req.connection.remotePort
-      console.log 'express request from '+ip+':'+port+' target is "'+req.params.target+'"'
-      console.dir req.params
-      target = HttpMethod.httproutes[req.params.target]
+      console.log 'express request from '+ip+':'+port+' target is "'+req.query.target+'"'
+      console.dir req.query
+      target = HttpMethod.httproutes[req.query.target]
       if target
         url_parts = url.parse(req.url, true)
-        message = { client: ip+':'+port, target: req.params.target, messageId: url_parts.messageId || uuid.v4() }
+        message = { client: ip+':'+port, target: req.query.target, messageId: url_parts.messageId || uuid.v4() }
         for p, part of url_parts
           message[p] = part # TODO: Guard against hax0r dataz
 
