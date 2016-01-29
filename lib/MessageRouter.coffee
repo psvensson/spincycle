@@ -101,7 +101,7 @@ class MessageRouter
           exit( -1)
         #console.log 'user found. now calling handler'
         if not m.limiter then m.limiter = new RateLimiter(@messagesPerSecond, 1000)
-        limiter.removeTokens 1, (err, remainingRequests) =>
+        m.limiter.removeTokens 1, (err, remainingRequests) =>
           if err
             m.replyFunc({status: e.general.NOT_ALLOWED, info: 'packets over '+@messagesPerSecond+' dropped. Have a nice day.', payload: {error: 'TOOMANYPACKETSPERSECOND'}})
           else
