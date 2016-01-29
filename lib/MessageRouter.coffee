@@ -9,6 +9,8 @@ SuperModel      = require('./SuperModel')
 ClientEndpoints = require('./ClientEndpoints')
 OStore          = require('./OStore')
 ResolveModule   = require('./ResolveModule')
+RateLimiter     = require('limiter').RateLimiter
+e               = require('./EventManager')
 
 # The MessageRouter registers names on which messages can be sent.
 # The idea is to abstract away different messaging methods (WS, WebRTC, HTTP) from the logic
@@ -28,7 +30,7 @@ class MessageRouter
 
   debug = process.env["DEBUG"]
 
-  constructor: (@authMgr, dburl) ->
+  constructor: (@authMgr, dburl, msgPS) ->
     MessageRouter.DB.dburl = dburl
     pjson = require('../package.json');
     console.log 'SpinCycle messageRouter constructor. Version - '+pjson.version
@@ -36,6 +38,7 @@ class MessageRouter
     @authMgr.messagerouter = @
     @resolver = new ResolveModule()
     @targets  = []
+    @messagesPerSecond = msgPS or 10
     @debugtargets  = []
     @args     = []
     @methods  = []
@@ -97,7 +100,12 @@ class MessageRouter
           console.log '** SpinCycle did not get message decorated with user property from AuthenticationManager **'
           exit( -1)
         #console.log 'user found. now calling handler'
-        fn(m) # With a player object that matches the session cookies or whatnot in the message
+        if not m.limiter then m.limiter = new RateLimiter(@messagesPerSecond, 1000)
+        limiter.removeTokens 1, (err, remainingRequests) =>
+          if err
+            m.replyFunc({status: e.general.NOT_ALLOWED, info: 'packets over '+@messagesPerSecond+' dropped. Have a nice day.', payload: {error: 'TOOMANYPACKETSPERSECOND'}})
+          else
+            fn(m) # With a player object that matches the session cookies or whatnot in the message
       )
     else
       console.log '--- could not find registered target for message! ---'

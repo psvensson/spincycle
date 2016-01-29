@@ -1,6 +1,6 @@
 {
   "name": "spincycle",
-  "version": "1.6.99",
+  "version": "1.7.00",
   "description": "A reactive message router and object manager that lets clients subscribe to object property changes on the server",
   "main": "index.js",
   "directories": {
@@ -37,6 +37,7 @@
     "glob": "^4.3.5",
     "googleapis": "^1.1.1",
     "influx": "^3.3.0",
+    "limiter": "^1.1.0",
     "lru-cache": "^2.5.0",
     "mocha": "^2.1.0",
     "mongo-oplog": "^1.0.1",
