@@ -124,7 +124,7 @@ class ObjectManager
             console.log 'No object found with id '+id
             msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'no such object', payload: msg.obj.id})
     else
-      msg.replyFunc({status: e.general.FAILURE, info: '_getObject missing parameter', payload: null })
+      msg.replyFunc({status: e.general.FAILURE, info: '_getObject for '+msg.type+' missing parameter', payload: null })
 
   getAggregateObjects: (msg) =>
     if not @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user)

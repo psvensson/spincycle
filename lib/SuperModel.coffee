@@ -131,7 +131,8 @@ class SuperModel
 
   serialize: (updatedObj) =>
     q = defer()
-    if not @_serializing
+    #if not @_serializing
+    if 1 == 1
       @_serializing = true
       OMgr.storeObject()
       delete updatedObj.record if updatedObj
