@@ -169,7 +169,7 @@ class SuperModel
     else
       model.forEach (robj) =>
         ((resolveobj) =>
-          #if debug then console.log 'resolveobj '+resolveobj.name
+          if debug then console.log 'SuperMode::loadFromIds for property '+resolveobj.name
           r = defer()
           allpromises.push(r)
           if resolveobj.value
@@ -199,7 +199,7 @@ class SuperModel
             if not ids or typeof ids == 'undefined' or ids == 'undefined'
               ids = []
               #if debug then console.log '============================== null resolveobj.ids for '+resolveobj.type+' ['+resolveobj.name+']'
-              r.resolve(null)
+              r.resolve()
             else                                                                    # array or hashtable by array of ids
               if typeof ids is 'string'
                 ids = [ids]
@@ -259,8 +259,8 @@ class SuperModel
     #console.dir record
     SuperModel.resolver.createObjectFrom(record).then( (obj) =>
       if not obj
-        #console.log ' Hmm. Missing object reference. Sad Face.'
-        #console.dir record
+        console.log ' Hmm. Missing object reference. Sad Face.'
+        console.dir record
         if count == 0 then r.resolve(null)
       else
         #if debug then console.log 'object '+resolveobj.name+' type '+resolveobj.type+' created: '+obj.id
