@@ -57,8 +57,8 @@ class ResolveModule
       #if debug then console.log 'ResolveModule.createObjectFrom resolving record with id '+record[0].id+' of type '+record[0].type
       module = ResolveModule.modulecache[record[0].type]
       if module
-        if debug then console.log 'createObjectFrom found existing module for '+record[0].type
-        if debug then console.dir module.prototype
+        #if debug then console.log 'createObjectFrom found existing module for '+record[0].type
+        #if debug then console.dir module.prototype
         o = Object.create(module.prototype)
         o._rev = record._rev
         o.constructor(record[0])
