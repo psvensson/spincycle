@@ -19,7 +19,7 @@ describe 'Spincycle Model Tests', ->
     DB.createDatabases(['foo','Level','Zone','Game','Tile','Entity','Player']).then () ->
     console.log '++++++++++++++++++++++++++++++++++++spec dbs created'
     authMgr         = new AuthenticationManager()
-    messageRouter   = new SpinCycle(authMgr)
+    messageRouter   = new SpinCycle(authMgr, null, 10)
     done()
 
   record =
@@ -329,12 +329,9 @@ describe 'Spincycle Model Tests', ->
       user:
         isAdmin: true
       replyFunc: (reply)->
-        #console.log 'reply for _listObject was'
-        #console.dir reply
         expect(reply.payload.length).to.gt(0)
         done()
     messageRouter.objectManager._listObjects(msg)
-
 
   it 'should include whole objects when using storedirectly', (done)->
     #console.log '------------------------------------------------trying to make a foo'
@@ -348,7 +345,6 @@ describe 'Spincycle Model Tests', ->
       #console.dir(dfoo)
       #console.log 'trying to make a dbar'
       new DirectBar().then (dbar) ->
-
         dbar.theFoo = dfoo
         dbar.foos.push dfoo
         dbar.footable[dfoo.name] = dfoo
@@ -460,3 +456,14 @@ describe 'Spincycle Model Tests', ->
       DB.findMany('DFoo', 'id', 'b44rrb3356').then (records) =>
         expect(records.length).to.equal(1)
         done()
+
+  it 'should get an error message when sending too many requests per second', (done)->
+    user = { name: 'foo', id:17}
+    for i in [0..30]
+      msg =
+        target: 'listcommands'
+        user: user
+        replyFunc: (reply)->
+          console.log 'reply was '+reply.info
+          #console.dir reply
+      messageRouter.routeMessage(msg)

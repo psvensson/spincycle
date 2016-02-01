@@ -32,7 +32,7 @@
       DB.createDatabases(['foo', 'Level', 'Zone', 'Game', 'Tile', 'Entity', 'Player']).then(function() {});
       console.log('++++++++++++++++++++++++++++++++++++spec dbs created');
       authMgr = new AuthenticationManager();
-      messageRouter = new SpinCycle(authMgr);
+      messageRouter = new SpinCycle(authMgr, null, 10);
       return done();
     });
     record = {
@@ -743,7 +743,7 @@
         })(this));
       });
     });
-    return it('should be able to do specific searches', function(done) {
+    it('should be able to do specific searches', function(done) {
       var record12;
       record12 = {
         id: 'b44rrb3356',
@@ -760,6 +760,25 @@
           };
         })(this));
       });
+    });
+    return it('should get an error message when sending too many requests per second', function(done) {
+      var i, j, msg, results, user;
+      user = {
+        name: 'foo',
+        id: 17
+      };
+      results = [];
+      for (i = j = 0; j <= 30; i = ++j) {
+        msg = {
+          target: 'listcommands',
+          user: user,
+          replyFunc: function(reply) {
+            return console.log('reply was ' + reply.info);
+          }
+        };
+        results.push(messageRouter.routeMessage(msg));
+      }
+      return results;
     });
   });
 
