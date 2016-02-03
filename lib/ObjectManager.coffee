@@ -292,7 +292,7 @@ class ObjectManager
       if property.array
         resolvedarr = []
         arr = record[property.name] or []
-        arr = arr.filter (el) -> el isnt null and el isnt 'null'
+        arr = arr.filter (el) -> el and el isnt null and el isnt 'null' and el isnt 'undefined'
         if debug then console.dir arr
         acount = arr.length
         if acount == 0
