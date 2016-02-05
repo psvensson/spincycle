@@ -16,7 +16,6 @@ class EventManager
     NO_SUCH_OBJECT:         'NO_SUCH_OBJECT'
 
 
-
   @event:(e...)->
     rv = []
     rv.push { e:e[key], o:e[key+1] or {} } for key in [0..e.length-1] by 2

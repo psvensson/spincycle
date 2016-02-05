@@ -235,19 +235,19 @@ class SuperModel
     #console.dir id
     OMgr.getObject(id, resolveobj.type).then( (oo) =>
       if oo
-        if debug then console.log 'found existing instance of '+resolveobj.name+' type '+resolveobj.type+' in OStore'
+        if debug then console.log 'SuperModel found existing instance of '+resolveobj.name+' type '+resolveobj.type+' in OStore'
         @insertObj(resolveobj, oo)
         if count == 0
-          if debug then console.log 'resolving '+resolveobj.name+' type '+resolveobj.type+' immediately'
+          if debug then console.log 'SuperModel resolving '+resolveobj.name+' type '+resolveobj.type+' immediately'
           r.resolve(oo)
       else
-        if debug then console.log 'did not find obj '+resolveobj.name+' ['+id+'] of type '+resolveobj.type+' in OStore. Getting from DB. typeof of id prop is '+(typeof id)
+        if debug then console.log 'SuperModel did not find obj '+resolveobj.name+' ['+id+'] of type '+resolveobj.type+' in OStore. Getting from DB. typeof of id prop is '+(typeof id)
         DB.get(resolveobj.type, [id]).then( (record) =>
           if not record
             console.log 'SuperModel::loadFromIds got back null record from DB for type '+resolveobj.type+' and id '+id
             if count == 0 then r.resolve(null)
           else
-            #if debug then console.log '** resolveObj no obj found and no record for id '+id
+            if debug then console.log '** resolveObj no obj found and no record for id '+id+' type '+resolveobj.type
             @createObjectFromRecord(r, resolveobj, count, record)
         , error)
     , error)

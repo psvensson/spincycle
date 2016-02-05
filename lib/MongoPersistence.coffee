@@ -155,7 +155,7 @@ class MongoPersistence
 
   get: (_type, id, cb) =>
     type = _type.toLowerCase()
-    #console.log '--------------------- Mongo.get called for type '+type+' and id '+id
+    if debug then console.log '--------------------- Mongo.get called for type '+type+' and id '+id
     if typeof id == 'object'
       console.log 'Mongo.get got an object as id instead of string !!!!! '
       console.dir id
@@ -167,10 +167,12 @@ class MongoPersistence
           console.dir err
           cb(null)
         else
+          if debug then console.log '------ Mongo get found obejct'
+          if debug then console.dir item
           cb(item)
 
   byProviderId: (_type, pid) =>
-    console.log 'byProviderId called for pid '+pid+' and type '+_type
+    #console.log 'byProviderId called for pid '+pid+' and type '+_type
     q = defer()
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>
@@ -180,8 +182,8 @@ class MongoPersistence
           console.dir err
           q.resolve(null)
         else
-          if debug then console.log 'Mongo byProviderId for '+pid+' got back'
-          if debug then console.dir item
+          #if debug then console.log 'Mongo byProviderId for '+pid+' got back'
+          #if debug then console.dir item
           q.resolve(item)
 
     return q

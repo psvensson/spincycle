@@ -459,11 +459,45 @@ describe 'Spincycle Model Tests', ->
 
   it 'should get an error message when sending too many requests per second', (done)->
     user = { name: 'foo', id:17}
-    for i in [0..30]
+    count = 20
+    failure = false
+    for i in [0..20]
       msg =
         target: 'listcommands'
         user: user
         replyFunc: (reply)->
           console.log 'reply was '+reply.info
           #console.dir reply
+          if reply.status == 'NOT_ALLOWED' then failure = true
+          if --count == 0
+            expect(failure).to.equal(true)
+            done()
       messageRouter.routeMessage(msg)
+
+  it 'should update an array on an object with a reference and have that reference be present in the array when searching for the object', (done)->
+    new Bar().then (bar) ->
+      bar.serialize()
+      new Foo().then (foo) ->
+        foo.serialize()
+
+        umsg =
+          obj:
+            id: bar.id
+            foos: [foo.id]
+          user:
+            isAdmin: true
+          replyFunc: (ureply)->
+            console.log 'update reply was'
+            console.dir(ureply)
+        messageRouter.objectManager._updateObject(umsg)
+
+        msg =
+          type: 'Bar'
+          user:
+            isAdmin: true
+          replyFunc: (reply)->
+            reply.payload.forEach (obj) -> if obj.id == bar.id then console.dir obj
+            expect(reply.payload.length).to.gt(0)
+            done()
+        messageRouter.objectManager._listObjects(msg)
+

@@ -135,7 +135,8 @@ class ObjectManager
       msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: obj})
 
   _listObjects: (msg) =>
-    #console.log 'listObjects called for type '+msg.type
+    if debug then console.log 'listObjects called for type '+msg.type
+    if debug then console.dir msg
     if typeof msg.type != 'undefined'
       if @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user) == no
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to list objects of type '+msg.type, payload: msg.type})
@@ -179,12 +180,16 @@ class ObjectManager
       records.forEach (record) =>
         objStore.getObject(record.id, record.type).then (oo) =>
           if oo
+            if debug then console.log 'found list object in OStore'
+            if debug then console.dir(oo.toClient())
             rv.push(oo.toClient())
             if --count == 0
               msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
           else
             @messageRouter.resolver.createObjectFrom(record).then (o) =>
               if debug then console.log 'resolved object '+o.id+' count = '+count
+              console.log 'created list object from resolver'
+              console.dir(o.toClient())
               rv.push(o.toClient())
               if --count == 0
                 msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})

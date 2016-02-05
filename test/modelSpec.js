@@ -761,24 +761,72 @@
         })(this));
       });
     });
-    return it('should get an error message when sending too many requests per second', function(done) {
-      var i, j, msg, results, user;
+    it('should get an error message when sending too many requests per second', function(done) {
+      var count, failure, i, j, msg, results, user;
       user = {
         name: 'foo',
         id: 17
       };
+      count = 20;
+      failure = false;
       results = [];
-      for (i = j = 0; j <= 30; i = ++j) {
+      for (i = j = 0; j <= 20; i = ++j) {
         msg = {
           target: 'listcommands',
           user: user,
           replyFunc: function(reply) {
-            return console.log('reply was ' + reply.info);
+            console.log('reply was ' + reply.info);
+            if (reply.status === 'NOT_ALLOWED') {
+              failure = true;
+            }
+            if (--count === 0) {
+              expect(failure).to.equal(true);
+              return done();
+            }
           }
         };
         results.push(messageRouter.routeMessage(msg));
       }
       return results;
+    });
+    return it('should update an array on an object with a reference and have that reference be present in the array when searching for the object', function(done) {
+      return new Bar().then(function(bar) {
+        bar.serialize();
+        return new Foo().then(function(foo) {
+          var msg, umsg;
+          foo.serialize();
+          umsg = {
+            obj: {
+              id: bar.id,
+              foos: [foo.id]
+            },
+            user: {
+              isAdmin: true
+            },
+            replyFunc: function(ureply) {
+              console.log('update reply was');
+              return console.dir(ureply);
+            }
+          };
+          messageRouter.objectManager._updateObject(umsg);
+          msg = {
+            type: 'Bar',
+            user: {
+              isAdmin: true
+            },
+            replyFunc: function(reply) {
+              reply.payload.forEach(function(obj) {
+                if (obj.id === bar.id) {
+                  return console.dir(obj);
+                }
+              });
+              expect(reply.payload.length).to.gt(0);
+              return done();
+            }
+          };
+          return messageRouter.objectManager._listObjects(msg);
+        });
+      });
     });
   });
 
