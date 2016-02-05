@@ -164,7 +164,7 @@ class DB
     return q
 
   @get: (type, ids) =>
-    #if debug then console.log 'DB.get called for type "'+type+'" and ids "'+ids+'"'
+    if debug then console.log 'DB.get called for type "'+type+'" and ids "'+ids+'"'
     if not ids.length then ids = [ids]
     q = defer()
     bam = false
@@ -206,11 +206,12 @@ class DB
     return q
 
   @set: (type, obj, cb) =>
-    #console.log 'DB.set called for type "'+type+'" and obj "'+obj.id+'"'
-    #console.dir obj
-    @lru.set(obj.id, obj)
-    @getDataStore().then (store)=> store.set type, obj, (res) ->
-      if cb then cb(res)
+    if obj
+      @lru.set(obj.id, obj)
+      @getDataStore().then (store)=> store.set type, obj, (res) ->
+        if cb then cb(res)
+    else
+      cb()
 
   @remove: (obj, cb) =>
     @lru.del obj.id
