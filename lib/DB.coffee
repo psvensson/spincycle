@@ -181,14 +181,16 @@ class DB
             console.dir id
             q.resolve(null)
           else
-            @getDataStore().then (store)=> store.get(type, id, (result) =>
-              if not result
-                console.log 'DB.get for type '+type+' and id '+id+' got back '+result
-              else
-                @lru.set(id, result)
-              if not bam then p.resolve(result)
-              bam = true
-            )
+            @getDataStore().then (store)=>
+              if debug then console.log 'DB.get calling datastore '+store
+              store.get(type, id, (result) =>
+                if not result
+                  console.log 'DB.get for type '+type+' and id '+id+' got back '+result
+                else
+                  @lru.set(id, result)
+                if not bam then p.resolve(result)
+                bam = true
+              )
         else
           if not bam then p.resolve(rv)
           bam = true
