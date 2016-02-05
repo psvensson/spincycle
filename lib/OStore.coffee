@@ -83,7 +83,10 @@ class OStore
                   diff[pp] = clean
                   changed = true
                   obj[pp] = clean
-                  if debug then console.log '** updating property "'+pp+'" on '+obj.type+' id '+record.id+' to '+record[pp]
+                  if debug then console.log '** updating property "'+pp+'" on '+obj.type+' id '+record.id+' to '+clean
+                  if debug then console.dir pp
+                  if debug then console.log '--------------------------------------------------------------------------'
+                  if debug then console.dir clean
 
       OStore.objects[record.id] = obj
       if OStore.anyoneIsListening(obj.id) then OStore.sendUpdatesFor(obj, changed)

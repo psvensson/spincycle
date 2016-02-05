@@ -50,10 +50,10 @@ class ObjectManager
   onGetModelFor: (msg) =>
     if msg.modelname
       @messageRouter.resolver.resolve msg.modelname, (path) =>
-        if debug then console.log 'onGetModelFor '+msg.modelname+' got back require path '+path
+        #if debug then console.log 'onGetModelFor '+msg.modelname+' got back require path '+path
         model = require(path)
-        if debug then console.log 'got model resolved to'
-        if debug then console.dir model.model
+        #if debug then console.log 'got model resolved to'
+        #if debug then console.dir model.model
         rv = []
         model.model.forEach (property) -> if property.public then rv.push(property)
         msg.replyFunc({status: e.general.SUCCESS, info: 'get model', payload: rv})
@@ -108,6 +108,7 @@ class ObjectManager
 
   _getObject: (msg) =>
     if debug then console.log '_getObject called for type '+msg.type
+    if debug then console.dir msg
     if msg.type and msg.obj.id
       id = msg.obj.id
       if id.indexOf and id.indexOf('all_') > -1
@@ -136,7 +137,6 @@ class ObjectManager
 
   _listObjects: (msg) =>
     if debug then console.log 'listObjects called for type '+msg.type
-    if debug then console.dir msg
     if typeof msg.type != 'undefined'
       if @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user) == no
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to list objects of type '+msg.type, payload: msg.type})
@@ -286,7 +286,7 @@ class ObjectManager
     count = model.length
 
     checkFinished = () ->
-      if debug then console.log 'checkFinished count = '+count
+      #if debug then console.log 'checkFinished count = '+count
       #console.dir rv
       if --count == 0
         #console.log 'resolving back object'
