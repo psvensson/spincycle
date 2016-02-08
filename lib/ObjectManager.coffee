@@ -170,6 +170,7 @@ class ObjectManager
       msg.replyFunc({status: e.general.FAILURE, info: '_listObjects missing parameter', payload: null })
 
   parseList: (records, msg) =>
+    """
     rv = []
     #console.log 'found '+records.length+' objects to return'
     count = records.length
@@ -193,6 +194,8 @@ class ObjectManager
               rv.push(o.toClient())
               if --count == 0
                 msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
+    """
+    msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: records})
   #---------------------------------------------------------------------------------------------------------------------
 
   expose: (type) =>

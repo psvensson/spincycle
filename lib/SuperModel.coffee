@@ -169,7 +169,7 @@ class SuperModel
     else
       model.forEach (robj) =>
         ((resolveobj) =>
-          if debug then console.log 'SuperMode::loadFromIds for property '+resolveobj.name
+          #if debug then console.log 'SuperMode::loadFromIds for property '+resolveobj.name
           r = defer()
           allpromises.push(r)
           if resolveobj.value
