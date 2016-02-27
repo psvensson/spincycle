@@ -27,6 +27,7 @@ class MessageRouter
   @ClientEndpoints = ClientEndpoints
   @OStore = OStore
   @ResolveModule = ResolveModule
+  @status = 'closed'
 
   debug = process.env["DEBUG"]
 
@@ -62,6 +63,13 @@ class MessageRouter
     for name, method of @methods
       method.expose(type)
 
+  open: () =>
+    MessageRouter.status = 'open'
+    console.log 'opening message router'
+
+  close: () =>
+    MessageRouter.status = 'closed'
+    console.log 'closing message router'
 
   # All messaging method adds their function for registering new paths or whatnot here
   # So for example for express you could add a method which makes sure the target name
@@ -90,29 +98,33 @@ class MessageRouter
     @targets[targetName] = null
 
   # Message format is {messageId: i, client: <ip:port>, messageTarget: t, replyFunction: r, messageBody: {b}}
+  # TODO: don't start serving messages until an explicit open call is issued from the owner
   routeMessage: (message) =>
-    fn = @targets[message.target]
-    #if debug then console.log 'routeMessage called for "'+message.target+'"'
-    #if debug then console.dir @targets
-    if fn
-      @authMgr.decorateMessageWithUser(message).then( (m)=>
-        if not m.user
-          console.log '** SpinCycle did not get message decorated with user property from AuthenticationManager **'
-          exit( -1)
-        #console.log 'user found. now calling handler'
-        if not m.user.limiter
-          console.log '--- creating new rate limiter for user '+m.user.id+' max request = '+parseInt(@messagesPerSecond)
-          m.user.limiter = new RateLimiter(parseInt(@messagesPerSecond), 1000)
-        #console.log 'remaining tokens before call is '+m.user.limiter.getTokensRemaining()
-        m.user.limiter.removeTokens 1, (err, remainingRequests) =>
-          #console.log 'messageRouter::routeMessage remaining requests for user is '+remainingRequests+' err = '+err
-          if parseInt(remainingRequests) < 1
-            m.replyFunc({status: e.general.NOT_ALLOWED, info: 'packets over '+@messagesPerSecond+'/s dropped. Have a nice day.', payload: {error: 'TOOMANYPACKETSPERSECOND'}})
-          else
-            fn(m) # With a player object that matches the session cookies or whatnot in the message
-      )
+    if MessageRouter.status isnt 'open'
+      m.replyFunc({status: e.general.NOT_ALLOWED, info: 'Message router is not yet open', payload: {error: 'ERRCHILLMAN'}})
     else
-      console.log '--- could not find registered target for message! ---'
+      fn = @targets[message.target]
+      #if debug then console.log 'routeMessage called for "'+message.target+'"'
+      #if debug then console.dir @targets
+      if fn
+        @authMgr.decorateMessageWithUser(message).then( (m)=>
+          if not m.user
+            console.log '** SpinCycle did not get message decorated with user property from AuthenticationManager **'
+            exit( -1)
+          #console.log 'user found. now calling handler'
+          if not m.user.limiter
+            console.log '--- creating new rate limiter for user '+m.user.id+' max request = '+parseInt(@messagesPerSecond)
+            m.user.limiter = new RateLimiter(parseInt(@messagesPerSecond), 1000)
+          #console.log 'remaining tokens before call is '+m.user.limiter.getTokensRemaining()
+          m.user.limiter.removeTokens 1, (err, remainingRequests) =>
+            #console.log 'messageRouter::routeMessage remaining requests for user is '+remainingRequests+' err = '+err
+            if parseInt(remainingRequests) < 1
+              m.replyFunc({status: e.general.NOT_ALLOWED, info: 'packets over '+@messagesPerSecond+'/s dropped. Have a nice day.', payload: {error: 'TOOMANYPACKETSPERSECOND'}})
+            else
+              fn(m) # With a player object that matches the session cookies or whatnot in the message
+        )
+      else
+        console.log '--- could not find registered target for message! ---'
 
 module.exports = MessageRouter
 
