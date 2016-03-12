@@ -12,6 +12,7 @@ class ResolveModule
 
   @modulecache = []
   @modulepathcache = []
+
   constructor: () ->
     console.log("+++ new ResolveModule created ++")
     process.on 'resolvemodule', (name, cb) =>

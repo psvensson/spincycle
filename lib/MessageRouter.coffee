@@ -6,11 +6,15 @@ RedisMethod     = require('./RedisMethod')
 DB              = require('./DB')
 EventManager    = require('./EventManager')
 SuperModel      = require('./SuperModel')
+SpinModule      = require('./SpinModule')
+SpinFunction    = require('./SpinFunction')
 ClientEndpoints = require('./ClientEndpoints')
 OStore          = require('./OStore')
 ResolveModule   = require('./ResolveModule')
 RateLimiter     = require('limiter').RateLimiter
 e               = require('./EventManager')
+express         = require("express")
+path            = require('path')
 
 # The MessageRouter registers names on which messages can be sent.
 # The idea is to abstract away different messaging methods (WS, WebRTC, HTTP) from the logic
@@ -31,14 +35,16 @@ class MessageRouter
 
   debug = process.env["DEBUG"]
 
-  constructor: (@authMgr, dburl, msgPS) ->
+  constructor: (@authMgr, dburl, msgPS, @app) ->
     MessageRouter.DB.dburl = dburl
     pjson = require('../package.json');
     @messagesPerSecond = msgPS or 100
-    console.log 'SpinCycle messageRouter constructor. Version - '+pjson.version+' packets per second limit = '+@messagesPerSecond
+    console.log 'SpinCycle messageRouter constructor. Version - '+pjson.version+' messages per second limit = '+@messagesPerSecond
     #console.dir @authMgr
     @authMgr.messagerouter = @
     @resolver = new ResolveModule()
+    ResolveModule.modulecache['SpinModule'] = SpinModule
+    ResolveModule.modulecache['SpinFunction'] = SpinFunction
     @targets  = []
     @debugtargets  = []
     @args     = []
@@ -58,6 +64,15 @@ class MessageRouter
         #console.log 'adding target '+name
         rv[name] = @args[name]
       msg.replyFunc({status: EventManager.general.SUCCESS, info: 'list of available targets', payload: rv})
+    @addServicePage()
+
+  addServicePage: () =>
+    p = path.join(__dirname, 'spin')
+    console.log('**************** addServicePage called -> '+p)
+    if @app
+      #@app.use '/_spin',express.static(path.join(__dirname, 'spin'))
+      @app.use('/spin/', express.static(path.join(__dirname, 'spin')))
+      #@app.use('/spin/', express.static('spin'))
 
   expose: (type) =>
     for name, method of @methods
