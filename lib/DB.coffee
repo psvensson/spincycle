@@ -9,6 +9,8 @@ OStore          = require('./OStore')
 #Roach          = require('./cockroach')
 Couch           = require('./CouchPersistence')
 Mongo           = require('./MongoPersistence')
+Rethink         = require('./RethinkPersistence')
+
 ResolveModule   = require('./ResolveModule')
 
 
@@ -33,6 +35,7 @@ class DB
       if not name then @DataStore = new Mongo(DB.dburl, DB)
       else if name == 'couchdb' then @DataStore = new Couch(DB.dburl)
       else if name == 'mongodb' then @DataStore = new Mongo(DB.dburl, DB)
+      else if name == 'rethinkdb' then @DataStore = new Rethink(DB.dburl, DB)
       @DataStore.connect().then (ds)=>
         @DataStore = ds
         #console.log 'DB got back datastore'
@@ -43,17 +46,15 @@ class DB
 
   @createDatabases:(dblist) =>
     q = defer()
-    #console.log 'createDatabases called'
+    console.log 'createDatabases called'
     @getDataStore().then (store)=>
-      #console.log 'DB.createDatabases got back store'
+      console.log 'DB.createDatabases got back store'
       promises = []
-      first = dblist.pop()
-      promises.push store
       dblist.forEach (dbname) =>
-        #if debug then console.log 'attempting to get store for '+dbname
-        @getDataStore(dbname).then (store)=>
-          promises.push store.getDbFor(dbname)
+        console.log 'attempting to get table for '+dbname
+        promises.push store.getDbFor(dbname)
       all(promises).then (results) =>
+        console.log 'DB.createDatabases all good'
         q.resolve(results)
     return q
 

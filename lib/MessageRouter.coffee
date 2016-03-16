@@ -66,6 +66,8 @@ class MessageRouter
       msg.replyFunc({status: EventManager.general.SUCCESS, info: 'list of available targets', payload: rv})
     @addServicePage()
 
+  #---------------------------------------------------------------------------------------------------------------------
+
   addServicePage: () =>
     p = path.join(__dirname, 'spin')
     console.log('**************** addServicePage called -> '+p)
@@ -73,6 +75,8 @@ class MessageRouter
       #@app.use '/_spin',express.static(path.join(__dirname, 'spin'))
       @app.use('/spin/', express.static(path.join(__dirname, 'spin')))
       #@app.use('/spin/', express.static('spin'))
+
+  #---------------------------------------------------------------------------------------------------------------------
 
   expose: (type) =>
     for name, method of @methods
@@ -116,7 +120,7 @@ class MessageRouter
   # TODO: don't start serving messages until an explicit open call is issued from the owner
   routeMessage: (message) =>
     if MessageRouter.status isnt 'open'
-      m.replyFunc({status: e.general.NOT_ALLOWED, info: 'Message router is not yet open', payload: {error: 'ERRCHILLMAN'}})
+      message.replyFunc({status: e.general.NOT_ALLOWED, info: 'Message router is not yet open', payload: {error: 'ERRCHILLMAN'}})
     else
       fn = @targets[message.target]
       #if debug then console.log 'routeMessage called for "'+message.target+'"'

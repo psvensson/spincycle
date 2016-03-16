@@ -233,7 +233,7 @@ class ObjectManager
     if not type
       console.log 'Objectmanager::getObjectPullThrough called with null type.'
       q.resolve(null)
-    if not id or id == null or id == 'null'
+    else if not id or id == null or id == 'null'
       console.log 'Objectmanager::getObjectPullThrough called with null id.'
       q.resolve(null)
     else

@@ -44,8 +44,6 @@ class SuperModel
       #@updateAllModels()
       SuperModel.oncreatelisteners.forEach (listener) -> listener(@)
 
-    @createdAt = @createdAt or Date.now()
-
     @type = @constructor.type
     q = defer()
 
@@ -55,7 +53,11 @@ class SuperModel
       @_rev = @record._rev
 
     @loadFromIds(@constructor.model).then( () =>
-      if not @createdAt then @createdAt = Date.now()
+
+      @createdAt = @createdAt or Date.now()
+      @modifiedAt = @modifiedAt or Date.now()
+      @createdBy = @createdBy or 'SYSTEM'
+
       if @postCreate
         @postCreate(q)
       else
@@ -254,8 +256,8 @@ class SuperModel
     #console.dir record
     SuperModel.resolver.createObjectFrom(record).then( (obj) =>
       if not obj
-        console.log ' Hmm. Missing object reference. Sad Face.'
-        console.dir record
+        #console.log ' Hmm. Missing object reference. Sad Face.'
+        #console.dir record
         if count == 0 then r.resolve(null)
       else
         #if debug then console.log 'object '+resolveobj.name+' type '+resolveobj.type+' created: '+obj.id

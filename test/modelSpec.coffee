@@ -16,11 +16,12 @@ describe 'Spincycle Model Tests', ->
 
   before (done)->
     console.log ' ------------------------------------- before called'
-    DB.createDatabases(['foo','Level','Zone','Game','Tile','Entity','Player']).then () ->
-    console.log '++++++++++++++++++++++++++++++++++++spec dbs created'
-    authMgr         = new AuthenticationManager()
-    messageRouter   = new SpinCycle(authMgr, null, 10)
-    done()
+    DB.createDatabases(['foo','bar','dfoo','directbar','hashbar']).then () ->
+      console.log '++++++++++++++++++++++++++++++++++++spec dbs created'
+      authMgr         = new AuthenticationManager()
+      messageRouter   = new SpinCycle(authMgr, null, 10)
+      messageRouter.open()
+      done()
 
   record =
     _rev: 99101020202030303404
@@ -427,7 +428,7 @@ describe 'Spincycle Model Tests', ->
     ResolveModule.modulecache['DFoo'] = DFoo
     new DFoo(record11).then (dfoo) ->
       dfoo.serialize()
-      query = {sort:'name', property: 'name', value: 'Ar*', wildcard: true}
+      query = {sort:'name', property: 'name', value: 'Arne*', wildcard: true}
       DB.findQuery('DFoo', query).then (records) =>
         expect(records.length).to.equal(1)
         done()
@@ -441,7 +442,7 @@ describe 'Spincycle Model Tests', ->
     new DFoo(record12).then (dfoo) ->
       dfoo.serialize()
       query = {sort:'name', property: 'id', value: '[Object object]'}
-      DB.findMany('DFoo', query).then (records) =>
+      DB.findQuery('DFoo', query).then (records) =>
         expect(records.length).to.equal(0)
         done()
 
@@ -459,9 +460,9 @@ describe 'Spincycle Model Tests', ->
 
   it 'should get an error message when sending too many requests per second', (done)->
     user = { name: 'foo', id:17}
-    count = 20
+    count = 12
     failure = false
-    for i in [0..20]
+    for i in [0..12]
       msg =
         target: 'listcommands'
         user: user
@@ -488,7 +489,7 @@ describe 'Spincycle Model Tests', ->
             isAdmin: true
           replyFunc: (ureply)->
             console.log 'update reply was'
-            console.dir(ureply)
+            #console.dir(ureply)
         messageRouter.objectManager._updateObject(umsg)
 
         msg =
@@ -496,7 +497,7 @@ describe 'Spincycle Model Tests', ->
           user:
             isAdmin: true
           replyFunc: (reply)->
-            reply.payload.forEach (obj) -> if obj.id == bar.id then console.dir obj
+            #reply.payload.forEach (obj) -> if obj.id == bar.id then console.dir obj
             expect(reply.payload.length).to.gt(0)
             done()
         messageRouter.objectManager._listObjects(msg)

@@ -29,11 +29,13 @@
     messageRouter = void 0;
     before(function(done) {
       console.log(' ------------------------------------- before called');
-      DB.createDatabases(['foo', 'Level', 'Zone', 'Game', 'Tile', 'Entity', 'Player']).then(function() {});
-      console.log('++++++++++++++++++++++++++++++++++++spec dbs created');
-      authMgr = new AuthenticationManager();
-      messageRouter = new SpinCycle(authMgr, null, 10);
-      return done();
+      return DB.createDatabases(['foo', 'bar', 'dfoo', 'directbar', 'hashbar']).then(function() {
+        console.log('++++++++++++++++++++++++++++++++++++spec dbs created');
+        authMgr = new AuthenticationManager();
+        messageRouter = new SpinCycle(authMgr, null, 10);
+        messageRouter.open();
+        return done();
+      });
     });
     record = {
       _rev: 99101020202030303404,
@@ -708,7 +710,7 @@
         query = {
           sort: 'name',
           property: 'name',
-          value: 'Ar*',
+          value: 'Arne*',
           wildcard: true
         };
         return DB.findQuery('DFoo', query).then((function(_this) {
@@ -735,7 +737,7 @@
           property: 'id',
           value: '[Object object]'
         };
-        return DB.findMany('DFoo', query).then((function(_this) {
+        return DB.findQuery('DFoo', query).then((function(_this) {
           return function(records) {
             expect(records.length).to.equal(0);
             return done();
@@ -767,10 +769,10 @@
         name: 'foo',
         id: 17
       };
-      count = 20;
+      count = 12;
       failure = false;
       _results = [];
-      for (i = _i = 0; _i <= 20; i = ++_i) {
+      for (i = _i = 0; _i <= 12; i = ++_i) {
         msg = {
           target: 'listcommands',
           user: user,
@@ -804,8 +806,7 @@
               isAdmin: true
             },
             replyFunc: function(ureply) {
-              console.log('update reply was');
-              return console.dir(ureply);
+              return console.log('update reply was');
             }
           };
           messageRouter.objectManager._updateObject(umsg);
@@ -815,11 +816,6 @@
               isAdmin: true
             },
             replyFunc: function(reply) {
-              reply.payload.forEach(function(obj) {
-                if (obj.id === bar.id) {
-                  return console.dir(obj);
-                }
-              });
               expect(reply.payload.length).to.gt(0);
               return done();
             }
