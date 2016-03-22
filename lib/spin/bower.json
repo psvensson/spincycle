@@ -1,0 +1,23 @@
+{
+  "name": "spin",
+  "homepage": "https://github.com/psvensson/spincycle",
+  "authors": [
+    "Peter Svensson <psvenson@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "example/app/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "ractive": "^0.7.3",
+    "requirejs": "^2.1.22"
+  }
+}
