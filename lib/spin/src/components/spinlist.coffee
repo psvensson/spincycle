@@ -6,6 +6,7 @@ define(['ractive', 'components/listelement'], (Ractive, listelement) =>
       list: []
       header: 'List'
       labels: 'name'
+      onSelected: ''
       getLabelFor: (i) ->
         el = this.get 'list.'+i
         rv = ''
@@ -13,8 +14,8 @@ define(['ractive', 'components/listelement'], (Ractive, listelement) =>
         rv
     oninit: () ->
       @on 'itemSelected', (e) ->
-        console.log 'item selected '
-        console.dir e
+        select = @get('onSelected')
+        if select then select(e)
     template: """
       <div style='display:flex; flex-direction: column'>
         <h4 style='margin-bottom:0'>{{header}}</h4>

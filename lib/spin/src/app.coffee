@@ -9,6 +9,10 @@ define(['ractive', 'components/spinlist', 'components/listelement'], (Ractive, s
         {name: 'baz', size:4, age: 3}
         {name: 'quux', size:1007, age: 991}
       ]
+      onSelected: (e)->
+        console.log 'app selected called'
+        console.dir e
+
     template: '<div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
       <header class="demo-header mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600">
         <div class="mdl-layout__header-row">
@@ -63,7 +67,7 @@ define(['ractive', 'components/spinlist', 'components/listelement'], (Ractive, s
         <div class="mdl-grid demo-content">
           <div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
 
-            <spinlist list="{{testlist}}"></spinlist>
+            <spinlist list="{{testlist}}" onSelected="{{onSelected}}"></spinlist>
 
           </div>
           <div class="demo-graphs mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--8-col">
