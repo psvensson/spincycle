@@ -15,8 +15,11 @@ class ObjectManager
    @updateObjectHooks = []
    @populationListeners = []
    SuperModel.onCreate (newmodel)=>
+     console.log 'got onCreate event'
+     console.dir @populationListeners
      @populationListeners.forEach (client) =>
        if ClientEndpoints.exists(client)
+         console.log 'sending population update create to client '+client
          ClientEndpoints.sendToEndpoint(client, {status: e.general.SUCCESS, info: 'POPULATION_UPDATE', payload: { added: newmodel.toClient() } })
 
 
@@ -62,10 +65,11 @@ class ObjectManager
 
   #---------------------------------------------------------------------------------------------------------------------
   _createObject: (msg) =>
-    if msg.obj.type
+    if msg.obj and msg.obj.type
       if @messageRouter.authMgr.canUserCreateThisObject(msg.obj.type, msg.user)
         #console.dir msg
         msg.obj.createdAt = Date.now()
+        msg.obj.modifiedAt = Date.now()
         msg.obj.createdBy = msg.user.id
         console.log 'objmgr.createObject called'
         SuperModel.resolver.createObjectFrom(msg.obj).then (o) =>
@@ -79,12 +83,13 @@ class ObjectManager
   _deleteObject: (msg) =>
     console.log 'delete called'
     if msg.obj and msg.obj.type and msg.obj.id
-      console.log 'delete got type'+msg.obj.type+', and id '+msg.obj.id
+      console.log 'delete got type '+msg.obj.type+', and id '+msg.obj.id
       objStore.getObject(msg.obj.id, msg.obj.type).then (obj) =>
         console.log 'got object form objstore -> '+obj
         if obj
           if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
             console.log 'user could write this object'
+            console.dir obj
             DB.remove obj, (removestatus) =>
               console.log 'object removed callback'
               @populationListeners.forEach (client) =>
@@ -147,7 +152,7 @@ class ObjectManager
           #if msg.query.wildcard
           #  DB.search(msg.type, msg.query.property, msg.query.value).then (records) => @parseList(records, msg)
           if msg.query.limit or msg.query.skip or msg.query.sort or msg.query.wildcard
-            if msg.query.value
+            if msg.query.value and msg.query.value != ''
               DB.findQuery(msg.type, msg.query).then (records) => @parseList(records, msg)
             else
               DB.all(msg.type, (records) => @parseList(records, msg))
@@ -195,6 +200,11 @@ class ObjectManager
               if --count == 0
                 msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
     """
+    records.forEach (r) =>
+      DB.get(r.type, [r.id]).then (records) =>
+        if records and records[0]
+          @messageRouter.resolver.createObjectFrom(records[0]).then (o) =>
+            objStore.storeObject o,false
     msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: records})
   #---------------------------------------------------------------------------------------------------------------------
 
@@ -394,13 +404,15 @@ class ObjectManager
   onRegisterForPopulationChanges: (msg) =>
     if msg.type
       @populationListeners.push msg.client
-      msg.replyFunc({status: e.general.SUCCESS, info: 'registered for population changes for type '+msg.type, payload: type})
+      msg.replyFunc({status: e.general.SUCCESS, info: 'registered for population changes for type '+msg.type, payload: msg.type})
       ClientEndpoints.onDisconnect (adr) =>
         if adr == msg.client
           idx = -1
           @populationListeners.forEach (client, i) =>
             if client == msg.client then idx = i
-          @populationListeners.splice(i, 1)
+          console.log 'idx = '+idx+' populationListeners is'
+          console.dir @populationListeners
+          if idx > -1 then @populationListeners.splice(idx, 1)
     else
       msg.replyFunc({status: e.general.FAILURE, info: 'onRegisterForPopulationChanges missing parameter', payload: null })
 

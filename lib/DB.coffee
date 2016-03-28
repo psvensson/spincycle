@@ -32,7 +32,7 @@ class DB
     if not @DataStore
       #@DataStore = new GDS()
       #@DataStore = new Roach()
-      if not name then @DataStore = new Mongo(DB.dburl, DB)
+      if not name then @DataStore = new Rethink(DB.dburl, DB)
       else if name == 'couchdb' then @DataStore = new Couch(DB.dburl)
       else if name == 'mongodb' then @DataStore = new Mongo(DB.dburl, DB)
       else if name == 'rethinkdb' then @DataStore = new Rethink(DB.dburl, DB)

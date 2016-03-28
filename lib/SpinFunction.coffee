@@ -7,8 +7,8 @@ class SpinFunction extends SuperModel
   @type       = 'SpinFunction'
   @model =
     [
-      {name: 'name',        public: true,   value: 'name',    default: 'Spin Module' }
-      {name: 'code',        public: true,   value: 'code',    default: '' }
+      {name: 'name',        public: true,   value: 'name',    default: 'Spin Function' }
+      {name: 'code',        public: true,   value: 'code',    default: ' ' }
       {name: 'version',     public: true,   value: 'version', default: '0.1' }
     ]
 

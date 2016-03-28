@@ -59,7 +59,7 @@ class RethinkPersistence
                 console.log 'tableList err = '+err2
                 console.dir err2
               table = r.db('spincycle').table(type)
-              console.lo 'creating new table '+type
+              console.log 'creating new table '+type
               @dbs[type] = table
               q.resolve(table)
             )
@@ -83,20 +83,21 @@ class RethinkPersistence
     return q
 
   all: (_type, cb)=>
-    #console.log 'all called'
     type = _type.toLowerCase()
+    if debug then console.log 'Rethink.all called for '+type
     @getDbFor(type).then (db)=>
+      console.log 'all got db'
       db.run @connection, (err, cursor) ->
         if err
           console.log 'all err: '+err
           console.dir err
           throw err
         cursor.toArray (ce, result)=>
-          #console.log 'all result is '+result
+          console.log 'all result is '+result
           cb result
 
   count: (_type)=>
-    console.log 'count called'
+    if debug then console.log 'Rethink.count called'
     type = _type.toLowerCase()
     q = defer()
     @getDbFor(type).then (db)=>
@@ -110,6 +111,7 @@ class RethinkPersistence
     return q
 
   get: (_type, id, cb) =>
+    if debug then console.log 'Rethink.get called'
     type = _type.toLowerCase()
     @getDbFor(type).then (db)=>
       db.get(id).run @connection, (err, result) ->
@@ -125,7 +127,7 @@ class RethinkPersistence
     @findMany(_type, property, _value)
 
   findMany: (_type, property, _value) =>
-    console.log 'findMany called'
+    if debug then console.log 'Rethink.findMany called'
     value = _value or ""
     if value
       value = value.toString()
@@ -148,7 +150,7 @@ class RethinkPersistence
     return q
 
   findQuery: (_type, query) =>
-    #console.log 'Rethink findQuery called for type '+_type
+    if debug then console.log 'Rethink findQuery called for type '+_type
     #console.dir query
     q = defer()
     type = _type.toLowerCase()
@@ -177,7 +179,7 @@ class RethinkPersistence
     return q
 
   search: (_type, property, _value) =>
-    console.log 'search called'
+    if debug then console.log 'Rethink.search called'
     value = _value or ""
     if value
       value = value.toString()
@@ -199,7 +201,7 @@ class RethinkPersistence
     return q
 
   set: (_type, obj, cb)=>
-    #console.log 'set called'
+    if debug then console.log 'Rethink.set called'
     type = _type.toLowerCase()
     @getDbFor(type).then (db)=>
       db.insert(obj, {conflict: "update", return_changes: true}).run @connection, (err, result) ->
@@ -211,7 +213,7 @@ class RethinkPersistence
         cb(result)
 
   remove: (_type, obj, cb) =>
-    console.log 'remove called'
+    if debug then console.log 'Rethink.remove called'
     type = _type.toLowerCase()
     id = obj.id
     @getDbFor(type).then (db)=>

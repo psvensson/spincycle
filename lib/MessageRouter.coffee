@@ -35,8 +35,9 @@ class MessageRouter
 
   debug = process.env["DEBUG"]
 
-  constructor: (@authMgr, dburl, msgPS, @app) ->
+  constructor: (@authMgr, dburl, msgPS, @app, dbtype = 'mongodb') ->
     MessageRouter.DB.dburl = dburl
+    DB.getDataStore(dbtype)
     pjson = require('../package.json');
     @messagesPerSecond = msgPS or 100
     console.log 'SpinCycle messageRouter constructor. Version - '+pjson.version+' messages per second limit = '+@messagesPerSecond
@@ -75,6 +76,9 @@ class MessageRouter
       #@app.use '/_spin',express.static(path.join(__dirname, 'spin'))
       @app.use('/spin/', express.static(path.join(__dirname, 'spin')))
       #@app.use('/spin/', express.static('spin'))
+    console.log('**************** exposing SpinModule and SpinFunction')
+    @objectManager.expose 'SpinModule'
+    @objectManager.expose 'SpinFunction'
 
   #---------------------------------------------------------------------------------------------------------------------
 

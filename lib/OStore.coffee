@@ -32,7 +32,7 @@ class OStore
       rv.push v
     return rv
 
-  @storeObject: (obj) =>
+  @storeObject: (obj, sendUpdates = true) =>
     if obj
       OStore.objects[obj.id] = obj
       OStore.types[obj.type] = obj.type
@@ -40,7 +40,7 @@ class OStore
       objs[obj.id] = obj
       OStore.objectsByType[obj.type] = objs
       #if debug then console.log 'storeObject storing '+obj.id+' with rev '+obj.rev+" and _rev "+obj._rev
-      @sendUpdatesFor(obj, true)
+      @sendUpdatesFor(obj, sendUpdates)
 
   @getObject: (id, type) =>
     q = defer()

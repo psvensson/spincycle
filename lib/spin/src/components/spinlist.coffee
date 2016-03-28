@@ -1,27 +1,45 @@
-define(['ractive', 'components/listelement'], (Ractive, listelement) =>
+define(['ractive'], (Ractive) =>
+
   spinlist = Ractive.extend({
-    components: {listelement: listelement}
-    isolated: false,
+    components: {}
+    isolated: false
+
     data: () ->
       list: []
       header: 'List'
       labels: 'name'
       onSelected: ''
+      onDeleted: ''
       getLabelFor: (i) ->
         el = this.get 'list.'+i
         rv = ''
-        this.get('labels').split(',').forEach (label)-> rv += el[label]
+        if el then this.get('labels').split(',').forEach (label)-> rv += el[label]
         rv
+
     oninit: () ->
-      @on 'itemSelected', (e) ->
-        select = @get('onSelected')
-        if select then select(e)
+      console.log 'spinlist created'
+      console.dir @get('list')
+      @on 'itemSelected', (e) =>
+        console.log 'onselected'
+        selected = @get('onSelected')
+        console.dir selected
+        if selected then selected(e)
+      @on 'deleted', (e) ->
+        console.log('* item delete clicked')
+        deleted = @get('onDeleted')
+        if deleted then deleted(e)
+
+      console.log 'spinlist done'
+
     template: """
       <div style='display:flex; flex-direction: column'>
         <h4 style='margin-bottom:0'>{{header}}</h4>
         <ul class="mdl-list" style='margin-top:0'>
         {{#list:i}}
-          <li class="mdl-list__item" on-click='itemSelected'>{{ getLabelFor(i) }}</li>
+          <div style='display:flex; flex-direction: row'>
+            <i on-click="deleted" class="mdl-color-text--blue-grey-400 material-icons" role="presentation">delete</i>
+            <li class="mdl-list__item" style="min-height:30px; padding-top:0; padding-bottom:0" on-click='itemSelected'>{{ getLabelFor(i) }}</li>
+          </div>
         {{/}}
         </ul>
       </div>

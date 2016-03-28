@@ -42,7 +42,8 @@ class SuperModel
       @constructor.model.push({ name: 'modifiedAt',   public: true,   value: 'modifiedAt' })
       @constructor.model.push({ name: 'createdBy',    public: true,   value: 'createdBy' })
       #@updateAllModels()
-      SuperModel.oncreatelisteners.forEach (listener) -> listener(@)
+
+    if not @record.id then SuperModel.oncreatelisteners.forEach (listener) => listener(@)
 
     @type = @constructor.type
     q = defer()
@@ -118,7 +119,7 @@ class SuperModel
     return rv
 
   toClient: () =>
-    #if debug then console.log '---------------------------------------- toClient -----------------------------------------------'
+    if debug then console.log '---------------------------------------- toClient -----------------------------------------------'
     #if debug then console.dir @
     r = @getRecord()
     ra = @.constructor.model
@@ -127,8 +128,7 @@ class SuperModel
       ra.forEach (el) =>
         if el.name == k and k != 'record' and el.public
           res = @prettyPrint(k, v)
-          #if debug then console.log 'toClient '+k+' -> '+res
-          rv[k] = res
+          rv[k] = res or el.default
     rv.id = @id
     rv.type = @.constructor.type
     return rv

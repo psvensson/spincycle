@@ -28,11 +28,13 @@
 
   authMgr = new AuthenticationManager();
 
-  messageRouter = new SpinCycle(authMgr, null, null, app);
+  messageRouter = new SpinCycle(authMgr, null, null, app, 'rethinkdb');
 
   new SpinCycle.HttpMethod(messageRouter, app, '/api/');
 
   new SpinCycle.WsMethod(messageRouter, server);
+
+  messageRouter.open();
 
 }).call(this);
 

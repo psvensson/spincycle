@@ -65,23 +65,27 @@
     <script src="https://code.getmdl.io/1.1.2/material.min.js"></script>
     <script src="bower_components/ractive/ractive.js"></script>
     <script src="bower_components/requirejs/require.js"></script>
+    <!-- <script src="bower_components/q/q.js"></script> -->
     <script>
       requirejs.config({
         baseUrl: 'src',
-        paths: {
+        paths:
+        {
           app: './app',
-          ractive: '../bower_components/ractive/ractive'
+          ractive: '../bower_components/ractive/ractive',
+          Q: '../bower_components/q/q',
+          uuid4: '../bower_components/uuid4/lib/browser/index',
+          io: "/socket.io/socket.io"
         },
         shim:
         {
-          ractive:
-          {
-            exports: 'Ractive'
-          }
+          ractive: { exports: 'Ractive' },
+          Q:{ exports: 'Q' },
+          io : { exports: 'io'}
         }
       });
     </script>
-    <script src="src/spinc.js"></script>
+    <!-- <script src="src/spinclient.js"></script> -->
     <script>
       requirejs(['app'])
     </script>
