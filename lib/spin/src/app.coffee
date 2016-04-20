@@ -1,6 +1,6 @@
-define(['spinclient', 'ractive', 'components/modelspinlist', 'components/spinmodel', 'io'], (spinclient, Ractive, modelspinlist, spinmodel, io) =>
+define(['spinclient', 'ractive', 'components/modelspinlist', 'components/spinmodel', 'components/mdldialog', 'io'], (spinclient, Ractive, modelspinlist, spinmodel, mdldialog, io) =>
   me = new Ractive(
-    components: {modelspinlist: modelspinlist, spinmodel: spinmodel}
+    components: {modelspinlist: modelspinlist, spinmodel: spinmodel, mdldialog: mdldialog}
     el: 'body'
     data:
       selectedmodel: ''
@@ -11,6 +11,15 @@ define(['spinclient', 'ractive', 'components/modelspinlist', 'components/spinmod
 
     oninit: () ->
       spinclient.setWebSocketInstance(io())
+      window.channels = []
+      window.subscribe = (name, cb)->
+        chs = window.channels[name] or []
+        chs.push cb
+        window.channels[name] = chs
+
+      window.publish = (name, what)->
+        chs = window.channels[name] or []
+        chs.forEach (cb) -> cb(what)
 
     template: '<div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
       <header class="demo-header mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600">
@@ -93,7 +102,8 @@ define(['spinclient', 'ractive', 'components/modelspinlist', 'components/spinmod
           </div>
         </div>
       </main>
-    </div>'
+    </div>
+    <mdldialog></mdldialog>'
   )
 )
 

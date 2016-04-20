@@ -39,8 +39,9 @@ define(['spinclient', 'ractive', 'components/spinlist'], (spinclient, Ractive, s
     #---------------------------------------------------------------------------
 
     oninit: () ->
-      console.log 'modelspinlist oninit'
+      console.log '==================================================================== modelspinlist oninit'
       @on 'onSelected', (e) ->
+        console.log 'modelspinlist onselected called for '+@_guid
         select = @get('onSelected')
         if select then select(e)
 
@@ -70,13 +71,12 @@ define(['spinclient', 'ractive', 'components/spinlist'], (spinclient, Ractive, s
         console.log 'create result'
         console.dir newmodel
 
-
-
     template: """
       <div style='display:flex; flex-direction: column'>
         <button on-click='onNewModel()' class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
           New {{type}}
         </button>
+
         <spinlist list='{{list}}' header="{{type}}" onSelected='{{onSelected}}' onDeleted='{{onDeleted}}'></spinlist>
       </div>
       """

@@ -7,10 +7,6 @@ DB              = require('./DB')
 error           = require('./Error').error
 ResolveModule   = require('./ResolveModule')
 
-
-##
-## TODO: Make it possible to seed the resolver with path to our reqquirements if we know them beforehand. *might* speed things up eh?
-##
 resolver = new ResolveModule()
 
 
