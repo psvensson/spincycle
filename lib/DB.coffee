@@ -172,7 +172,12 @@ class DB
 
     all(ids.map(
       (id) =>
-        rv = @lru.get id
+        try
+          rv = @lru.get id
+        catch err
+          console.log '************* ERROR '
+          console.dir arguments
+          console.dir err
         p = defer()
         #console.log 'DB found in lru: '+rv
         if not rv

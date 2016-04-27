@@ -26,7 +26,7 @@ class OStore
 
   @listTypes: () =>
     rv = []
-    console.log 'listTypes called'
+    console.log 'listTypes called' 
     console.dir @types
     for k,v of @types
       rv.push v
