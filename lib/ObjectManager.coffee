@@ -258,6 +258,7 @@ class ObjectManager
             @messageRouter.resolver.createObjectFrom(record).then (oo) =>
               q.resolve(oo)
         else
+          if debug then console.log 'getObjectPullThrough found object'
           q.resolve(o)
     return q
 

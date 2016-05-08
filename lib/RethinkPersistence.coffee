@@ -93,7 +93,8 @@ class RethinkPersistence
           console.dir err
           throw err
         cursor.toArray (ce, result)=>
-          console.log 'all result is '+result
+          if debug then console.log 'all result is '+result
+          if debug then console.dir result
           cb result
 
   count: (_type)=>
