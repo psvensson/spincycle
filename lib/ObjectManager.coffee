@@ -114,12 +114,14 @@ class ObjectManager
   _getObject: (msg) =>
     if debug then console.log '_getObject called for type '+msg.type
     if debug then console.dir msg
-    if msg.type and msg.obj.id
+    if msg.type and msg.obj and msg.obj.id
       id = msg.obj.id
       if id.indexOf and id.indexOf('all_') > -1
         @getAggregateObjects(msg)
       else
         @getObjectPullThrough(id, msg.type).then (obj) =>
+          if debug then '_getObject got back obj '
+          if debug then console.dir obj
           if obj
             if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
               msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: obj.toClient()})
@@ -237,7 +239,7 @@ class ObjectManager
       @._countObjects(msg)
 
   getObjectPullThrough: (id, type) =>
-    if debug then console.log 'getObjectPullThrough for id '
+    if debug then console.log 'getObjectPullThrough for id '+id+' and type '+type
     if debug then console.dir id
     q = defer()
     if not type
