@@ -39,7 +39,7 @@ class RedisMethod
     #
     target = @redisroutes[msg.target]
     if target
-      msg.client    = msg.channelId
+      msg.client    = msg.channelID
       msg.messageId = msg.messageId || uuid.v4()
       msg.replyFunc = (_replydata) =>
         if not _replydata.payload
