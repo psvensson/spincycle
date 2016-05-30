@@ -25,9 +25,9 @@ class RedisMethod
   onChannelMessage: (channel, message) =>
     if debug then console.log 'redismethod got channel '+channel+' message '+message
     #console.dir channel
-    #console.log '-------------------------------------------------------------------'
+    console.log '-------------------------------------------------------------------'
     msg = JSON.parse(message)
-    if debug then console.dir msg
+    console.dir msg
     clientChannel = msg.channelID
     if clientChannel then ClientEndpoints.registerEndpoint msg.channelID, (msg) ->
       @sendclient.publish(clientChannel, JSON.stringify(msg))
@@ -47,10 +47,10 @@ class RedisMethod
           replydata = {status: 'SUCCESS', info: 'reply', payload: _replydata}
         else
           replydata = _replydata
-        if debug then console.log 'redismethod replying to message '+msg.messageId+' on channel '+msg.channelId
-        if debug then console.dir message
-        if debug then console.log '---------------------replydata is-------------------------'
-        if debug then console.dir replydata
+        console.log 'redismethod replying to message '+msg.messageId+' on channel '+msg.channelId
+        console.dir message
+        console.log '---------------------replydata is-------------------------'
+        console.dir replydata
         replydata.messageId = msg.messageId
         @sendclient.publish(clientChannel, JSON.stringify(replydata))
       target(msg)
