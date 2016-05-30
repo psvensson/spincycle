@@ -7,7 +7,7 @@ class ClientEndpoints
   @onconnectcbs     = []
 
   @registerEndpoint: (address, sendFunc) ->
-    if debug then console.log 'registerEndpoint called for address '+address
+    console.log 'ClientEndpoints.registerEndpoint called for address '+address
     @endpoints[address] = sendFunc
     @onconnectcbs.forEach (cb) => cb(address)
 
@@ -26,7 +26,9 @@ class ClientEndpoints
       console.log '** no endpoint found for address '+address
 
   @exists: (address) =>
-    @endpoints[address]
+    rv = @endpoints[address]
+    console.log 'ClientEndpoints.exists called for '+address+' -> '+rv
+    rv
 
   @onDisconnect: (cb) =>
     @ondisconnectcbs.push cb
