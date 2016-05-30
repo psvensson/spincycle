@@ -266,6 +266,8 @@ class ObjectManager
     console.log 'onUpdateObject called for '+msg.obj.type+' - '+msg.obj.id
     if msg.obj and msg.obj.id
       DB.getFromStoreOrDB(msg.obj.type, msg.obj.id).then( (obj) =>
+        console.log 'onUpdateObject getFromStoreOrDB returned '+obj
+        console.dir obj
         if obj
           if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
             if debug then console.log 'can write'

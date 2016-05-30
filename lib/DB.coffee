@@ -63,9 +63,12 @@ class DB
     q = defer()
     OStore.getObject(id, type).then (oo)=>
       if oo
+        console.log 'getFromStoreOrDb resolved from Ostore directly...'
         q.resolve(oo)
       else
         @get(type, [id]).then (records) =>
+          console.log 'DB.getFromStoreOrDb get returns..'
+          console.dir records
           if records and records[0]
             record = records[0]
             resolver.createObjectFrom(record).then (ooo) =>
