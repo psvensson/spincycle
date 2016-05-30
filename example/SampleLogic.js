@@ -34,10 +34,10 @@
               name: 'New Game ' + (SampleLogic.gamecount++)
             }).then(function(game) {
               console.log('SampleLogic: -- new game ' + game.name + ' created --');
-              return game.serialize();
+              game.serialize();
+              return _this.games.push(game);
             });
           }
-          _this.games.push(game);
           games.forEach(function(gamerecord) {
             return new Game(gamerecord).then(function(game) {
               return _this.games.push(game);

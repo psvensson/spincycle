@@ -19,7 +19,7 @@ class SampleLogic
         new Game({name: 'New Game '+(SampleLogic.gamecount++)}).then (game)=>
           console.log 'SampleLogic: -- new game '+game.name+' created --'
           game.serialize()
-      @games.push game
+          @games.push game
       games.forEach (gamerecord) =>
         # We only need to do this manually for top-level object models. Any references will be resolved, required, instantiated and put where they should recursively
         # For example the playerids array will be resolved to actual player objects and put in a players array on each game object
