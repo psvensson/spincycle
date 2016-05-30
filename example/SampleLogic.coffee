@@ -14,6 +14,12 @@ class SampleLogic
     DB.all 'SampleGame', (games) =>
       console.log ' setting all games to '+games
       console.dir(games)
+      if(games.length == 0)
+        console.log 'No games found! Creating one...'
+        new Game({name: 'New Game '+(SampleLogic.gamecount++)}).then (game)=>
+        console.log 'SampleLogic: -- new game '+game.name+' created --'
+        game.serialize()
+      @games.push game
       games.forEach (gamerecord) =>
         # We only need to do this manually for top-level object models. Any references will be resolved, required, instantiated and put where they should recursively
         # For example the playerids array will be resolved to actual player objects and put in a players array on each game object
@@ -24,7 +30,7 @@ class SampleLogic
       console.log 'added '+@games.length+' games from storage'
 
     @messageRouter.addTarget('listGames',         '<noargs>', @onListPlayerGames)
-    @messageRouter.addTarget('listGamePlayers',   'gameId', @onListGamePlayers)
+    @messageRouter.addTarget('listGamePlayers',   'gameId',   @onListGamePlayers)
     @messageRouter.addTarget('newGame',           '<noargs>', @onNewGame)
 
     @messageRouter.objectManager.expose('SampleGame')

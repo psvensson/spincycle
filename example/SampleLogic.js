@@ -28,6 +28,15 @@
         return function(games) {
           console.log(' setting all games to ' + games);
           console.dir(games);
+          if (games.length === 0) {
+            console.log('No games found! Creating one...');
+            new Game({
+              name: 'New Game ' + (SampleLogic.gamecount++)
+            }).then(function(game) {});
+            console.log('SampleLogic: -- new game ' + game.name + ' created --');
+            game.serialize();
+          }
+          _this.games.push(game);
           games.forEach(function(gamerecord) {
             return new Game(gamerecord).then(function(game) {
               game.serialize();
