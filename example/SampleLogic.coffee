@@ -25,7 +25,7 @@ class SampleLogic
         # For example the playerids array will be resolved to actual player objects and put in a players array on each game object
         new Game(gamerecord).then (game) =>
           game.serialize()
-          console.log '--- adding game '+game.name
+          console.log '------------------------------------------------------------ SampleLogic adding game '+game.name
           @games.push(game)
       console.log 'added '+@games.length+' games from storage'
 

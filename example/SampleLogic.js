@@ -40,7 +40,7 @@
           games.forEach(function(gamerecord) {
             return new Game(gamerecord).then(function(game) {
               game.serialize();
-              console.log('--- adding game ' + game.name);
+              console.log('------------------------------------------------------------ SampleLogic adding game ' + game.name);
               return _this.games.push(game);
             });
           });
