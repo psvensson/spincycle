@@ -36,6 +36,8 @@
 
   new SpinCycle.WsMethod(messageRouter, server);
 
+  new SpinCycle.RedisMethod(messageRouter, server);
+
   logic = new SampleLogic(messageRouter);
 
 }).call(this);

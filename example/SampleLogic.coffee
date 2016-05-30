@@ -30,6 +30,8 @@ class SampleLogic
     @messageRouter.objectManager.expose('SampleGame')
     @messageRouter.objectManager.expose('SamplePlayer')
 
+    @messageRouter.open()
+
   onNewGame: (msg) =>
     console.log 'SampleLogic: New Game called'
     new Game({name: 'New Game '+(SampleLogic.gamecount++)}).then (game)=>

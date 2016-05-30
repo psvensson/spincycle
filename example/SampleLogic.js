@@ -43,6 +43,7 @@
       this.messageRouter.addTarget('newGame', '<noargs>', this.onNewGame);
       this.messageRouter.objectManager.expose('SampleGame');
       this.messageRouter.objectManager.expose('SamplePlayer');
+      this.messageRouter.open();
     }
 
     SampleLogic.prototype.onNewGame = function(msg) {

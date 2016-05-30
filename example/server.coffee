@@ -26,5 +26,8 @@ new SpinCycle.HttpMethod(messageRouter, app, '/api/')
 #--------------------------------------------------> WS Routing
 new SpinCycle.WsMethod(messageRouter, server)
 #<-------------------------------------------------- WS Routing
+#--------------------------------------------------> WS Routing
+new SpinCycle.RedisMethod(messageRouter, server)
+#<-------------------------------------------------- WS Routing
 # Adding sample logic
 logic = new SampleLogic(messageRouter)
