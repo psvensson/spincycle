@@ -28,7 +28,7 @@
     authMgr = void 0;
     messageRouter = void 0;
     before(function(done) {
-      console.log(' ------------------------------------- before called');
+      console.log('------------------------------------- before called');
       return DB.createDatabases(['foo', 'bar', 'dfoo', 'directbar', 'hashbar']).then(function() {
         console.log('++++++++++++++++++++++++++++++++++++spec dbs created');
         authMgr = new AuthenticationManager();

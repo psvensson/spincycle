@@ -279,6 +279,7 @@ class ObjectManager
               if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db. modifiedAt = '+obj.modifiedAt
               obj.serialize(robj).then () =>
                 record = obj.getRecord()
+                if objStore.anyoneIsListening(obj.id) then objStore.sendUpdatesFor(obj, true)
                 @updateObjectHooks.forEach (hook) => hook(record)
                 msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
           else

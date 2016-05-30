@@ -15,7 +15,7 @@ describe 'Spincycle Model Tests', ->
   messageRouter = undefined
 
   before (done)->
-    console.log ' ------------------------------------- before called'
+    console.log '------------------------------------- before called'
     DB.createDatabases(['foo','bar','dfoo','directbar','hashbar']).then () ->
       console.log '++++++++++++++++++++++++++++++++++++spec dbs created'
       authMgr         = new AuthenticationManager()

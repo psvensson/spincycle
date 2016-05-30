@@ -47,10 +47,10 @@ class RedisMethod
           replydata = {status: 'SUCCESS', info: 'reply', payload: _replydata}
         else
           replydata = _replydata
-        console.log 'redismethod replying to message '+msg.messageId+' on channel '+msg.channelId
-        console.dir message
-        console.log '---------------------replydata is-------------------------'
-        console.dir replydata
+        #console.log 'redismethod replying to message '+msg.messageId+' on channel '+msg.channelId
+        #console.dir message
+        #console.log '---------------------replydata is-------------------------'
+        #console.dir replydata
         replydata.messageId = msg.messageId
         @sendclient.publish(clientChannel, JSON.stringify(replydata))
       target(msg)
