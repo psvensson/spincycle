@@ -285,7 +285,7 @@ class ObjectManager
                 record = obj.getRecord()
                 if objStore.anyoneIsListening(robj.id)
                   console.log 'sending updates'
-                  objStore.sendUpdatesFor(robj, true)
+                  objStore.sendUpdatesFor(obj, true)
                 else
                   console.log 'apparently noone is listening for updates on this object!'
                   console.dir objStore.listeners
