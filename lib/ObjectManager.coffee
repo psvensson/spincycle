@@ -380,7 +380,7 @@ class ObjectManager
           if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
             rememberedListenerId = undefined
             listenerId = objStore.addListenerFor(msg.obj.id, msg.obj.type, (uobj) ->
-              console.log '--------------------- sending update of object '+msg.obj.id+' type '+msg.obj.type+' to client'
+              console.log '--------------------- onRegisterForUpdates on callback sending update of object '+msg.obj.id+' type '+msg.obj.type+' to client'
               console.dir uobj
               toclient = uobj.toClient()
               #if debug then console.dir(toclient)
