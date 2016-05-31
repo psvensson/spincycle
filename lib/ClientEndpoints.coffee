@@ -17,8 +17,8 @@ class ClientEndpoints
     @ondisconnectcbs.forEach (cb) => cb(address)
 
   @sendToEndpoint: (address, msg) ->
-    console.log 'sendToEndpoint "'+address+'" called. endpoints are..'
-    console.dir @endpoints
+    #console.log 'sendToEndpoint "'+address+'" called. endpoints are..'
+    #console.dir @endpoints
     func = @endpoints[address]
     if func
       func(msg)

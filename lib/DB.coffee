@@ -80,15 +80,15 @@ class DB
   @getOrCreateObjectByRecord: (record) =>
     q = defer()
     OStore.getObject(record.id, record.type).then (oo)=>
-      if debug then console.log 'DB.getOrCreateObjectByRecord OStore returns '+oo
+      #if debug then console.log 'DB.getOrCreateObjectByRecord OStore returns '+oo
       if oo
         q.resolve(oo)
       else
         @get(record.type, [record.id]).then (res)=>
-          if debug then console.log 'DB.getOrCreateObjectByRecord DB load returns '+res
-          if debug then console.dir res
+          #if debug then console.log 'DB.getOrCreateObjectByRecord DB load returns '+res
+          #if debug then console.dir res
           if res and res[0]
-            console.log 'DB.getOrCreateObjectByRecord found existing record in DB *'
+            if debug then console.log 'DB.getOrCreateObjectByRecord found existing record in DB *'
             record = res[0]
           resolver.createObjectFrom(record).then (ooo) =>
             if debug then console.log 'DB.getOrCreateObjectByRecord createFromRecord returns '+ooo
