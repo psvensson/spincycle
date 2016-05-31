@@ -381,7 +381,7 @@ class ObjectManager
             rememberedListenerId = undefined
             listenerId = objStore.addListenerFor(msg.obj.id, msg.obj.type, (uobj) ->
               console.log '--------------------- onRegisterForUpdates on callback sending update of object '+msg.obj.id+' type '+msg.obj.type+' to client'
-              console.dir uobj
+              #console.dir uobj
               toclient = uobj.toClient()
               #if debug then console.dir(toclient)
               if ClientEndpoints.exists(msg.client)
