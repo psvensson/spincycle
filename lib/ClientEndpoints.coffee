@@ -17,8 +17,8 @@ class ClientEndpoints
     @ondisconnectcbs.forEach (cb) => cb(address)
 
   @sendToEndpoint: (address, msg) ->
-    #console.log 'sendToEndpoint "'+address+'" called. endpoints are..'
-    #console.dir @endpoints
+    console.log 'sendToEndpoint "'+address+'" called. endpoints are..'
+    console.dir @endpoints
     func = @endpoints[address]
     if func
       func(msg)
@@ -27,7 +27,7 @@ class ClientEndpoints
 
   @exists: (address) =>
     rv = @endpoints[address]
-    #console.log 'ClientEndpoints.exists called for '+address+' -> '+rv
+    console.log 'ClientEndpoints.exists called for '+address+' -> '+rv
     rv
 
   @onDisconnect: (cb) =>

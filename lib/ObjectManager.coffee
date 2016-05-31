@@ -266,29 +266,29 @@ class ObjectManager
     console.log 'onUpdateObject called for '+msg.obj.type+' - '+msg.obj.id
     if msg.obj and msg.obj.id
       DB.getFromStoreOrDB(msg.obj.type, msg.obj.id).then( (obj) =>
-        console.log 'onUpdateObject getFromStoreOrDB returned '+obj
-        console.dir obj
+        #console.log 'onUpdateObject getFromStoreOrDB returned '+obj
+        #console.dir obj
         if obj
-          console.log 'have an object'
+          #console.log 'have an object'
           canwrite = @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
           if canwrite
-            console.log 'can write'
+            #console.log 'can write'
             # Make sure to resolve object references in arrays and hashtables
             for k,v of msg.obj
               obj[k] = v if k isnt 'id'
             @resolveReferences(obj, obj.constructor.model).then (robj)=>
-              console.log 'found object'
+              #console.log 'found object'
               #objStore.updateObj(robj)
               objStore[robj.id] = obj
               if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db. modifiedAt = '+obj.modifiedAt
               obj.serialize(robj).then () =>
                 record = obj.getRecord()
                 if objStore.anyoneIsListening(robj.id)
-                  console.log 'sending updates'
+                  #console.log 'sending updates'
                   objStore.sendUpdatesFor(obj, true)
                 else
-                  console.log 'apparently noone is listening for updates on this object!'
-                  console.dir objStore.listeners
+                  #console.log 'apparently noone is listening for updates on this object!'
+                  #console.dir objStore.listeners
                 @updateObjectHooks.forEach (hook) => hook(record)
                 msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
           else

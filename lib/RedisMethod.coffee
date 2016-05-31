@@ -30,8 +30,8 @@ class RedisMethod
     console.dir msg
     clientChannel = msg.channelID
     msg.client    = msg.channelID
-    if clientChannel then ClientEndpoints.registerEndpoint msg.channelID, (msg) =>
-      @sendclient.publish(clientChannel, JSON.stringify(msg))
+    if clientChannel then ClientEndpoints.registerEndpoint msg.channelID, (sendmsg) =>
+      @sendclient.publish(clientChannel, JSON.stringify(sendmsg))
     #
     # TODO:
     #
@@ -40,7 +40,6 @@ class RedisMethod
     #
     target = @redisroutes[msg.target]
     if target
-
       msg.messageId = msg.messageId || uuid.v4()
       msg.replyFunc = (_replydata) =>
         if not _replydata.payload
