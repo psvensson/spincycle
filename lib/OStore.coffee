@@ -103,11 +103,11 @@ class OStore
     rv
 
   @sendUpdatesFor: (obj, changed) =>
-    if debug then console.log 'sendUpdatesFor called for obj '+obj.id+' changed = '+changed+', anyone is listening == '+OStore.anyoneIsListening(obj.id)
+    console.log 'sendUpdatesFor called for obj '+obj.id+' changed = '+changed+', anyone is listening == '+OStore.anyoneIsListening(obj.id)
     if changed and OStore.anyoneIsListening(obj.id)
       #
-      #console.dir obj
-      if debug then console.log 'adding obj to updateQueue..'
+      console.dir obj
+      console.log 'adding obj to updateQueue..'
       OStore.updateQueue.push obj
 
   @sendAllUpdatesFor: (obj, changed) =>
