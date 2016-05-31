@@ -131,7 +131,7 @@ class OStore
     rv
 
   @addListenerFor:(id, type, cb) =>
-    if debug then console.log 'OStore::addListenerFor called with type:'+type+' id '+id
+    console.log 'OStore::addListenerFor called with type:'+type+' id '+id
     list = OStore.listeners[id] or []
     listenerId = uuid.v4()
     #console.log 'listener id = '+listenerId
@@ -142,6 +142,7 @@ class OStore
     #@getObject(id, type).then((result) ->
     #  cb(result)
     #, error)
+    console.dir OStore.listeners
     return listenerId
 
   @removeListenerFor: (id, listenerId) =>
