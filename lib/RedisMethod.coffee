@@ -31,7 +31,7 @@ class RedisMethod
     clientChannel = msg.channelID
     msg.client    = msg.channelID
     if clientChannel then ClientEndpoints.registerEndpoint msg.channelID, (sendmsg) =>
-      console.log '*** sending backchannel message through redis channel .'+clientChannel
+      console.log '******************* sending backchannel message through redis channel .'+clientChannel
       console.dir sendmsg
       @sendclient.publish(clientChannel, JSON.stringify(sendmsg))
     #
