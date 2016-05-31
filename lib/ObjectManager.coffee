@@ -269,13 +269,15 @@ class ObjectManager
         console.log 'onUpdateObject getFromStoreOrDB returned '+obj
         console.dir obj
         if obj
-          if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
-            if debug then console.log 'can write'
+          console.log 'have an object'
+          canwrite = @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
+          if canwrite
+            console.log 'can write'
             # Make sure to resolve object references in arrays and hashtables
             for k,v of msg.obj
               obj[k] = v if k isnt 'id'
             @resolveReferences(obj, obj.constructor.model).then (robj)=>
-              if debug then console.log 'found object'
+              console.log 'found object'
               #objStore.updateObj(robj)
               objStore[robj.id] = robj
               if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db. modifiedAt = '+obj.modifiedAt
@@ -285,7 +287,7 @@ class ObjectManager
                 @updateObjectHooks.forEach (hook) => hook(record)
                 msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
           else
-            console.log 'object update fail: could not find any object'
+            console.log 'object update fail: not allowed to write'
             msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.UPDATE_OBJECT_FAIL, payload: msg.obj.id})
         else
           console.log 'No object of type '+msg.obj.type+' found with id '+msg.obj.id
@@ -298,8 +300,8 @@ class ObjectManager
       msg.replyFunc({status: e.general.FAILURE, info: 'missing parameter(s) for object update', payload: msg.obj.id})
 
   resolveReferences: (record, model) =>
-    if debug then console.log 'resolveReferences model is '
-    if debug then console.dir model
+    console.log 'resolveReferences model is '
+    console.dir model
     rv = {id: record.id}
     q = defer()
     count = model.length

@@ -34,7 +34,7 @@ class AuthenticationManager
 
   # When a user sends a '_create'+<object_type> message, this method gets called to allow or disallow creating of the object
   canUserCreateThisObject: (type, user) =>
-    true # same here
+    true # same here 
 
   # When a user sends a '_create'+<object_type> message, this method gets called to allow or disallow creating of the object
   canUserListTheseObjects: (type, user) =>
