@@ -27,7 +27,7 @@ class ClientEndpoints
 
   @exists: (address) =>
     rv = @endpoints[address]
-    console.log 'ClientEndpoints.exists called for '+address+' -> '+rv
+    #console.log 'ClientEndpoints.exists called for '+address+' -> '+rv
     rv
 
   @onDisconnect: (cb) =>
