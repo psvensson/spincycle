@@ -103,7 +103,7 @@ class OStore
     rv
 
   @sendUpdatesFor: (obj, changed) =>
-    #console.log 'sendUpdatesFor called for obj '+obj.id+' changed = '+changed+', anyone is listening == '+OStore.anyoneIsListening(obj.id)
+    console.log 'sendUpdatesFor called for obj '+obj.id+' type '+obj.type+' changed = '+changed+', anyone is listening == '+OStore.anyoneIsListening(obj.id)
     if changed and OStore.anyoneIsListening(obj.id)
       #
       #console.dir obj
