@@ -87,7 +87,7 @@ describe 'Spincycle Model Tests', ->
     [
       {name: 'name', public: true, value: 'name', default: 'yohoo'}
       {name: 'theFoo', value: 'theFoo', type: 'Foo' }
-      {name: 'foos', public: true, array: true, ids: 'foos'}
+      {name: 'foos', public: true, array: true, ids: 'foos', type: 'Foo'}
       {name: 'footable', hashtable: true, ids: 'footable', type: 'Foo'}
     ]
     constructor: (@record={}) ->
@@ -501,4 +501,10 @@ describe 'Spincycle Model Tests', ->
             expect(reply.payload.length).to.gt(0)
             done()
         messageRouter.objectManager._listObjects(msg)
+
+  it 'should be able to resolve object graphs properly', (done)->
+    messageRouter.objectManager.resolveReferences(record2, Bar.model).then (result)->
+      console.log '---------------- resolvereferences results ------------------'
+      console.dir result
+      done()
 

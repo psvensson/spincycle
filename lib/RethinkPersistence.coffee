@@ -120,8 +120,8 @@ class RethinkPersistence
           console.log 'get err: '+err
           console.dir err
           throw err
-        console.log 'get result was'
-        console.log result
+        #console.log 'get result was'
+        #console.log result
         cb result
 
   find: (_type, property, _value) =>

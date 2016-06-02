@@ -137,7 +137,8 @@
           name: 'foos',
           "public": true,
           array: true,
-          ids: 'foos'
+          ids: 'foos',
+          type: 'Foo'
         }, {
           name: 'footable',
           hashtable: true,
@@ -791,7 +792,7 @@
       }
       return _results;
     });
-    return it('should update an array on an object with a reference and have that reference be present in the array when searching for the object', function(done) {
+    it('should update an array on an object with a reference and have that reference be present in the array when searching for the object', function(done) {
       return new Bar().then(function(bar) {
         bar.serialize();
         return new Foo().then(function(foo) {
@@ -822,6 +823,13 @@
           };
           return messageRouter.objectManager._listObjects(msg);
         });
+      });
+    });
+    return it('should be able to resolve object graphs properly', function(done) {
+      return messageRouter.objectManager.resolveReferences(record2, Bar.model).then(function(result) {
+        console.log('---------------- resolvereferences results ------------------');
+        console.dir(result);
+        return done();
       });
     });
   });

@@ -284,6 +284,8 @@ class ObjectManager
               obj.serialize(robj).then () =>
                 record = obj.getRecord()
                 #objStore.sendUpdatesFor(obj, true)
+                console.log 'final object update result------>'
+                console.log record
                 @updateObjectHooks.forEach (hook) => hook(record)
                 msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
           else
@@ -310,12 +312,14 @@ class ObjectManager
       #if debug then console.log 'checkFinished count = '+count
       #console.dir rv
       if --count == 0
-        #console.log 'resolving back object'
+        console.log 'resolving back object'
+        console.dir(rv)
         q.resolve(rv)
 
     model.forEach (property) =>
       #if debug then console.log 'going through array property '+property.name
       if property.array
+        #console.log 'going through array property '+property.name
         resolvedarr = []
         arr = record[property.name] or []
         arr = arr.filter (el) -> el and el isnt null and el isnt 'null' and el isnt 'undefined'
@@ -326,20 +330,20 @@ class ObjectManager
           checkFinished()
         else
           arr.forEach (idorobj) =>
-            #if debug then console.log 'resolving array'
-            #if debug then console.dir arr
+            #console.log 'resolving array'
+            console.dir arr
             if idorobj and typeof idorobj == 'object' then id = idorobj.id else id = idorobj
-            #if debug then console.log 'attempting to get array name '+property.name+' object type '+property.type+' id '+id
+            #console.log 'attempting to get array name '+property.name+' object type '+property.type+' id '+id
             @getObjectPullThrough(id, property.type).then (o)=>
               #console.log ' we got object '+o
               #console.dir o
               resolvedarr.push(o)
-              #if debug then console.log 'adding array reference '+o.id+' name '+o.name
+              #console.log 'adding array reference '+o.id+' name '+o.name
               if --acount == 0
                 rv[property.name] = resolvedarr
                 checkFinished()
       else if property.hashtable
-        #if debug then console.log 'going through hashtable property '+property.name
+        #console.log 'going through hashtable property '+property.name
         resolvedhash = {}
         if record[property.name] and record[property.name].length
           harr = record[property.name] or []
@@ -351,14 +355,14 @@ class ObjectManager
             harr.forEach (id) =>
               @getObjectPullThrough(id, property.type).then (o)=>
                 resolvedhash[o.name] = o
-                #if debug then console.log 'adding hashtable reference '+o.id+' name '+o.name
+                #console.log 'adding hashtable reference '+o.id+' name '+o.name
                 if --hcount == 0
                   rv[property.name] = resolvedhash
                   checkFinished()
         else
           rv[property.name] = record[property.name]
       else
-        #if debug then console.log 'resolveReference adding direct reference '+property.name
+        #console.log 'resolveReference adding direct reference '+property.name
         rv[property.name] = record[property.name]
         checkFinished()
 
