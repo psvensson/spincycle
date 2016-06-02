@@ -302,8 +302,8 @@ class ObjectManager
       msg.replyFunc({status: e.general.FAILURE, info: 'missing parameter(s) for object update', payload: msg.obj.id})
 
   resolveReferences: (record, model) =>
-    #console.log 'resolveReferences model is '
-    #console.dir model
+    console.log 'resolveReferences model is '
+    console.dir model
     rv = {id: record.id}
     q = defer()
     count = model.length
