@@ -49,7 +49,7 @@ class RedisMethod
           replydata = {status: 'SUCCESS', info: 'reply', payload: _replydata}
         else
           replydata = _replydata
-        console.log 'redismethod replying to target '+mg.target+' message '+msg.messageId+' on channel '+msg.channelId
+        console.log 'redismethod replying to target '+msg.target+' message '+msg.messageId+' on channel '+msg.channelId
         #console.dir message
         #console.log '---------------------replydata is-------------------------'
         #console.dir replydata
