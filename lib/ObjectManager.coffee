@@ -317,8 +317,8 @@ class ObjectManager
     trashed
 
   resolveReferences: (record, model) =>
-    console.log 'resolveReferences model is '
-    console.dir model
+    #console.log 'resolveReferences model is '
+    #console.dir model
     rv = {id: record.id}
     q = defer()
     count = model.length
@@ -327,8 +327,8 @@ class ObjectManager
       #if debug then console.log 'checkFinished count = '+count
       #console.dir rv
       if --count == 0
-        console.log 'resolving back object'
-        console.dir(rv)
+        #console.log 'resolving back object'
+        #console.dir(rv)
         q.resolve(rv)
 
     model.forEach (property) =>
