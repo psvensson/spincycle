@@ -159,7 +159,7 @@ class OStore
     #console.log '-------------------------------------------------------sendAtInterval called '
     #console.dir OStore.updateQueue
     if OStore.updateQueue.length > 0
-      if debug then console.log 'OStore.sendAtInterval queue length = '+OStore.updateQueue.length
+      #if debug then console.log 'OStore.sendAtInterval queue length = '+OStore.updateQueue.length
       l = OStore.updateQueue.length
       count = 0
       while count < l
@@ -168,7 +168,7 @@ class OStore
         #console.dir OStore.listeners
         listeners = OStore.listeners[obj.id] or []
         for lid of listeners
-          if debug then console.log 'sending to listener '+lid+' -> '+listeners[lid]
+          #if debug then console.log 'sending to listener '+lid+' -> '+listeners[lid]
           listeners[lid](obj)
 
       if debug then console.log 'queue length after send = '+OStore.updateQueue.length
