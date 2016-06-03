@@ -35,6 +35,7 @@ class SampleGame extends SuperModel
         @players[player.name] = player
         player.serialize()
         console.log 'serializing player '+player.name
+      @serialize()
       q.resolve()
 
     return q

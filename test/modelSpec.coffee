@@ -8,6 +8,7 @@ AuthenticationManager = require('../example/AuthenticationManager')
 express         = require("express")
 app             = express()
 SpinCycle       = require('../lib/MessageRouter')
+ClientEndpoints  = require('../lib/ClientEndpoints')
 
 describe 'Spincycle Model Tests', ->
 
@@ -514,12 +515,46 @@ describe 'Spincycle Model Tests', ->
         foo.serialize()
         bar.foos.push foo
         bar.serialize()
-        console.log '------------------------- initial bar object'
-        console.dir bar
         brecord = bar.toClient()
         brecord.name = 'Doctored Bar object'
         messageRouter.objectManager.resolveReferences(brecord, Bar.model).then (result)->
           console.log '---------------- resolvereferences results ------------------'
           console.dir result
+          expect(result.foos.length).to.gt(0)
           done()
+
+  it 'should be able to get correct array references to an object update subscriber', (done)->
+    new Bar().then (bar) ->
+      new Foo().then (foo) ->
+        foo.serialize()
+        bar.foos.push foo
+        bar.serialize()
+        console.log '------------------------- initial bar object'
+        console.dir bar
+
+        ClientEndpoints.registerEndpoint 'fooclient',(reply)->
+          console.log '--__--__--__ object update __--__--__--'
+          console.dir reply
+          expect(reply.payload.foos[0]).to.equal(foo.id)
+          done()
+
+        msg =
+          type: 'Bar'
+          client: 'fooclient'
+          obj:{id: bar.id, type: 'Bar'}
+          user:
+            isAdmin: true
+          replyFunc: (reply)->
+
+        messageRouter.objectManager.onRegisterForUpdatesOn(msg)
+
+        brecord = bar.toClient()
+        brecord.name = 'Extra Doctored Bar object'
+        umsg =
+          obj: brecord
+          user:
+            isAdmin: true
+          replyFunc: (ureply)->
+
+        messageRouter.objectManager._updateObject(umsg)
 

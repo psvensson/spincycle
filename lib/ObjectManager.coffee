@@ -327,8 +327,8 @@ class ObjectManager
       #console.log 'checkFinished count = '+count
       #console.dir rv
       if --count == 0
-        console.log 'Objectmanager.resolveReferences resolving back object'
-        console.dir(rv)
+        #console.log 'Objectmanager.resolveReferences resolving back object'
+        #console.dir(rv)
         q.resolve(rv)
 
     model.forEach (property) =>
@@ -361,7 +361,7 @@ class ObjectManager
                 rv[property.name] = resolvedarr
                 checkFinished()
       else if property.hashtable
-        console.log '======================================== going through hashtable property '+property.name
+        #console.log '======================================== going through hashtable property '+property.name
         resolvedhash = {}
         if record[property.name] and record[property.name].length
           harr = record[property.name] or []
@@ -381,7 +381,7 @@ class ObjectManager
           rv[property.name] = record[property.name]
           checkFinished()
       else
-        console.log 'resolveReference adding direct reference '+property.name
+        #console.log 'resolveReference adding direct reference '+property.name
         rv[property.name] = record[property.name]
         checkFinished()
 
