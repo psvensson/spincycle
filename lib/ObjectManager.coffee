@@ -324,41 +324,44 @@ class ObjectManager
     count = model.length
 
     checkFinished = () ->
-      #if debug then console.log 'checkFinished count = '+count
+      #console.log 'checkFinished count = '+count
       #console.dir rv
       if --count == 0
-        #console.log 'resolving back object'
-        #console.dir(rv)
+        console.log 'Objectmanager.resolveReferences resolving back object'
+        console.dir(rv)
         q.resolve(rv)
 
     model.forEach (property) =>
-      #if debug then console.log 'going through array property '+property.name
+      #console.log 'going through array property '+property.name
+      #console.dir property
       if property.array
         #console.log 'going through array property '+property.name
         resolvedarr = []
         arr = record[property.name] or []
+        #console.dir arr
         arr = arr.filter (el) -> el and el isnt null and el isnt 'null' and el isnt 'undefined'
-        if debug then console.dir arr
+        #if debug then console.dir arr
         acount = arr.length
+        #console.log 'acount = '+acount
         if acount == 0
           rv[property.name] = []
           checkFinished()
         else
           arr.forEach (idorobj) =>
             #console.log 'resolving array'
-            console.dir arr
+            #console.dir arr
             if idorobj and typeof idorobj == 'object' then id = idorobj.id else id = idorobj
             #console.log 'attempting to get array name '+property.name+' object type '+property.type+' id '+id
             @getObjectPullThrough(id, property.type).then (o)=>
               #console.log ' we got object '+o
               #console.dir o
               resolvedarr.push(o)
-              #console.log 'adding array reference '+o.id+' name '+o.name
+              #console.log 'adding array reference '+o.id+' name '+o.name+' acount = '+acount
               if --acount == 0
                 rv[property.name] = resolvedarr
                 checkFinished()
       else if property.hashtable
-        #console.log 'going through hashtable property '+property.name
+        console.log '======================================== going through hashtable property '+property.name
         resolvedhash = {}
         if record[property.name] and record[property.name].length
           harr = record[property.name] or []
@@ -376,8 +379,9 @@ class ObjectManager
                   checkFinished()
         else
           rv[property.name] = record[property.name]
+          checkFinished()
       else
-        #console.log 'resolveReference adding direct reference '+property.name
+        console.log 'resolveReference adding direct reference '+property.name
         rv[property.name] = record[property.name]
         checkFinished()
 

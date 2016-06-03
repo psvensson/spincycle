@@ -825,11 +825,30 @@
         });
       });
     });
-    return it('should be able to resolve object graphs properly', function(done) {
+    it('should be able to resolve object graphs properly', function(done) {
       return messageRouter.objectManager.resolveReferences(record2, Bar.model).then(function(result) {
         console.log('---------------- resolvereferences results ------------------');
         console.dir(result);
         return done();
+      });
+    });
+    return it('should be able to update scalars without trashing array references', function(done) {
+      return new Bar().then(function(bar) {
+        return new Foo().then(function(foo) {
+          var brecord;
+          foo.serialize();
+          bar.foos.push(foo);
+          bar.serialize();
+          console.log('------------------------- initial bar object');
+          console.dir(bar);
+          brecord = bar.toClient();
+          brecord.name = 'Doctored Bar object';
+          return messageRouter.objectManager.resolveReferences(brecord, Bar.model).then(function(result) {
+            console.log('---------------- resolvereferences results ------------------');
+            console.dir(result);
+            return done();
+          });
+        });
       });
     });
   });

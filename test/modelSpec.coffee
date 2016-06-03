@@ -508,3 +508,18 @@ describe 'Spincycle Model Tests', ->
       console.dir result
       done()
 
+  it 'should be able to update scalars without trashing array references', (done)->
+    new Bar().then (bar) ->
+      new Foo().then (foo) ->
+        foo.serialize()
+        bar.foos.push foo
+        bar.serialize()
+        console.log '------------------------- initial bar object'
+        console.dir bar
+        brecord = bar.toClient()
+        brecord.name = 'Doctored Bar object'
+        messageRouter.objectManager.resolveReferences(brecord, Bar.model).then (result)->
+          console.log '---------------- resolvereferences results ------------------'
+          console.dir result
+          done()
+
