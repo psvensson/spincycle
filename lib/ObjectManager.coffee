@@ -87,7 +87,7 @@ class ObjectManager
       objStore.getObject(msg.obj.id, msg.obj.type).then (obj) =>
         console.log 'got object form objstore -> '+obj
         if obj
-          if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
+          if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user, msg.obj)
             console.log 'user could write this object'
             console.dir obj
             DB.remove obj, (removestatus) =>
@@ -270,7 +270,7 @@ class ObjectManager
         #console.dir obj
         if obj
           #console.log 'have an object'
-          canwrite = @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user)
+          canwrite = @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user, msg.obj)
           if canwrite
             console.log 'can write'
             # Make sure to resolve object references in arrays and hashtables
