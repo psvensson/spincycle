@@ -19,7 +19,8 @@ class SampleGame extends SuperModel
   postCreate: (q) =>
     if @players.length == 0
       @createPlayers().then () =>
-        console.log 'SampelGame players created...'
+        console.log 'SampleGame players created...'
+        console.dir @
         q.resolve(@)
     else
       q.resolve(@)
@@ -32,7 +33,7 @@ class SampleGame extends SuperModel
       console.log 'sample players created'
       results.forEach (player) =>
         #console.dir player
-        @players[player.name] = player
+        @players.push player
         player.serialize()
         console.log 'serializing player '+player.name
       @serialize()

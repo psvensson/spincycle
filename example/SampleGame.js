@@ -46,7 +46,8 @@
       if (this.players.length === 0) {
         return this.createPlayers().then((function(_this) {
           return function() {
-            console.log('SampelGame players created...');
+            console.log('SampleGame players created...');
+            console.dir(_this);
             return q.resolve(_this);
           };
         })(this));
@@ -64,7 +65,7 @@
         return function(results) {
           console.log('sample players created');
           results.forEach(function(player) {
-            _this.players[player.name] = player;
+            _this.players.push(player);
             player.serialize();
             return console.log('serializing player ' + player.name);
           });
