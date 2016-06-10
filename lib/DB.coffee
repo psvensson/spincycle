@@ -196,10 +196,14 @@ class DB
               if debug then console.log 'DB.get calling datastore '+store
               store.get(type, id, (result) =>
                 if not result
-                  if debug then console.log 'DB.get for type '+type+' and id '+id+' got back '+result
+                  if debug
+                    console.log 'DB.get for type '+type+' and id '+id+' got back '+result
+                    bam = false
                 else
                   @lru.set(id, result)
-                if not bam then p.resolve(result)
+                if not bam
+                  if debug then console.log 'DB.get resolving '+result
+                  p.resolve(result)
                 bam = true
               )
         else
