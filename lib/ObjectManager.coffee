@@ -253,10 +253,13 @@ class ObjectManager
         if not o
           if debug then console.log 'getObjectPullThrough did not find object type '+type+' id '+id+' in ostore, getting from db'
           DB.get(type, [id]).then (record) =>
-            #console.log 'getting record from db'
-            #console.dir record
-            @messageRouter.resolver.createObjectFrom(record).then (oo) =>
-              q.resolve(oo)
+            if record
+              #console.log 'getting record from db'
+              #console.dir record
+              @messageRouter.resolver.createObjectFrom(record).then (oo) =>
+                q.resolve(oo)
+            else
+              q.resolve null
         else
           if debug then console.log 'getObjectPullThrough found object'
           q.resolve(o)
