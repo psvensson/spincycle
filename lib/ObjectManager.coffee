@@ -113,7 +113,8 @@ class ObjectManager
 
   _getObject: (msg) =>
     if debug then console.log '_getObject called for type '+msg.type
-    if debug then console.dir msg
+    if debug then console.dir msg.obj
+    #if debug then console.dir msg
     if msg.type and msg.obj and msg.obj.id
       id = msg.obj.id
       if id.indexOf and id.indexOf('all_') > -1
@@ -352,9 +353,10 @@ class ObjectManager
           checkFinished()
         else
           arr.forEach (idorobj) =>
-            #console.log 'resolving array'
+            console.log 'resolving array element '+idorobj
             #console.dir arr
-            if idorobj and typeof idorobj == 'object' then id = idorobj.id else id = idorobj
+            id = idorobj
+            if typeof idorobj == 'object' then id = idorobj.id
             #console.log 'attempting to get array name '+property.name+' object type '+property.type+' id '+id
             @getObjectPullThrough(id, property.type).then (o)=>
               #console.log ' we got object '+o
