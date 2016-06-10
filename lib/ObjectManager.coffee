@@ -255,7 +255,7 @@ class ObjectManager
           DB.get(type, [id]).then (record) =>
             if debug then console.log 'getting record from db'
             if debug then console.dir record
-            if record
+            if record or not record[0] or record[0] == null
               @messageRouter.resolver.createObjectFrom(record).then (oo) =>
                 q.resolve(oo)
             else
