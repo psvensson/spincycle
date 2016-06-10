@@ -31,8 +31,8 @@ class RedisMethod
     clientChannel = msg.channelID
     msg.client    = msg.channelID
     if clientChannel then ClientEndpoints.registerEndpoint msg.channelID, (sendmsg) =>
-      #console.log '******************* sending backchannel message through redis channel .'+clientChannel
-      #console.dir sendmsg
+      if debug then console.log '******************* sending backchannel message through redis channel .'+clientChannel
+      if debug then console.dir sendmsg
       @sendclient.publish(clientChannel, JSON.stringify(sendmsg))
     #
     # TODO:
@@ -51,8 +51,8 @@ class RedisMethod
           replydata = _replydata
         console.log 'redismethod replying to target '+msg.target+' message '+msg.messageId+' on channel '+clientChannel
         #console.dir message
-        #console.log '---------------------replydata is-------------------------'
-        #console.dir replydata
+        if debug then console.log '---------------------replydata is-------------------------'
+        if debug then console.dir replydata
         replydata.messageId = msg.messageId
         @sendclient.publish(clientChannel, JSON.stringify(replydata))
       target(msg)
