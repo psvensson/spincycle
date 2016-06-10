@@ -255,12 +255,12 @@ class ObjectManager
           DB.get(type, [id]).then (record) =>
             if debug then console.log 'getting record from db'
             if debug then console.dir record
-            if record or not record[0] or record[0] == null
-              @messageRouter.resolver.createObjectFrom(record).then (oo) =>
-                q.resolve(oo)
-            else
+            if not record or not record[0] or record[0] == null
               if debug then console.log '------- getObjectPullThrough got null record. resolving null'
               q.resolve null
+            else
+              @messageRouter.resolver.createObjectFrom(record).then (oo) =>
+                q.resolve(oo)
         else
           if debug then console.log 'getObjectPullThrough found object'
           q.resolve(o)
