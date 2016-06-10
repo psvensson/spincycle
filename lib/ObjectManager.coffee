@@ -253,12 +253,13 @@ class ObjectManager
         if not o
           if debug then console.log 'getObjectPullThrough did not find object type '+type+' id '+id+' in ostore, getting from db'
           DB.get(type, [id]).then (record) =>
+            if debug then console.log 'getting record from db'
+            if debug then console.dir record
             if record
-              #console.log 'getting record from db'
-              #console.dir record
               @messageRouter.resolver.createObjectFrom(record).then (oo) =>
                 q.resolve(oo)
             else
+              if debug then console.log '------- getObjectPullThrough got null record. resolving null'
               q.resolve null
         else
           if debug then console.log 'getObjectPullThrough found object'
@@ -327,10 +328,10 @@ class ObjectManager
     count = model.length
 
     checkFinished = () ->
-      #console.log 'checkFinished count = '+count
+      if debug then console.log 'checkFinished count = '+count
       #console.dir rv
       if --count == 0
-        #console.log 'Objectmanager.resolveReferences resolving back object'
+        if debug then console.log 'Objectmanager.resolveReferences resolving back object'
         #console.dir(rv)
         q.resolve(rv)
 
@@ -358,7 +359,7 @@ class ObjectManager
             @getObjectPullThrough(id, property.type).then (o)=>
               #console.log ' we got object '+o
               #console.dir o
-              resolvedarr.push(o)
+              if o then resolvedarr.push(o)
               #console.log 'adding array reference '+o.id+' name '+o.name+' acount = '+acount
               if --acount == 0
                 rv[property.name] = resolvedarr
@@ -375,7 +376,7 @@ class ObjectManager
           else
             harr.forEach (id) =>
               @getObjectPullThrough(id, property.type).then (o)=>
-                resolvedhash[o.name] = o
+                if o then resolvedhash[o.name] = o
                 #console.log 'adding hashtable reference '+o.id+' name '+o.name
                 if --hcount == 0
                   rv[property.name] = resolvedhash
