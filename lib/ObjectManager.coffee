@@ -15,8 +15,8 @@ class ObjectManager
    @updateObjectHooks = []
    @populationListeners = []
    SuperModel.onCreate (newmodel)=>
-     console.log 'got onCreate event'
-     console.dir @populationListeners
+     #console.log 'got onCreate event'
+     #console.dir @populationListeners
      @populationListeners.forEach (client) =>
        if ClientEndpoints.exists(client)
          console.log 'sending population update create to client '+client
