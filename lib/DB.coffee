@@ -90,11 +90,11 @@ class DB
           if res and res[0]
             if debug then console.log 'DB.getOrCreateObjectByRecord found existing record in DB *'
             record = res[0]
-          else
-            q.resolve()
-          resolver.createObjectFrom(record).then (ooo) =>
+            resolver.createObjectFrom(record).then (ooo) =>
             if debug then console.log 'DB.getOrCreateObjectByRecord createFromRecord returns '+ooo
             q.resolve(ooo)
+          else
+            q.resolve()
     return q
 
   @byProviderId: (type, pid) =>
