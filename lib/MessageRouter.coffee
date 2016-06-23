@@ -139,12 +139,16 @@ class MessageRouter
             console.log '--- creating new rate limiter for user '+m.user.id+' max request = '+parseInt(@messagesPerSecond)
             m.user.limiter = new RateLimiter(parseInt(@messagesPerSecond), 1000)
           #console.log 'remaining tokens before call is '+m.user.limiter.getTokensRemaining()
-          m.user.limiter.removeTokens 1, (err, remainingRequests) =>
-            #console.log 'messageRouter::routeMessage remaining requests for user is '+remainingRequests+' err = '+err
-            if parseInt(remainingRequests) < 1
-              m.replyFunc({status: e.general.NOT_ALLOWED, info: 'packets over '+@messagesPerSecond+'/s dropped. Have a nice day.', payload: {error: 'TOOMANYPACKETSPERSECOND'}})
-            else
-              fn(m) # With a player object that matches the session cookies or whatnot in the message
+          if m.user.limiter and m.user.limiter.removeTokens
+            m.user.limiter.removeTokens 1, (err, remainingRequests) =>
+              #console.log 'messageRouter::routeMessage remaining requests for user is '+remainingRequests+' err = '+err
+              if parseInt(remainingRequests) < 1
+                m.replyFunc({status: e.general.NOT_ALLOWED, info: 'packets over '+@messagesPerSecond+'/s dropped. Have a nice day.', payload: {error: 'TOOMANYPACKETSPERSECOND'}})
+              else
+                fn(m) # With a player object that matches the session cookies or whatnot in the message
+          else
+            console.log '** user '+m.user.name+' have no ratelimiter or at least not one with a removeToken function!!!'
+            console.dir m.user
         )
       else
         console.log '--- could not find registered target for message! ---'
