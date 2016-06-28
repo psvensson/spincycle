@@ -29,7 +29,7 @@ class HttpMethod
       target = HttpMethod.httproutes[req.query.target]
       if target
         message = { client: ip+':'+port, target: req.query.target, messageId: url_parts.messageId || uuid.v4() }
-        for p, part of req.query
+        for p, part of url_parts
           message[p] = part # TODO: Guard against hax0r dataz
         #console.log 'message is now'
         #console.dir message
@@ -39,7 +39,7 @@ class HttpMethod
         target(message)
 
     app.get basePath, (req, res) ->
-      url_parts = url.parse(req.url, true)
+      url_parts = req.query
       doSend(req, res, url_parts)
 
     app.post basePath, (req, res) ->
