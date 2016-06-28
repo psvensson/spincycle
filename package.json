@@ -1,6 +1,6 @@
 {
   "name": "spincycle",
-  "version": "1.7.81",
+  "version": "1.7.82",
   "description": "A reactive message router and object manager that lets clients subscribe to object property changes on the server",
   "main": "index.js",
   "directories": {
@@ -29,6 +29,7 @@
   },
   "homepage": "https://github.com/psvensson/spincycle",
   "dependencies": {
+    "basic-auth": "^1.0.4",
     "chai": "^2.2.0",
     "cors": "^2.5.3",
     "express": "^4.11.1",
@@ -51,6 +52,5 @@
     "rethinkdb": "^2.2.2",
     "socket.io": "^1.3.2"
   },
-  "devDependencies": {
-  }
+  "devDependencies": {}
 }

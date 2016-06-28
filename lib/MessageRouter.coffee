@@ -104,14 +104,14 @@ class MessageRouter
       #console.log 'registering target '+targetName+' on method '+methodName
       method.registrationFunc(targetName, @routeMessage)
 
-  addTarget: (targetName, args, targetFunc) =>
+  addTarget: (targetName, args, targetFunc, props) =>
     #console.log 'adding route target for "'+targetName+'" args = '+args
     @targets[targetName] = targetFunc
     @args[targetName] = args
     for name,method of @methods
       #console.log 'registering target '+targetName+' on method '+name
       if method.registrationFunc
-        method.registrationFunc(targetName, @routeMessage)
+        method.registrationFunc(targetName, @routeMessage, props)
       else
         console.log 'Spincycle did NOT find target for '+targetName
         console.log '----------------methods-------------------'
