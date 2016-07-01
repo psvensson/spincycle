@@ -358,12 +358,12 @@ class ObjectManager
             #console.dir arr
             id = idorobj
             if typeof idorobj == 'object' then id = idorobj.id
-            #console.log 'attempting to get array name '+property.name+' object type '+property.type+' id '+id
+            if debug then console.log 'attempting to get array name '+property.name+' object type '+property.type+' id '+id
             @getObjectPullThrough(id, property.type).then (o)=>
-              #console.log ' we got object '+o
-              #console.dir o
+              if debug then console.log ' we got object '+o
+              if debug then console.dir o
               if o then resolvedarr.push(o)
-              #console.log 'adding array reference '+o.id+' name '+o.name+' acount = '+acount
+              if debug then console.log 'adding array reference '+o.id+' name '+o.name+' acount = '+acount
               if --acount == 0
                 rv[property.name] = resolvedarr
                 checkFinished()
