@@ -261,6 +261,7 @@ class ObjectManager
               q.resolve null
             else
               @messageRouter.resolver.createObjectFrom(record).then (oo) =>
+                if debug then console.log '------- getObjectPullThrough got object '+oo.id+'  '+oo.type
                 q.resolve(oo)
         else
           if debug then console.log 'getObjectPullThrough found object'
@@ -337,7 +338,7 @@ class ObjectManager
         q.resolve(rv)
 
     model.forEach (property) =>
-      #console.log 'going through array property '+property.name
+      if debug then console.log 'going through array property '+property.name
       #console.dir property
       if property.array
         #console.log 'going through array property '+property.name
