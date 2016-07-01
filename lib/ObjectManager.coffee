@@ -254,14 +254,14 @@ class ObjectManager
         if not o
           if debug then console.log 'getObjectPullThrough did not find object type '+type+' id '+id+' in ostore, getting from db'
           DB.get(type, [id]).then (record) =>
-            if debug then console.log 'getting record from db'
-            if debug then console.dir record
+            #if debug then console.log 'getting record from db'
+            #if debug then console.dir record
             if not record or not record[0] or record[0] == null
               if debug then console.log '------- getObjectPullThrough got null record. resolving null'
               q.resolve null
             else
               @messageRouter.resolver.createObjectFrom(record).then (oo) =>
-                if debug then console.log '------- getObjectPullThrough got object '+oo.id+'  '+oo.type
+                #if debug then console.log '------- getObjectPullThrough got object '+oo.id+'  '+oo.type
                 q.resolve(oo)
         else
           if debug then console.log 'getObjectPullThrough found object'
@@ -330,15 +330,15 @@ class ObjectManager
     count = model.length
 
     checkFinished = () ->
-      if debug then console.log 'checkFinished count = '+count
+      #if debug then console.log 'checkFinished count = '+count
       #console.dir rv
       if --count == 0
-        if debug then console.log 'Objectmanager.resolveReferences resolving back object'
+        #if debug then console.log 'Objectmanager.resolveReferences resolving back object'
         #console.dir(rv)
         q.resolve(rv)
 
     model.forEach (property) =>
-      if debug then console.log 'going through array property '+property.name
+     # if debug then console.log 'going through array property '+property.name
       #console.dir property
       if property.array
         #console.log 'going through array property '+property.name
@@ -358,12 +358,12 @@ class ObjectManager
             #console.dir arr
             id = idorobj
             if typeof idorobj == 'object' then id = idorobj.id
-            if debug then console.log 'attempting to get array name '+property.name+' object type '+property.type+' id '+id
+            #if debug then console.log 'attempting to get array name '+property.name+' object type '+property.type+' id '+id
             @getObjectPullThrough(id, property.type).then (o)=>
-              if debug then console.log ' we got object '+o
-              if debug then console.dir o
+              #if debug then console.log ' we got object '+o
+              #if debug then console.dir o
               if o then resolvedarr.push(o)
-              if debug then console.log 'adding array reference '+o.id+' name '+o.name+' acount = '+acount
+              #if debug then console.log 'adding array reference '+o.id+' name '+o.name+' acount = '+acount
               if --acount == 0
                 rv[property.name] = resolvedarr
                 checkFinished()
