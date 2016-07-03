@@ -15,6 +15,7 @@ define(['ractive'], (Ractive) =>
         dialog = @find('#'+@get('guid')+'-dialog')
         dialog.close()
 
+        
     oninit: () ->
       guid = @_guid
       @set('guid', guid)
