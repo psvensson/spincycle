@@ -1,6 +1,8 @@
 e     = require('../lib/EventManager')
 Game  = require('./SampleGame')
+SamplePlayer = require('./SamplePlayer')
 DB    = require('../lib/DB')
+ResolveModule   = require('../lib/ResolveModule')
 
 class SampleLogic
 
@@ -33,6 +35,9 @@ class SampleLogic
 
     @messageRouter.objectManager.expose('SampleGame')
     @messageRouter.objectManager.expose('SamplePlayer')
+
+    ResolveModule.modulecache['SampleGame'] = Game
+    ResolveModule.modulecache['SamplePlayer'] = SamplePlayer
 
     @messageRouter.open()
 
