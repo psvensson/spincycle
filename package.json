@@ -1,6 +1,6 @@
 {
   "name": "spincycle",
-  "version": "1.7.83",
+  "version": "1.7.84",
   "description": "A reactive message router and object manager that lets clients subscribe to object property changes on the server",
   "main": "index.js",
   "directories": {
@@ -35,6 +35,7 @@
     "express": "^4.11.1",
     "felix-couchdb": "^1.0.7",
     "findit": "^2.0.0",
+    "gcloud": "^0.36.0",
     "glob": "^4.3.5",
     "googleapis": "^1.1.1",
     "influx": "^3.3.0",
