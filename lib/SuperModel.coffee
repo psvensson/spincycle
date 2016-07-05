@@ -228,10 +228,10 @@ class SuperModel
     #console.dir id
     OMgr.getObject(id, resolveobj.type).then( (oo) =>
       if oo
-        if debug then console.log 'SuperModel found existing instance of '+resolveobj.name+' type '+resolveobj.type+' in OStore'
+        #if debug then console.log 'SuperModel found existing instance of '+resolveobj.name+' type '+resolveobj.type+' in OStore'
         @insertObj(resolveobj, oo)
         if count == 0
-          if debug then console.log 'SuperModel resolving '+resolveobj.name+' type '+resolveobj.type+' immediately'
+          #if debug then console.log 'SuperModel resolving '+resolveobj.name+' type '+resolveobj.type+' immediately'
           r.resolve(oo)
       else
         if debug then console.log 'SuperModel did not find obj '+resolveobj.name+' ['+id+'] of type '+resolveobj.type+' in OStore. Getting from DB. typeof of id prop is '+(typeof id)

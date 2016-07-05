@@ -30,7 +30,7 @@ class GooglePersistence
     type = _type.toLowerCase()
     if debug then console.log 'Google.all called for '+type
     @getDbFor(type).then (db)=>
-      query = db.createQuery(type).order('-createdAt').limit(10000)
+      query = db.createQuery(type).limit(10000)
       db.runQuery query, (err, entities) ->
         if err
           if debug then console.log 'Google.all ERROR: '+err
@@ -38,8 +38,9 @@ class GooglePersistence
           cb()
         else
           if debug then console.log 'Google.all returns '+entities.length+' entities'
-          if debug then console.dir entities
-          cb(entities)
+          result = entities.map (el)->el.data
+          #if debug then console.dir result
+          cb(result)
 
   count: (_type)=>
     if debug then console.log 'Google.count called'
@@ -64,17 +65,19 @@ class GooglePersistence
     return q
 
   get: (_type, id, cb) =>
-    if debug then console.log 'Google.get called '
     type = _type.toLowerCase()
+    #if debug then console.log 'Google.get called type = '+type+' id = '+id
     @getDbFor(type).then (db)=>
       key = db.key([type, id])
-      db.get key, (err, entity) =>
+      #if debug then console.log '-- Google.get key for '+type+' became '
+      #if debug then console.dir key
+      db.get {key:key}, (err, entity) =>
         if err
           if debug then console.log 'Google.get ERROR: '+err
           if debug then console.dir err
           cb()
         else
-          if debug then console.log 'Google.get returns entity'
+          if debug then console.log 'Google.get returns entity for '+type+' id = '+id
           if debug then console.dir entity
           cb(entity)
 
@@ -82,18 +85,22 @@ class GooglePersistence
     @findMany(_type, property, _value)
 
   findMany: (_type, property, _value) =>
-    if debug then console.log 'Google.findMany called'
+    q = defer()
     value = _value or ""
-    query = db.createQuery(type).order('-createdAt').limit(10000).filter(property, '=', value)
-    db.runQuery query, (err, entities) ->
-      if err
-        if debug then console.log 'Google.all ERROR: '+err
-        if debug then console.dir err
-        cb()
-      else
-        if debug then console.log 'Google.all returns '+entities.length+' entities'
-        if debug then console.dir entities
-        cb(entities)
+    type = _type.toLowerCase()
+    if debug then console.log 'Google.findMany called for '+type+' filtering on '+property+' = '+value
+    @getDbFor(type).then (db)=>
+      query = db.createQuery(type).limit(10000).filter(property, '=', value)
+      db.runQuery query, (err, entities) ->
+        if err
+          if debug then console.log 'Google.findMany ERROR: '+err
+          if debug then console.dir err
+          q.resolve()
+        else
+          if debug then console.log 'Google.all returns '+entities.length+' entities'
+          #if debug then console.dir entities
+          result = entities.map (el)->el.data
+          q.resolve(result)
     return q
 
   findQuery: (_type, query) =>
@@ -101,25 +108,28 @@ class GooglePersistence
 
   # datastore doesn't support wildcard text searches :/
   search: (_type, property, _value) =>
-    @findMany(_type, property, value)
+    @findMany(_type, property, _value)
 
   set: (_type, obj, cb)=>
     type = _type.toLowerCase()
-    if debug then console.log 'Google.set called for '+type
-    if debug then console.dir obj
+    if debug then console.log '-- Google.set called for '+type+' - '+JSON.stringify(obj)
+    #if debug then console.dir obj
     @getDbFor(type).then (db)=>
       if not obj.id
         key = db.key(type)
         obj.id = key.path[1]
       else
         key = db.key(type, obj.id)
-      db.upsert key, obj, (err)=>
+      #if debug then console.log '-- Google.set key for '+type+' became '
+      #if debug then console.dir key
+      db.upsert {key:key, data:obj}, (err)=>
+        if debug then console.log '-- Google.set done for '+type+' '+obj.id+' !'
         if err
           if debug then console.log 'Google.set ERROR: '+err
           if debug then console.dir err
-          cb(false)
+          cb()
         else
-          cb(true)
+          cb(obj)
 
   remove: (_type, obj, cb) =>
     if debug then console.log 'Google.remove called'

@@ -232,18 +232,23 @@ describe 'Spincycle Model Tests', ->
       #console.dir bar
       expect(bar.footable).to.exist
 
-  it 'should be able to persist newly added hashtable references and still have them after serializing and reloading from record', ()->
+  it 'should be able to persist newly added hashtable references and still have them after serializing and reloading from record', (done)->
     new Bar(record2).then (bar) ->
       OStore.storeObject(bar)
       new Foo(f4record).then (foo) ->
         OStore.storeObject(foo)
         bar.footable[foo.name] = foo
-        foo.serialize()
-        bar.serialize()
-        DB.get('Bar', [4711]).then (newbars) ->
-          newbar = newbars[0]
-          #console.dir newbar
-          expect(newbar.footable).to.exist
+        foo.serialize().then ()->
+          bar.serialize().then ()->
+            DB.get('Bar', [4711]).then (newbars) ->
+              newbar = newbars[0]
+              #console.dir newbar
+              expect(newbar.footable).to.exist
+              setTimeout(
+                ()->
+                done()
+              ,400
+              )
 
   it 'should be able to use custom properties for hashtable keys', ()->
     record222 =
@@ -315,6 +320,7 @@ describe 'Spincycle Model Tests', ->
                 if vals1[i] and vals1[i] != vals2[i] then same = false else same = true
               expect(same).to.equal(true)
 
+
   it 'should filter out crap values in arrays when updating', ()->
     new Fooznaz().then (fz) ->
       record = fz.toClient()
@@ -331,9 +337,18 @@ describe 'Spincycle Model Tests', ->
       user:
         isAdmin: true
       replyFunc: (reply)->
+        console.log '--------------testing if listObject always returns an array'
+        console.dir reply
         expect(reply.payload.length).to.gt(0)
         done()
-    messageRouter.objectManager._listObjects(msg)
+    setTimeout(
+      ()->
+        messageRouter.objectManager._listObjects(msg)
+      ,400
+    )
+
+
+
 
   it 'should include whole objects when using storedirectly', (done)->
     #console.log '------------------------------------------------trying to make a foo'
@@ -363,6 +378,7 @@ describe 'Spincycle Model Tests', ->
               expect(newdbar.theFoo.name).to.equal(dfoo.name)
               done()
 
+
   it 'should be able to do a search on a property', (done)->
     record7=
       id: 'bbb456'
@@ -370,11 +386,12 @@ describe 'Spincycle Model Tests', ->
       name: 'BolarsKolars'
     ResolveModule.modulecache['DFoo'] = DFoo
     new DFoo(record7).then (dfoo) ->
-      dfoo.serialize()
-      query = {sort:'name', property: 'name', value: 'BolarsKolars'}
-      DB.findQuery('DFoo', query).then (records) =>
-        expect(records.length).to.equal(1)
-        done()
+      dfoo.serialize().then ()->
+        query = {sort:'name', property: 'name', value: 'BolarsKolars'}
+        DB.findQuery('DFoo', query).then (records) =>
+          expect(records.length).to.equal(1)
+          done()
+
 
   it 'should not get any results when searching on the wrong property', (done)->
     record7=
@@ -383,24 +400,26 @@ describe 'Spincycle Model Tests', ->
       name: 'BolarsKolars2'
     ResolveModule.modulecache['DFoo'] = DFoo
     new DFoo(record7).then (dfoo) ->
-      dfoo.serialize()
-      query = {sort:'name', property: 'id', value: 'BolarsKolars2'}
-      DB.findQuery('DFoo', query).then (records) =>
-        expect(records.length).to.equal(0)
-        done()
+      dfoo.serialize().then ()->
+        query = {sort:'name', property: 'id', value: 'BolarsKolars2'}
+        DB.findQuery('DFoo', query).then (records) =>
+          expect(records.length).to.equal(0)
+          done()
 
-  it 'should not be able to search on a wildcard property', (done)->
+
+  it 'should be able to search on a wildcard property', (done)->
     record8=
       id: 'bbb456'
       type: 'DFoo'
       name: 'MehmetBolarsKolars'
     ResolveModule.modulecache['DFoo'] = DFoo
     new DFoo(record8).then (dfoo) ->
-      dfoo.serialize()
-      query = {sort:'name', property: 'name', value: 'Meh', wildcard: true}
-      DB.findQuery('DFoo', query).then (records) =>
-        expect(records.length).to.equal(1)
-        done()
+      dfoo.serialize().then ()->
+        query = {sort:'name', property: 'name', value: 'Meh', wildcard: true}
+        DB.findQuery('DFoo', query).then (records) =>
+          expect(records.length).to.equal(1)
+          done()
+
 
   it 'should be able to get two hits on a wildcard property', (done)->
     record9=
@@ -413,13 +432,13 @@ describe 'Spincycle Model Tests', ->
       name: 'MyhmetBolarsKolars'
     ResolveModule.modulecache['DFoo'] = DFoo
     new DFoo(record9).then (dfoo1) ->
-      dfoo1.serialize()
-      new DFoo(record10).then (dfoo2) ->
-        dfoo2.serialize()
-        query = {sort:'name', property: 'name', value: 'My', wildcard: true}
-        DB.findQuery('DFoo', query).then (records) =>
-          expect(records.length).to.equal(2)
-          done()
+      dfoo1.serialize().then ()->
+        new DFoo(record10).then (dfoo2) ->
+          dfoo2.serialize().then ()->
+            query = {sort:'name', property: 'name', value: 'My', wildcard: true}
+            DB.findQuery('DFoo', query).then (records) =>
+              expect(records.length).to.equal(2)
+              done()
 
   it 'should not bomb on searches with wildcard characters', (done)->
     record11=
@@ -428,11 +447,11 @@ describe 'Spincycle Model Tests', ->
       name: 'ArnelarsKolars'
     ResolveModule.modulecache['DFoo'] = DFoo
     new DFoo(record11).then (dfoo) ->
-      dfoo.serialize()
-      query = {sort:'name', property: 'name', value: 'Arne*', wildcard: true}
-      DB.findQuery('DFoo', query).then (records) =>
-        expect(records.length).to.equal(1)
-        done()
+      dfoo.serialize().then ()->
+        query = {sort:'name', property: 'name', value: 'Arne*', wildcard: true}
+        DB.findQuery('DFoo', query).then (records) =>
+          expect(records.length).to.equal(1)
+          done()
 
   it 'should not bomb on specific searches with faulty values', (done)->
     record12=
@@ -441,11 +460,11 @@ describe 'Spincycle Model Tests', ->
       name: 'MixnelarsKolars'
     ResolveModule.modulecache['DFoo'] = DFoo
     new DFoo(record12).then (dfoo) ->
-      dfoo.serialize()
-      query = {sort:'name', property: 'id', value: '[Object object]'}
-      DB.findQuery('DFoo', query).then (records) =>
-        expect(records.length).to.equal(0)
-        done()
+      dfoo.serialize().then ()->
+        query = {sort:'name', property: 'id', value: '[Object object]'}
+        DB.findQuery('DFoo', query).then (records) =>
+          expect(records.length).to.equal(0)
+          done()
 
   it 'should be able to do specific searches', (done)->
     record12=
@@ -454,10 +473,12 @@ describe 'Spincycle Model Tests', ->
       name: 'AlohaMixnelarsKolars'
     ResolveModule.modulecache['DFoo'] = DFoo
     new DFoo(record12).then (dfoo) ->
-      dfoo.serialize()
-      DB.findMany('DFoo', 'id', 'b44rrb3356').then (records) =>
-        expect(records.length).to.equal(1)
-        done()
+      dfoo.serialize().then ()->
+        DB.findMany('DFoo', 'id', 'b44rrb3356').then (records) =>
+          console.log '--------------------- specific search recods '
+          console.dir records
+          expect(records.length).to.equal(1)
+          done()
 
   it 'should get an error message when sending too many requests per second', (done)->
     user = { name: 'foo', id:17}
@@ -480,81 +501,79 @@ describe 'Spincycle Model Tests', ->
     new Bar().then (bar) ->
       bar.serialize()
       new Foo().then (foo) ->
-        foo.serialize()
-
-        umsg =
-          obj:
-            id: bar.id
-            foos: [foo.id]
-          user:
-            isAdmin: true
-          replyFunc: (ureply)->
-            console.log 'update reply was'
-            #console.dir(ureply)
-        messageRouter.objectManager._updateObject(umsg)
-
-        msg =
-          type: 'Bar'
-          user:
-            isAdmin: true
-          replyFunc: (reply)->
-            #reply.payload.forEach (obj) -> if obj.id == bar.id then console.dir obj
-            expect(reply.payload.length).to.gt(0)
-            done()
-        messageRouter.objectManager._listObjects(msg)
+        foo.serialize().then ()->
+          umsg =
+            obj:
+              id: bar.id
+              foos: [foo.id]
+            user:
+              isAdmin: true
+            replyFunc: (ureply)->
+              console.log 'update reply was'
+              #console.dir(ureply)
+          messageRouter.objectManager._updateObject(umsg)
+          msg =
+            type: 'Bar'
+            user:
+              isAdmin: true
+            replyFunc: (reply)->
+              #reply.payload.forEach (obj) -> if obj.id == bar.id then console.dir obj
+              expect(reply.payload.length).to.gt(0)
+              done()
+          messageRouter.objectManager._listObjects(msg)
 
   it 'should be able to resolve object graphs properly', (done)->
     messageRouter.objectManager.resolveReferences(record2, Bar.model).then (result)->
-      console.log '---------------- resolvereferences results ------------------'
-      console.dir result
+      #console.log '---------------- resolvereferences results ------------------'
+      #console.dir result
       done()
 
   it 'should be able to update scalars without trashing array references', (done)->
     new Bar().then (bar) ->
       new Foo().then (foo) ->
-        foo.serialize()
-        bar.foos.push foo
-        bar.serialize()
-        brecord = bar.toClient()
-        brecord.name = 'Doctored Bar object'
-        messageRouter.objectManager.resolveReferences(brecord, Bar.model).then (result)->
-          console.log '---------------- resolvereferences results ------------------'
-          console.dir result
-          expect(result.foos.length).to.gt(0)
-          done()
+        foo.serialize().then ()->
+          bar.foos.push foo
+          bar.serialize().then ()->
+            brecord = bar.toClient()
+            brecord.name = 'Doctored Bar object'
+            messageRouter.objectManager.resolveReferences(brecord, Bar.model).then (result)->
+              #console.log '---------------- resolvereferences results ------------------'
+              #console.dir result
+              expect(result.foos.length).to.gt(0)
+              done()
 
   it 'should be able to get correct array references to an object update subscriber', (done)->
     new Bar().then (bar) ->
       new Foo().then (foo) ->
-        foo.serialize()
-        bar.foos.push foo
-        bar.serialize()
-        console.log '------------------------- initial bar object'
-        console.dir bar
+        foo.serialize().then ()->
+          bar.foos.push foo
+          bar.serialize().then ()->
+            #console.log '------------------------- initial bar object'
+            #console.dir bar
 
-        ClientEndpoints.registerEndpoint 'fooclient',(reply)->
-          console.log '--__--__--__ object update __--__--__--'
-          console.dir reply
-          expect(reply.payload.foos[0]).to.equal(foo.id)
-          done()
+            ClientEndpoints.registerEndpoint 'fooclient',(reply)->
+              console.log '--__--__--__ object update __--__--__--'
+              console.dir reply
+              expect(reply.payload.foos[0]).to.equal(foo.id)
+              done()
 
-        msg =
-          type: 'Bar'
-          client: 'fooclient'
-          obj:{id: bar.id, type: 'Bar'}
-          user:
-            isAdmin: true
-          replyFunc: (reply)->
+            msg =
+              type: 'Bar'
+              client: 'fooclient'
+              obj:{id: bar.id, type: 'Bar'}
+              user:
+                isAdmin: true
+              replyFunc: (reply)->
 
-        messageRouter.objectManager.onRegisterForUpdatesOn(msg)
+            messageRouter.objectManager.onRegisterForUpdatesOn(msg)
 
-        brecord = bar.toClient()
-        brecord.name = 'Extra Doctored Bar object'
-        umsg =
-          obj: brecord
-          user:
-            isAdmin: true
-          replyFunc: (ureply)->
+            brecord = bar.toClient()
+            brecord.name = 'Extra Doctored Bar object'
+            umsg =
+              obj: brecord
+              user:
+                isAdmin: true
+              replyFunc: (ureply)->
 
-        messageRouter.objectManager._updateObject(umsg)
+            messageRouter.objectManager._updateObject(umsg)
 

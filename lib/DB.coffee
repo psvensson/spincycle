@@ -33,8 +33,8 @@ class DB
     if not @DataStore
       #@DataStore = new GDS()
       #@DataStore = new Roach()
-      #if not name then @DataStore = new Rethink(DB.dburl, DB)
-      if not name then @DataStore = new Google(DB.dburl, DB)
+      if not name then @DataStore = new Rethink(DB.dburl, DB)
+      #if not name then @DataStore = new Google(DB.dburl, DB)
       else if name == 'couchdb' then @DataStore = new Couch(DB.dburl)
       else if name == 'mongodb' then @DataStore = new Mongo(DB.dburl, DB)
       else if name == 'rethinkdb' then @DataStore = new Rethink(DB.dburl, DB)
@@ -136,8 +136,8 @@ class DB
   @findMany: (type, property, value) =>
     q = defer()
     @getDataStore().then (store) => store.findMany(type, property, value).then (results) =>
-      if debug then console.log 'DB.findMany results are..'
-      if debug then console.dir results
+      #if debug then console.log 'DB.findMany results are..'
+      #if debug then console.dir results
       if not results or not results.length
         console.log 'DB.find type '+type+', property '+property+', value '+value+' got back '+results
         q.resolve([])
@@ -153,6 +153,7 @@ class DB
         #if debug then console.log ' DB.findQuery got back '
         #if debug then console.dir results
         results.forEach (result) =>
+          #console.dir result
           if result then @lru.set(result.id, result)
       q.resolve(results)
     return q
@@ -171,7 +172,7 @@ class DB
     return q
 
   @get: (type, ids) =>
-    if debug then console.log 'DB.get called for type "'+type+'" and ids "'+ids+'"'
+    #if debug then console.log 'DB.get called for type "'+type+'" and ids "'+ids+'"'
     if not ids.length then ids = [ids]
     q = defer()
     bam = false
@@ -185,7 +186,7 @@ class DB
           console.dir arguments
           console.dir err
         p = defer()
-        #console.log 'DB found in lru: '+rv
+        #console.log 'DB found '+id+'  in lru: '+rv
         if not rv
           #if debug then console.log ' attempting to use datastore for type '+type+' and id '+id+' typeof = '+(typeof id)
           if (typeof id == 'object')
@@ -194,7 +195,7 @@ class DB
             q.resolve(null)
           else
             @getDataStore().then (store)=>
-              if debug then console.log 'DB.get calling datastore '+store
+              #if debug then console.log 'DB.get calling datastore '+store
               store.get(type, id, (result) =>
                 if not result
                   if debug

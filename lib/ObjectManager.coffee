@@ -264,7 +264,7 @@ class ObjectManager
                 #if debug then console.log '------- getObjectPullThrough got object '+oo.id+'  '+oo.type
                 q.resolve(oo)
         else
-          if debug then console.log 'getObjectPullThrough found object'
+          #if debug then console.log 'getObjectPullThrough found object'
           q.resolve(o)
     return q
 
