@@ -79,7 +79,7 @@ class GooglePersistence
         else
           if debug then console.log 'Google.get returns entity for '+type+' id = '+id
           if debug then console.dir entity
-          cb(entity)
+          cb(entity.value)
 
   find: (_type, property, _value) =>
     @findMany(_type, property, _value)
