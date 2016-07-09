@@ -119,7 +119,7 @@ class GooglePersistence
         key = db.key(type)
         obj.id = key.path[1]
       else
-        key = db.key(type, obj.id)
+        key = db.key([type, obj.id])
       if debug then console.log '-- Google.set key for '+type+' became '
       if debug then console.dir key
       db.upsert {key:key, data:obj}, (err)=>
