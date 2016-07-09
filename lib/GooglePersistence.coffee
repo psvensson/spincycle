@@ -113,15 +113,15 @@ class GooglePersistence
   set: (_type, obj, cb)=>
     type = _type.toLowerCase()
     if debug then console.log '-- Google.set called for '+type+' - '+JSON.stringify(obj)
-    #if debug then console.dir obj
+    if debug then console.dir obj
     @getDbFor(type).then (db)=>
       if not obj.id
         key = db.key(type)
         obj.id = key.path[1]
       else
         key = db.key(type, obj.id)
-      #if debug then console.log '-- Google.set key for '+type+' became '
-      #if debug then console.dir key
+      if debug then console.log '-- Google.set key for '+type+' became '
+      if debug then console.dir key
       db.upsert {key:key, data:obj}, (err)=>
         if debug then console.log '-- Google.set done for '+type+' '+obj.id+' !'
         if err
