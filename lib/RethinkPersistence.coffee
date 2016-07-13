@@ -32,7 +32,8 @@ class RethinkPersistence
         cursor.each (el)->
           console.log '--- --- ---'
           console.dir el
-          @DB.onUpdated(el)
+          if el
+            @DB.onUpdated(el)
 
   _dogetDBFor: (_type)=>
     q = defer()
