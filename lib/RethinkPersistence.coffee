@@ -26,12 +26,12 @@ class RethinkPersistence
 
   listenForChanges: (table) =>
     table.changes().run @connection,(err,cursor)=>
-      if debug then console.log '========================================================changes result is '+cursor
-      if debug then console.dir cursor
+      #if debug then console.log '========================================================changes result is '+cursor
+      #if debug then console.dir cursor
       if cursor
         cursor.each (el)->
-          console.log '--- --- ---'
-          console.dir el
+          if debug then console.log 'Rethink changes updae --- --- ---'
+          if debug then console.dir el
           if el
             @DB.onUpdated(el)
 

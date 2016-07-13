@@ -74,8 +74,8 @@ class ObjectManager
         msg.obj.createdBy = msg.user.id
         console.log 'objmgr.createObject called'
         SuperModel.resolver.createObjectFrom(msg.obj).then (o) =>
-          o.serialize()
-          msg.replyFunc({status: e.general.SUCCESS, info: 'new '+msg.obj.type, payload: o})
+          o.serialize().then () =>
+            msg.replyFunc({status: e.general.SUCCESS, info: 'new '+msg.obj.type, payload: o})
       else
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to create objects of that type', payload: msg.obj.type})
     else
