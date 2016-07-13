@@ -201,8 +201,8 @@ class SuperModel
               #if debug then console.dir ids
               count = ids.length
               if count == 0
-                if debug then console.log 'no ids for '+resolveobj.name+' so resolving null'
-                r.resolve(null)
+                if debug then console.log 'no ids for '+resolveobj.name+' so resolving undefined'
+                r.resolve(undefined)
               else
                   ids.forEach (_id) =>
                     ((id) =>
