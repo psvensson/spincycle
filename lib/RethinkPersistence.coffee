@@ -28,8 +28,8 @@ class RethinkPersistence
     table.changes().run @connection,(err,cursor)=>
       if debug then console.log '========================================================changes result is '+cursor
       if debug then console.dir cursor
-      cursor.each (el)->
-        if cursor
+      if cursor
+        cursor.each (el)->
           console.log '--- --- ---'
           console.dir el
           @DB.onUpdated(el)
