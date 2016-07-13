@@ -24,6 +24,12 @@ class RethinkPersistence
 
   getConnection: () =>
 
+  listenForChanges: (table) =>
+    table.changes().run @connection,(err,cursor)=>
+      #console.log '========================================================changes result is '+cursor
+      #console.dir cursor
+      @DB.onUpdated(cursor)
+
   _dogetDBFor: (_type)=>
     q = defer()
     type = _type.toLowerCase()
@@ -48,6 +54,7 @@ class RethinkPersistence
               #console.log 'did not find table '+type+' in cache. Adding now..'
               table = r.db('spincycle').table(type)
               @dbs[type] = table
+              @listenForChanges(table)
             #console.log 'resolving table from cache: '+type
             q.resolve table
           else
@@ -61,6 +68,7 @@ class RethinkPersistence
               table = r.db('spincycle').table(type)
               console.log 'creating new table '+type
               @dbs[type] = table
+              @listenForChanges(table)
               q.resolve(table)
             )
       )
