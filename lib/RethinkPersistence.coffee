@@ -26,8 +26,8 @@ class RethinkPersistence
 
   listenForChanges: (table) =>
     table.changes().run @connection,(err,cursor)=>
-      #console.log '========================================================changes result is '+cursor
-      #console.dir cursor
+      if debug then console.log '========================================================changes result is '+cursor
+      if debug then console.dir cursor
       @DB.onUpdated(cursor)
 
   _dogetDBFor: (_type)=>
