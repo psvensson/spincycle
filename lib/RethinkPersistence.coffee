@@ -25,7 +25,7 @@ class RethinkPersistence
   getConnection: () =>
 
   listenForChanges: (table) =>
-    table.changes().run @connection,(err,cursor)=>
+    table.changes().run(@connection).then (cursor)=>
       #if debug then console.log '========================================================changes result is '+cursor
       #if debug then console.dir cursor
       if cursor
