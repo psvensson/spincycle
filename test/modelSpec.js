@@ -564,7 +564,6 @@
         },
         replyFunc: function(reply) {
           console.log('--------------testing if listObject always returns an array');
-          console.dir(reply);
           expect(reply.payload.length).to.gt(0);
           return done();
         }
@@ -774,8 +773,6 @@
         return dfoo.serialize().then(function() {
           return DB.findMany('DFoo', 'id', 'b44rrb3356').then((function(_this) {
             return function(records) {
-              console.log('--------------------- specific search recods ');
-              console.dir(records);
               expect(records.length).to.equal(1);
               return done();
             };
@@ -868,7 +865,7 @@
         });
       });
     });
-    return it('should be able to get correct array references to an object update subscriber', function(done) {
+    it('should be able to get correct array references to an object update subscriber', function(done) {
       return new Bar().then(function(bar) {
         return new Foo().then(function(foo) {
           return foo.serialize().then(function() {
@@ -876,8 +873,6 @@
             return bar.serialize().then(function() {
               var brecord, msg, umsg;
               ClientEndpoints.registerEndpoint('fooclient', function(reply) {
-                console.log('--__--__--__ object update __--__--__--');
-                console.dir(reply);
                 expect(reply.payload.foos[0]).to.equal(foo.id);
                 return done();
               });
@@ -908,6 +903,28 @@
           });
         });
       });
+    });
+    return it('should be able to get population change callbacks', function(done) {
+      var msg;
+      ClientEndpoints.registerEndpoint('updateclient', function(reply) {
+        console.log('--__--__--__  update client got population change __--__--__--');
+        console.dir(reply);
+        expect(reply.payload).to.exist;
+        return done();
+      });
+      msg = {
+        type: 'Bar',
+        client: 'updateclient',
+        user: {
+          isAdmin: true
+        },
+        replyFunc: function(reply) {
+          return new Bar().then(function(bar) {
+            return console.log('bar created. waiting for population change');
+          });
+        }
+      };
+      return messageRouter.objectManager.onRegisterForPopulationChanges(msg);
     });
   });
 

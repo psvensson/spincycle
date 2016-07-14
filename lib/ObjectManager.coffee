@@ -6,6 +6,7 @@ DB              = require('./DB')
 ClientEndpoints = require('./ClientEndpoints')
 objStore        = require('./OStore')
 error           = require('./Error').error
+uuid            = require('node-uuid')
 
 debug = process.env["DEBUG"]
 
@@ -15,10 +16,13 @@ class ObjectManager
    @updateObjectHooks = []
    @populationListeners = []
    SuperModel.onCreate (newmodel)=>
-     if debug then console.log 'got onCreate event'
-     if debug then console.dir newmodel
+     #console.log 'got onCreate event'
+     #console.dir newmodel
      #console.dir @populationListeners
-     @populationListeners.forEach (client) =>
+     sublist = @populationListeners[newmodel.type] or {}
+     #console.log 'sublist for population updtaes is'
+     #console.sublist
+     for k,client of sublist
        if ClientEndpoints.exists(client)
          console.log 'sending population update create to client '+client
          ClientEndpoints.sendToEndpoint(client, {status: e.general.SUCCESS, info: 'POPULATION_UPDATE', payload: { added: newmodel.toClient() } })
@@ -32,6 +36,7 @@ class ObjectManager
     @messageRouter.addTarget('getModelFor',             'modelname', @onGetModelFor)
     @messageRouter.addTarget('getAccessTypesFor',             'modelname', @onGetAccessTypesFor)
     @messageRouter.addTarget('registerForPopulationChangesFor', 'type', @onRegisterForPopulationChanges)
+    @messageRouter.addTarget('deRegisterForPopulationChangesFor', 'id,listenerid', @onDeregisterForPopulationChanges)
 
   registerUpdateObjectHook: (hook) =>
     @updateObjectHooks.push hook
@@ -89,11 +94,12 @@ class ObjectManager
         console.log 'got object form objstore -> '+obj
         if obj
           if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user, msg.obj)
-            console.log 'user could write this object'
-            console.dir obj
+            #console.log 'user could write this object'
+            #console.dir obj
             DB.remove obj, (removestatus) =>
               console.log 'object removed callback'
-              @populationListeners.forEach (client) =>
+              sublist = @populationListeners[msg.type] or {}
+              for k,client of sublist
                 if ClientEndpoints.exists(client)
                   console.log 'updating population changes callback'
                   ClientEndpoints.sendToEndpoint(client, {status: e.general.SUCCESS, info: 'POPULATION_UPDATE', payload: { removed: obj.toClient() } })
@@ -242,14 +248,14 @@ class ObjectManager
 
   getObjectPullThrough: (id, type) =>
     if debug then console.log 'getObjectPullThrough for id '+id+' and type '+type
-    if debug then console.dir id
+    #if debug then console.dir id
     q = defer()
     if not type
       console.log 'Objectmanager::getObjectPullThrough called with null type.'
-      q.resolve(null)
+      q.resolve()
     else if not id or id == null or id == 'null'
       console.log 'Objectmanager::getObjectPullThrough called with null id.'
-      q.resolve(null)
+      q.resolve()
     else
       objStore.getObject(id, type).then (o) =>
         if not o
@@ -355,7 +361,7 @@ class ObjectManager
           checkFinished()
         else
           arr.forEach (idorobj) =>
-            console.log 'resolving array element '+idorobj
+            #console.log 'resolving array element '+idorobj
             #console.dir arr
             id = idorobj
             if typeof idorobj == 'object' then id = idorobj.id
@@ -412,7 +418,7 @@ class ObjectManager
                 toclient = uobj
               else
                 toclient = uobj.toClient()
-              if debug then console.dir(toclient)
+              #if debug then console.dir(toclient)
               if ClientEndpoints.exists(msg.client)
                 ClientEndpoints.sendToEndpoint(msg.client, {status: e.general.SUCCESS, info: 'OBJECT_UPDATE', payload: toclient })
               else
@@ -448,23 +454,29 @@ class ObjectManager
     if debug then console.log 'onDeregisterForUpdatesOn called for id '+msg.id+' and listener id '+msg.listenerid
     if msg.id and msg.listenerid and msg.type
       objStore.removeListenerFor(msg.id, msg.listenerid)
-      msg.replyFunc({status: e.general.SUCCESS, info: 'deregistered listener for obejct', payload: msg.id })
+      msg.replyFunc({status: e.general.SUCCESS, info: 'deregistered listener for object', payload: msg.id })
     else
       msg.replyFunc({status: e.general.FAILURE, info: 'onDeregisterForUpdatesOn missing parameter', payload: null })
 
   onRegisterForPopulationChanges: (msg) =>
     if msg.type
-      @populationListeners.push msg.client
-      msg.replyFunc({status: e.general.SUCCESS, info: 'registered for population changes for type '+msg.type, payload: msg.type})
+      poplistenid = uuid.v4()
+      sublist = @populationListeners[msg.type] or {}
+      sublist[poplistenid] = msg.client
+      @populationListeners[msg.type] = sublist
+      msg.replyFunc({status: e.general.SUCCESS, info: 'registered for population changes for type '+msg.type, payload: poplistenid})
       ClientEndpoints.onDisconnect (adr) =>
         if adr == msg.client
-          idx = -1
-          @populationListeners.forEach (client, i) =>
-            if client == msg.client then idx = i
-          console.log 'idx = '+idx+' populationListeners is'
-          console.dir @populationListeners
-          if idx > -1 then @populationListeners.splice(idx, 1)
+          sublist = @populationListeners[msg.type] or {}
+          delete sublist[poplistenid]
     else
       msg.replyFunc({status: e.general.FAILURE, info: 'onRegisterForPopulationChanges missing parameter', payload: null })
+
+  onDeregisterForPopulationChanges: (msg) =>
+    if msg.type and msg.listenerid
+      sublist = @populationListeners[msg.type] or {}
+      delete sublist[poplistenid]
+    else
+      msg.replyFunc({status: e.general.FAILURE, info: 'onDeregisterForPopulationChanges missing parameter', payload: null })
 
 module.exports = ObjectManager

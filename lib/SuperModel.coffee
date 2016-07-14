@@ -39,7 +39,6 @@ class SuperModel
       @constructor.model.push({ name: 'createdBy',    public: true,   value: 'createdBy' })
       #@updateAllModels()
 
-    if not @record.id then SuperModel.oncreatelisteners.forEach (listener) => listener(@)
 
     @type = @constructor.type
     q = defer()
@@ -55,6 +54,9 @@ class SuperModel
       @modifiedAt = @modifiedAt or Date.now()
       @createdBy = @createdBy or 'SYSTEM'
 
+      if not @record.id then SuperModel.oncreatelisteners.forEach (listener) => listener(@)
+
+      
       if @postCreate
         @postCreate(q)
       else

@@ -338,7 +338,7 @@ describe 'Spincycle Model Tests', ->
         isAdmin: true
       replyFunc: (reply)->
         console.log '--------------testing if listObject always returns an array'
-        console.dir reply
+        #console.dir reply
         expect(reply.payload.length).to.gt(0)
         done()
     setTimeout(
@@ -475,8 +475,8 @@ describe 'Spincycle Model Tests', ->
     new DFoo(record12).then (dfoo) ->
       dfoo.serialize().then ()->
         DB.findMany('DFoo', 'id', 'b44rrb3356').then (records) =>
-          console.log '--------------------- specific search recods '
-          console.dir records
+          #console.log '--------------------- specific search recods '
+          #console.dir records
           expect(records.length).to.equal(1)
           done()
 
@@ -552,8 +552,8 @@ describe 'Spincycle Model Tests', ->
             #console.dir bar
 
             ClientEndpoints.registerEndpoint 'fooclient',(reply)->
-              console.log '--__--__--__ object update __--__--__--'
-              console.dir reply
+              #console.log '--__--__--__ object update __--__--__--'
+              #console.dir reply
               expect(reply.payload.foos[0]).to.equal(foo.id)
               done()
 
@@ -576,4 +576,22 @@ describe 'Spincycle Model Tests', ->
               replyFunc: (ureply)->
 
             messageRouter.objectManager._updateObject(umsg)
+
+  it 'should be able to get population change callbacks', (done)->
+    ClientEndpoints.registerEndpoint 'updateclient',(reply)->
+      console.log '--__--__--__  update client got population change __--__--__--'
+      console.dir reply
+      expect(reply.payload).to.exist
+      done()
+
+    msg =
+      type: 'Bar'
+      client: 'updateclient'
+      user:
+        isAdmin: true
+      replyFunc: (reply)->
+        new Bar().then (bar) ->
+          console.log 'bar created. waiting for population change'
+
+    messageRouter.objectManager.onRegisterForPopulationChanges(msg)
 
