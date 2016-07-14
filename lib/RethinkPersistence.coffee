@@ -101,10 +101,11 @@ class RethinkPersistence
     @getDbFor(type).then (db)=>
       if debug then console.log 'all got query'
       if debug then console.dir query
-      rr = db.orderBy(query?.sort or 'name')
+      rr = db
       if query?.limit
         if debug then console.log 'skipping '+query.skip+' limiting '+query.limit
-        rr.skip(query.skip).limit(query.limit)
+        rr.skip(parseInt(query.skip)).limit(parseInt(query.limit))
+      if query?.sort then rr = db.orderBy(query?.sort or 'name')
       rr.run @connection, (err, cursor) ->
         if err
           console.log 'all err: '+err
@@ -130,7 +131,7 @@ class RethinkPersistence
     return q
 
   get: (_type, id, cb) =>
-    if debug then console.log 'Rethink.get called'
+    #if debug then console.log 'Rethink.get called'
     type = _type.toLowerCase()
     @getDbFor(type).then (db)=>
       db.get(id).run @connection, (err, result) ->
