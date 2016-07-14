@@ -16,9 +16,9 @@ class ObjectManager
    @updateObjectHooks = []
    @populationListeners = []
    SuperModel.onCreate (newmodel)=>
-     #console.log 'got onCreate event'
-     #console.dir newmodel
-     #console.dir @populationListeners
+     if debug then console.log 'ObjectManager got onCreate event'
+     if debug then console.dir newmodel
+     if debug then console.dir @populationListeners
      sublist = @populationListeners[newmodel.type] or {}
      #console.log 'sublist for population updtaes is'
      #console.sublist

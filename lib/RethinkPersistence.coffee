@@ -30,7 +30,7 @@ class RethinkPersistence
       #if debug then console.dir cursor
       if cursor
         cursor.each (el)->
-          if debug then console.log 'Rethink changes updae --- --- ---'
+          if debug then console.log 'Rethink changes update --- --- ---'
           if debug then console.dir el
           if el
             @DB.onUpdated(el)
