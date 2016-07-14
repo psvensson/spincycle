@@ -104,7 +104,7 @@ class RethinkPersistence
       rr = db
       if query?.limit
         if debug then console.log 'skipping '+query.skip+' limiting '+query.limit
-        rr.skip(parseInt(query.skip)).limit(parseInt(query.limit))
+        rr = rr.skip(parseInt(query.skip)).limit(parseInt(query.limit))
       if query?.sort then rr = db.orderBy(query?.sort or 'name')
       rr.run @connection, (err, cursor) ->
         if err

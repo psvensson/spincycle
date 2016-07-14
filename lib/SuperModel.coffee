@@ -56,7 +56,7 @@ class SuperModel
 
       if not @record.id then SuperModel.oncreatelisteners.forEach (listener) => listener(@)
 
-      
+
       if @postCreate
         @postCreate(q)
       else
@@ -203,7 +203,7 @@ class SuperModel
               #if debug then console.dir ids
               count = ids.length
               if count == 0
-                if debug then console.log 'no ids for '+resolveobj.name+' so resolving undefined'
+                #if debug then console.log 'no ids for '+resolveobj.name+' so resolving undefined'
                 r.resolve(undefined)
               else
                   ids.forEach (_id) =>
