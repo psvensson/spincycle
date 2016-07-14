@@ -73,11 +73,13 @@ class ObjectManager
   _createObject: (msg) =>
     if msg.obj and msg.obj.type
       if @messageRouter.authMgr.canUserCreateThisObject(msg.obj.type, msg.user)
-        #console.dir msg
+        if debug then console.log 'objmgr.createObject called'
+        if debug then console.dir msg
         msg.obj.createdAt = Date.now()
         msg.obj.modifiedAt = Date.now()
         msg.obj.createdBy = msg.user.id
-        console.log 'objmgr.createObject called'
+        if debug then console.log 'objmgr.createObject called. record is now'
+        if debug then console.dir msg.obj
         SuperModel.resolver.createObjectFrom(msg.obj).then (o) =>
           o.serialize().then () =>
             msg.replyFunc({status: e.general.SUCCESS, info: 'new '+msg.obj.type, payload: o})
