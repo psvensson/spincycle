@@ -108,10 +108,10 @@ class DB
       q.resolve(undefined)
     return q
 
-  @all: (type, cb) =>
+  @all: (type, query, cb) =>
     @getDataStore().then (store)=>
       if store.all
-        store.all(type, cb)
+        store.all(type, query, cb)
       else
         console.log 'DB.all: All not implemented in underlying persistence logic'
         cb []

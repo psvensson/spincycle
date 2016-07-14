@@ -95,12 +95,15 @@ class RethinkPersistence
         q.resolve(db)
     return q
 
-  all: (_type, cb)=>
+  all: (_type, query, cb)=>
     type = _type.toLowerCase()
     if debug then console.log 'Rethink.all called for '+type
     @getDbFor(type).then (db)=>
-      console.log 'all got db'
-      db.run @connection, (err, cursor) ->
+      #console.log 'all got db'
+      rr = db.orderBy(query?.sort or 'name')
+      if query?.limit
+        rr = rr.slice(query.skip, query.limit)
+      rr.run @connection, (err, cursor) ->
         if err
           console.log 'all err: '+err
           console.dir err

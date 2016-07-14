@@ -167,11 +167,11 @@ class ObjectManager
             if msg.query.value and msg.query.value != ''
               DB.findQuery(msg.type, msg.query).then (records) => @parseList(records, msg)
             else
-              DB.all(msg.type, (records) => @parseList(records, msg))
+              DB.all(msg.type, msg.query, (records) => @parseList(records, msg))
           else
             DB.findMany(msg.type, msg.query.property, msg.query.value).then (records) => @parseList(records, msg)
         else
-          DB.all(msg.type, (records) => @parseList(records, msg))
+          DB.all(msg.type, msg.query, (records) => @parseList(records, msg))
     else
       msg.replyFunc({status: e.general.FAILURE, info: '_listObjects missing parameter', payload: null })
 

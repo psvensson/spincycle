@@ -118,7 +118,7 @@ class MongoPersistence
       q.resolve(db)
     return q
 
-  all: (_type, cb)=>
+  all: (_type, query, cb)=>
     if debug then console.log 'Mongo::all called for type '+_type
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>

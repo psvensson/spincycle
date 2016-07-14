@@ -72,7 +72,7 @@ class CouchPersistence
       )
     return q
 
-  all: (_type, cb) =>
+  all: (_type, query, cb) =>
     rv = []
     type = _type.toLowerCase()
     @getDbFor(type).then (db) =>

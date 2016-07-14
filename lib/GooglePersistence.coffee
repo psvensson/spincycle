@@ -26,7 +26,7 @@ class GooglePersistence
       q.resolve(dataset)
     return q
 
-  all: (_type, cb)=>
+  all: (_type, query, cb)=>
     type = _type.toLowerCase()
     if debug then console.log 'Google.all called for '+type
     @getDbFor(type).then (db)=>
