@@ -204,7 +204,7 @@ class DB
                 else
                   @lru.set(id, result)
                 if not bam
-                  if debug then console.log 'DB.get resolving '+result
+                  #if debug then console.log 'DB.get resolving '+result
                   p.resolve(result)
                 bam = true
               )
