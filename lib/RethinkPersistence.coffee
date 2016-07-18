@@ -146,8 +146,9 @@ class RethinkPersistence
   find: (_type, property, _value) =>
     @findMany(_type, property, _value)
 
-  findMany: (_type, property, _value) =>
+  findMany: (_type, _property, _value) =>
     if debug then console.log 'Rethink.findMany called'
+    property = _property or ""
     value = _value or ""
     if value
       value = value.toString()
