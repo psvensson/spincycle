@@ -19,7 +19,7 @@ app.options('*', cors())
 
 #--------------------------------------------------> Set up Message Router
 authMgr         = new AuthenticationManager()
-messageRouter   = new SpinCycle(authMgr, null, null, app)
+messageRouter   = new SpinCycle(authMgr, null, 10, app, 'mongodb')
 #--------------------------------------------------> Express Routing
 new SpinCycle.HttpMethod(messageRouter, app, '/api/')
 #<-------------------------------------------------- Express Routing
