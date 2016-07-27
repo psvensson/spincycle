@@ -13,7 +13,7 @@ class SampleLogic
     DB.createDatabases(['samplegame', 'sampleplayer']).then (results)=>
       console.log ' DB init done..'
       console.dir results
-    DB.all 'SampleGame', (games) =>
+    DB.all 'SampleGame', {}, (games) =>
       console.log ' setting all games to '+games
       console.dir(games)
       if(games.length == 0)
