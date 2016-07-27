@@ -34,7 +34,7 @@
       return DB.createDatabases(['foo', 'bar', 'dfoo', 'directbar', 'hashbar']).then(function() {
         console.log('++++++++++++++++++++++++++++++++++++spec dbs created');
         authMgr = new AuthenticationManager();
-        messageRouter = new SpinCycle(authMgr, null, 10);
+        messageRouter = new SpinCycle(authMgr, null, 10, app, 'mongodb');
         messageRouter.open();
         return done();
       });

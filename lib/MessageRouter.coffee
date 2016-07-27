@@ -36,7 +36,10 @@ class MessageRouter
   debug = process.env["DEBUG"]
 
   constructor: (@authMgr, dburl, msgPS, @app, dbtype = 'mongodb') ->
+    #console.log 'MessageRouter dbtype = '+dbtype
+    # console.dir arguments
     MessageRouter.DB.dburl = dburl
+    MessageRouter.DB.dbname = dbtype
     DB.getDataStore(dbtype)
     pjson = require('../package.json');
     @messagesPerSecond = msgPS or 100

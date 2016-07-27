@@ -23,12 +23,14 @@ class DB
   @dburl: 'localhost'
   @lru: LRU()
   @lrudiff: LRU()
+  @dbname : ''
 
   @onUpdated: (record)=>
     OStore.updateObj(record)
 
-  @getDataStore: (name) =>
-    #console.log 'DB.getDataStore called '
+  @getDataStore: (_name) =>
+    name = _name or DB.dbname
+    #console.log 'DB.getDataStore called name = '+name
     q = defer()
     if not @DataStore
       #@DataStore = new GDS()
@@ -41,7 +43,7 @@ class DB
       else if name == 'google' then @DataStore = new Google(DB.dburl, DB)
       @DataStore.connect().then (ds)=>
         @DataStore = ds
-        console.log 'DB got back datastore'
+        console.log 'DB got back datastore for '+name
         q.resolve(ds)
     else
       q.resolve(@DataStore)
