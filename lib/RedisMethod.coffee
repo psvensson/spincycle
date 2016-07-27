@@ -20,7 +20,7 @@ class RedisMethod
     @listenclient.subscribe('spinchannel')
     @listenclient.on('message', @onChannelMessage)
     messageRouter.addMethod 'redis', @
-
+ 
 
   onChannelMessage: (channel, message) =>
     console.log '-------------------------------------------------------------------'

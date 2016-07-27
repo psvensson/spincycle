@@ -113,7 +113,7 @@ class MongoPersistence
               #-----------------------------------------------------------------
             #console.log 'getDbFor resolving db'
             q.resolve(ndb)
-        )
+        ) 
     else
       q.resolve(db)
     return q

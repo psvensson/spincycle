@@ -31,10 +31,10 @@
     messageRouter = void 0;
     before(function(done) {
       console.log('------------------------------------- before called');
+      authMgr = new AuthenticationManager();
+      messageRouter = new SpinCycle(authMgr, null, 10, app, 'mongodb');
       return DB.createDatabases(['foo', 'bar', 'dfoo', 'directbar', 'hashbar']).then(function() {
         console.log('++++++++++++++++++++++++++++++++++++spec dbs created');
-        authMgr = new AuthenticationManager();
-        messageRouter = new SpinCycle(authMgr, null, 10, app, 'mongodb');
         messageRouter.open();
         return done();
       });

@@ -16,7 +16,7 @@ class CouchPersistence
   getDbFor: (_type) =>
     #console.log 'getDbFor called for '+_type
     q = defer()
-    q.tag = uuid.v4()
+    q.tag = uuid.v4() 
     type = _type.toLowerCase()
     db = @dbs[type]
     if not db

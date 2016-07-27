@@ -5,7 +5,7 @@ class EventManager
     FAILURE:                'FAILURE'
     NOT_ALLOWED:            'NOT_ALLOWED'
     NOOP:                   'NOOP'
-
+ 
   @gamemanager =
     REGISTER_UPDATES:       'REGISTER_UPDATES'
     DEREGISTER_UPDATES:     'DEREISTER_UODATES'

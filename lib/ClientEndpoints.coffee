@@ -4,7 +4,7 @@ class ClientEndpoints
 
   @endpoints        = []
   @ondisconnectcbs  = []
-  @onconnectcbs     = []
+  @onconnectcbs     = [] 
 
   @registerEndpoint: (address, sendFunc) ->
     #console.log 'ClientEndpoints.registerEndpoint called for address '+address

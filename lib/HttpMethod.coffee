@@ -11,7 +11,7 @@ class HttpMethod
 
   constructor: (messageRouter, app, basePath) ->
     #console.log 'HttpMethod called for path '+basePath
-
+ 
     doSend = (req, res, url_parts)->
       user  = basicAuth(req)
       if user

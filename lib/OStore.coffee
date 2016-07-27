@@ -19,7 +19,7 @@ class OStore
     if debug then console.log 'OStore::listObjectsByType called for type '+type
     v = @objectsByType[type]
     for kk,vv of v
-      if vv
+      if vv 
         rv.push vv
         if debug then console.log 'adding '+vv.name
     return rv

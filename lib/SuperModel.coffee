@@ -21,7 +21,7 @@ class SuperModel
     SuperModel.oncreatelisteners.push cb
 
   _getRecord:() =>
-   rv = @getRecord()
+   rv = @getRecord() 
    rv._rev = @._rev
    return rv;
 

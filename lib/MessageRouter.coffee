@@ -80,8 +80,12 @@ class MessageRouter
       @app.use('/spin/', express.static(path.join(__dirname, 'spin')))
       #@app.use('/spin/', express.static('spin'))
     console.log('**************** exposing SpinModule and SpinFunction')
-    @objectManager.expose 'SpinModule'
-    @objectManager.expose 'SpinFunction'
+    DB.createDatabases(['SpinModule', 'SpinFunction']).then ()=>
+      console.log ' DB init done..'
+      @objectManager.expose 'SpinModule'
+      @objectManager.expose 'SpinFunction'
+      ResolveModule.modulecache['SpinFunction'] = SpinFunction
+      ResolveModule.modulecache['SpinModule'] = SpinModule
 
   #---------------------------------------------------------------------------------------------------------------------
 

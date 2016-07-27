@@ -10,7 +10,7 @@ class GooglePersistence
 
   connect: ()=>
     console.log 'Google connect called...'
-    q = defer()
+    q = defer() 
     q.resolve(@)
     return q
 

@@ -19,7 +19,7 @@ class SpinModule extends SuperModel
     return super
 
   postCreate: (q) =>
-      q.resolve(@)
+      q.resolve(@) 
 
 
 

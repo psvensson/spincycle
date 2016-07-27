@@ -16,7 +16,7 @@ class ResolveModule
   constructor: () ->
     console.log("+++ new ResolveModule created ++")
     process.on 'resolvemodule', (name, cb) =>
-      @resolve(name, cb)
+      @resolve(name, cb) 
 
   resolve: (name, cb) =>
     rv = ResolveModule.modulepathcache[name]

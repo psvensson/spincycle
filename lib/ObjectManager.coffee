@@ -223,7 +223,7 @@ class ObjectManager
   expose: (type) =>
     objStore.types[type] = type
     @messageRouter.addTarget '_create'+type, 'obj', (msg) =>
-      msg.type = type
+      msg.type = type 
       @_createObject(msg)
 
     # TODO: delete object hierarchy as well? Maybe also check for other objects referencing this, disallowing if so

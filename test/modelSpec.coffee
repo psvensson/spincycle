@@ -17,10 +17,11 @@ describe 'Spincycle Model Tests', ->
 
   before (done)->
     console.log '------------------------------------- before called'
+    authMgr         = new AuthenticationManager()
+    messageRouter   = new SpinCycle(authMgr, null, 10, app, 'mongodb')
     DB.createDatabases(['foo','bar','dfoo','directbar','hashbar']).then () ->
       console.log '++++++++++++++++++++++++++++++++++++spec dbs created'
-      authMgr         = new AuthenticationManager()
-      messageRouter   = new SpinCycle(authMgr, null, 10, app, 'mongodb')
+
       messageRouter.open()
       done()
 

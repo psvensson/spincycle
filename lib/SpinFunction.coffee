@@ -16,7 +16,7 @@ class SpinFunction extends SuperModel
     return super
 
   postCreate: (q) =>
-    q.resolve(@)
+    q.resolve(@) 
 
 
 
