@@ -18,7 +18,8 @@ describe 'Spincycle Model Tests', ->
   before (done)->
     console.log '------------------------------------- before called'
     authMgr         = new AuthenticationManager()
-    messageRouter   = new SpinCycle(authMgr, null, 10, app, 'mongodb')
+    #messageRouter   = new SpinCycle(authMgr, null, 10, app, 'mongodb')
+    messageRouter   = new SpinCycle(authMgr, null, 10, app, 'rethinkdb')
     DB.createDatabases(['foo','bar','dfoo','directbar','hashbar']).then () ->
       console.log '++++++++++++++++++++++++++++++++++++spec dbs created'
 
@@ -27,7 +28,7 @@ describe 'Spincycle Model Tests', ->
 
   record =
     _rev: 99101020202030303404
-    id: 17
+    id: '17'
     name: 'foo'
 
   f1record =
@@ -221,6 +222,23 @@ describe 'Spincycle Model Tests', ->
         #console.dir bar
         expect(bar.theFoo).to.exist
 
+  it 'should create an object that has a direct reference and be able to set and update that reference', (done)->
+    new Foo({id:'12345'}).then (o) ->
+      o.serialize().then ()->
+        new Bar().then (bar) ->
+          bar.theFoo = '12345'
+          umsg =
+            obj: bar
+            user:
+              isAdmin: true
+            replyFunc: (ureply)->
+              console.log 'update reply was'
+              console.dir(ureply)
+              expect(ureply.status).to.equal('SUCCESS')
+              done()
+          messageRouter.objectManager._updateObject(umsg)
+
+
   it 'should get back id from direct reference when creating record', ()->
     new Foo(f1record).then (foo) ->
       OStore.storeObject(foo)
@@ -347,9 +365,6 @@ describe 'Spincycle Model Tests', ->
         messageRouter.objectManager._listObjects(msg)
       ,400
     )
-
-
-
 
   it 'should include whole objects when using storedirectly', (done)->
     #console.log '------------------------------------------------trying to make a foo'
