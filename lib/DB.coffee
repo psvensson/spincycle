@@ -227,8 +227,9 @@ class DB
   @set: (type, obj, cb) =>
     if obj
       @lru.set(obj.id, obj)
-      @getDataStore().then (store)=> store.set type, obj, (res) ->
-        if cb then cb(res)
+      @getDataStore().then (store)=>
+        store.set type, obj, (res) ->
+          if cb then cb(res)
     else
       cb()
 
