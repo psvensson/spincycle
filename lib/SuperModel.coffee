@@ -142,7 +142,7 @@ class SuperModel
       record = @getRecord()
       delete record.record if record.record
       if @_rev then record._rev = @_rev
-      DB.set(@.constructor.type, record).then (res) =>
+      DB.set @.constructor.type, record, (res) =>
         #if debug then console.log ' * serialized and persisted '+@type+" id "+@id
         @_serializing = false
         if res then q.resolve(@) else q.resolve()
