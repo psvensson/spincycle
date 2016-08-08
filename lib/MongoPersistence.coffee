@@ -314,7 +314,7 @@ class MongoPersistence
     @getDbFor(type).then (collection) =>
       if debug then console.log 'Mongo.set called for type '+type+' and id '+obj.id
       if typeof obj.id == 'object' then console.dir obj
-      collection.update {id: obj.id}, obj,{ upsert: true },(err, result, details) =>
+      collection.update {id: obj.id}, obj,{ upsert: true }, (err, result, details) =>
         if debug then console.log 'mongo set result was '+result
         if err
           console.log 'MONGO set Error: '+err

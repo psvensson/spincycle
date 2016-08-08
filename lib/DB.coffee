@@ -229,6 +229,7 @@ class DB
       @lru.set(obj.id, obj)
       @getDataStore().then (store)=>
         store.set type, obj, (res) ->
+          if debug then console.log 'DB.set got back '+res
           if cb then cb(res)
     else
       cb()
