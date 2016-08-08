@@ -230,7 +230,7 @@ class DB
       @getDataStore().then (store)=>
         store.set type, obj, (res) ->
           if debug then console.log 'DB.set got back '+res
-          if cb then cb(res)
+          cb(res)
     else
       cb()
 
