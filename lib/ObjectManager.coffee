@@ -123,14 +123,13 @@ class ObjectManager
   _getObject: (msg) =>
     if debug then console.log '_getObject called for type '+msg.type
     if debug then console.dir msg.obj
-    #if debug then console.dir msg
     if msg.type and msg.obj and msg.obj.id
       id = msg.obj.id
       if id.indexOf and id.indexOf('all_') > -1
         @getAggregateObjects(msg)
       else
         @getObjectPullThrough(id, msg.type).then (obj) =>
-          if debug then '_getObject got back obj '
+          if debug then '_getObject got back obj from getObjectPullThrough: '
           if debug then console.dir obj
           if obj
             if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
@@ -142,7 +141,7 @@ class ObjectManager
               console.log '_getObject got NOT ALLOWED for user '+msg.user.id+' for '+msg.type+' id '+obj.id
               msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: id})
           else
-            console.log 'No object found with id '+id
+            console.log '_getObject No object found with id '+id+' of type '+msg.obj.type
             msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'no such object', payload: msg.obj.id})
     else
       msg.replyFunc({status: e.general.FAILURE, info: '_getObject for '+msg.type+' missing parameter', payload: null })
@@ -189,7 +188,7 @@ class ObjectManager
     else
       msg.replyFunc({status: e.general.FAILURE, info: '_listObjects missing parameter', payload: null })
 
-  parseList: (records, msg) =>
+  parseList: (_records, msg) =>
     """
     rv = []
     #console.log 'found '+records.length+' objects to return'
@@ -215,12 +214,19 @@ class ObjectManager
               if --count == 0
                 msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
     """
-    records.forEach (r) =>
+    count = _records.length
+    _records.forEach (r) =>
+      #console.log 'resolving '+count+' records'
       DB.get(r.type, [r.id]).then (records) =>
+        #console.log '-- result of getting record '+r.type+' id '+r.id+' is '+records
         if records and records[0]
           @messageRouter.resolver.createObjectFrom(records[0]).then (o) =>
+            #console.log '----- resolved object for record '+r.id
             objStore.storeObject o,false
-    msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: records})
+            if --count == 0 then msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: records})
+        else
+          #console.log '  oops empty records for '+r.id
+          msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: records})
   #---------------------------------------------------------------------------------------------------------------------
 
   expose: (type) =>
@@ -264,16 +270,16 @@ class ObjectManager
     else
       objStore.getObject(id, type).then (o) =>
         if not o
-          #if debug then console.log '- getObjectPullThrough did not find object type '+type+' id '+id+' in ostore, getting from db'
+          if debug then console.log '- getObjectPullThrough did not find object type '+type+' id '+id+' in ostore, getting from db'
           DB.get(type, [id]).then (record) =>
-            #if debug then console.log 'getting record from db'
-            #if debug then console.dir record
+            if debug then console.log '- getObjectPullThrough getting record from db'
+            if debug then console.dir record
             if not record or not record[0] or record[0] == null
-              if debug then console.log '------- getObjectPullThrough got null record. resolving null'
+              if debug then console.log '- getObjectPullThrough got null record. resolving null'
               q.resolve null
             else
               @messageRouter.resolver.createObjectFrom(record).then (oo) =>
-                #if debug then console.log '------- getObjectPullThrough got object '+oo.id+'  '+oo.type
+                if debug then console.log '- getObjectPullThrough got object '+oo.id+'  '+oo.type
                 q.resolve(oo)
         else
           #if debug then console.log '- getObjectPullThrough found object'
