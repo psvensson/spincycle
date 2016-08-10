@@ -280,6 +280,7 @@ class ObjectManager
             else
               @messageRouter.resolver.createObjectFrom(record).then (oo) =>
                 if debug then console.log '- getObjectPullThrough got object '+oo.id+'  '+oo.type
+                if debug then console.dir oo
                 q.resolve(oo)
         else
           #if debug then console.log '- getObjectPullThrough found object'
@@ -349,7 +350,7 @@ class ObjectManager
     count = model.length
 
     checkFinished = (pname) ->
-      if debug then console.log 'checkFinished for property '+pname+' count = '+count
+      #if debug then console.log 'checkFinished for property '+pname+' count = '+count
       #console.dir rv
       if --count == 0
         #if debug then console.log 'Objectmanager.resolveReferences resolving back object'
