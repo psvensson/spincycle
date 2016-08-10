@@ -26,7 +26,8 @@ class DB
   @dbname : ''
 
   @onUpdated: (record)=>
-    OStore.updateObj(record)
+    resolver.createObjectFrom(record).then (ooo) =>
+      OStore.updateObj(ooo)
 
   @getDataStore: (_name) =>
     name = _name or DB.dbname

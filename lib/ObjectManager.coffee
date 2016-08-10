@@ -128,6 +128,7 @@ class ObjectManager
       if id.indexOf and id.indexOf('all_') > -1
         @getAggregateObjects(msg)
       else
+        if debug then console.log '_getObject calling getObjectPullThrough for type '+msg.type
         @getObjectPullThrough(id, msg.type).then (obj) =>
           if debug then '_getObject got back obj from getObjectPullThrough: '
           if debug then console.dir obj
@@ -283,7 +284,7 @@ class ObjectManager
                 if debug then console.dir oo
                 q.resolve(oo)
         else
-          #if debug then console.log '- getObjectPullThrough found object'
+          if debug then console.log '- getObjectPullThrough found object in objStore'
           q.resolve(o)
     return q
 
@@ -291,8 +292,8 @@ class ObjectManager
     console.log 'onUpdateObject called for '+msg.obj.type+' - '+msg.obj.id
     if msg.obj and msg.obj.id
       DB.getFromStoreOrDB(msg.obj.type, msg.obj.id).then( (obj) =>
-        #console.log 'onUpdateObject getFromStoreOrDB returned '+obj
-        #console.dir obj
+        console.log 'onUpdateObject getFromStoreOrDB returned '+obj
+        console.dir obj
         if obj
           #console.log 'have an object'
           canwrite = @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user, msg.obj)
@@ -303,8 +304,8 @@ class ObjectManager
               for k,v of msg.obj
                 obj[k] = v if k isnt 'id'
               @resolveReferences(obj, obj.constructor.model).then (robj)=>
-                #console.log 'found object'
-                #objStore.updateObj(robj)
+                console.log '++++++++++++++++++++++++++++++++++++++++++++++ onUpdateObject after resolveReferences:'
+                objStore.updateObj(robj)
                 objStore[robj.id] = obj
                 if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db. modifiedAt = '+obj.modifiedAt
                 obj.serialize(robj).then (res) =>
