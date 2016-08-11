@@ -216,6 +216,9 @@ class ObjectManager
                 msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
     """
     count = _records.length
+    if count == 0
+      msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: []})
+    else
     _records.forEach (r) =>
       #console.log 'resolving '+count+' records'
       DB.get(r.type, [r.id]).then (records) =>

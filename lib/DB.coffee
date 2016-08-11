@@ -142,7 +142,7 @@ class DB
       #if debug then console.log 'DB.findMany results are..'
       #if debug then console.dir results
       if not results or not results.length
-        console.log 'DB.find type '+type+', property '+property+', value '+value+' got back '+results
+        console.log 'DB.findMany type '+type+', property '+property+', value '+value+' got back '+results
         q.resolve([])
       else
         results.forEach (result) => @lru.set(result.id, result)
