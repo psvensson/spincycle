@@ -153,7 +153,7 @@ class RethinkPersistence
     if value
       value = value.toString()
       value = value.replace(/[^\w\s@.-]/gi, '')
-    console.log 'Rethink findmany called for type '+_type+' property '+property+' and value '+value
+    #console.log 'Rethink findmany called for type '+_type+' property '+property+' and value '+value
     q = defer()
     type = _type.toLowerCase()
     @getDbFor(type).then (db)=>

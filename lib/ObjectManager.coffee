@@ -269,7 +269,7 @@ class ObjectManager
       console.log '- Objectmanager::getObjectPullThrough called with null type.'
       q.resolve()
     else if not id or id == null or id == 'null'
-      console.log '- Objectmanager::getObjectPullThrough called with null id.'
+      console.log '- Objectmanager::getObjectPullThrough called with null id for type '+type
       q.resolve()
     else
       objStore.getObject(id, type).then (o) =>
@@ -292,11 +292,11 @@ class ObjectManager
     return q
 
   onUpdateObject: (msg) =>
-    console.log 'onUpdateObject called for '+msg.obj.type+' - '+msg.obj.id
+    #console.log 'onUpdateObject called for '+msg.obj.type+' - '+msg.obj.id
     if msg.obj and msg.obj.id
       DB.getFromStoreOrDB(msg.obj.type, msg.obj.id).then( (obj) =>
-        console.log 'onUpdateObject getFromStoreOrDB returned '+obj
-        console.dir obj
+        #console.log 'onUpdateObject getFromStoreOrDB returned '+obj
+        #console.dir obj
         if obj
           #console.log 'have an object'
           canwrite = @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user, msg.obj)
@@ -307,7 +307,7 @@ class ObjectManager
               for k,v of msg.obj
                 obj[k] = v if k isnt 'id'
               @resolveReferences(obj, obj.constructor.model).then (robj)=>
-                console.log '++++++++++++++++++++++++++++++++++++++++++++++ onUpdateObject after resolveReferences:'
+                #console.log '++++++++++++++++++++++++++++++++++++++++++++++ onUpdateObject after resolveReferences:'
                 objStore.updateObj(robj)
                 objStore[robj.id] = obj
                 if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db. modifiedAt = '+obj.modifiedAt
@@ -386,8 +386,8 @@ class ObjectManager
                 rv[property.name] = resolvedarr
                 checkFinished(property.name)
       else if property.hashtable
-        console.log '======================================== going through hashtable property '+property.name
-        console.dir record[property.name]
+        #console.log '======================================== going through hashtable property '+property.name
+        #console.dir record[property.name]
         resolvedhash = {}
         if record[property.name] and record[property.name]
           harr = record[property.name] or []
@@ -433,7 +433,7 @@ class ObjectManager
           if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
             rememberedListenerId = undefined
             listenerId = objStore.addListenerFor(msg.obj.id, msg.obj.type, (uobj) =>
-              console.log '--------------------- onRegisterForUpdates on callback sending update of object '+msg.obj.id+' type '+msg.obj.type+' to client'
+              #console.log '--------------------- onRegisterForUpdates on callback sending update of object '+msg.obj.id+' type '+msg.obj.type+' to client'
               #console.dir uobj
               if @isAlreadyToCliented(uobj)
                 toclient = uobj

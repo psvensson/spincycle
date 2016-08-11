@@ -51,7 +51,6 @@ class RedisMethod
         else
           replydata = _replydata
         console.log 'redismethod replying to target '+msg.target+' message '+msg.messageId+' on channel '+clientChannel
-        #console.dir message
         if debug then console.log '---------------------replydata is-------------------------'
         if debug then console.dir replydata
         replydata.messageId = msg.messageId

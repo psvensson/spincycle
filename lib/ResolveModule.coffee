@@ -24,7 +24,8 @@ class ResolveModule
       #if debug then console.log 'resolving module '+name+' from cache -> '+rv
       cb(rv)
     else
-      #if debug then console.log '.. looking up module '+name
+      #console.log '.. looking up module '+name
+      if not name then throw(new Error('ResolveModule was given an undefined type to resolve!!!'))
       finder = require('findit')(dirname)
 
       #This listens for files found

@@ -40,7 +40,7 @@ class OStore
       objs[obj.id] = obj
       OStore.objectsByType[obj.type] = objs
       #if debug then console.log 'storeObject storing '+obj.id+' with rev '+obj.rev+" and _rev "+obj._rev
-      @sendUpdatesFor(obj, sendUpdates)
+      #@sendUpdatesFor(obj, sendUpdates)
 
   @getObject: (id, type) =>
     q = defer()
@@ -60,7 +60,7 @@ class OStore
       OStore.objectsByType[obj.type] = obj
 
   @updateObj = (record, force) ->
-    #if debug then console.log '+ oStore.updateObj called for obj '+record.id
+    if debug then console.log '+ oStore.updateObj called for obj '+record.id
     #console.log 'updateObj '+record
     #console.dir record
     obj = OStore.objects[record.id]
@@ -89,7 +89,9 @@ class OStore
                   #if debug then console.dir clean
 
       OStore.objects[record.id] = obj
-      if OStore.anyoneIsListening(obj.id) then OStore.sendUpdatesFor(obj, changed)
+      if OStore.anyoneIsListening(obj.id)
+        #console.log 'updateObj calling sendUpdates for '+record.id
+        OStore.sendUpdatesFor(obj, changed)
     else
       console.log 'OStore: tried to update an object which we did not have in cache!'
 
@@ -105,7 +107,7 @@ class OStore
   @sendUpdatesFor: (obj, changed) =>
     #console.log 'OStore.sendUpdatesFor called for obj '+obj.id+' type '+obj.type+' changed = '+changed+', anyone is listening == '+OStore.anyoneIsListening(obj.id)
     if changed and OStore.anyoneIsListening(obj.id)
-      console.dir obj
+      #console.dir obj
       #console.log 'adding obj to updateQueue..'
       OStore.updateQueue.push obj
 

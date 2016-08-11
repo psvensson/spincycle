@@ -16,12 +16,12 @@ describe 'Spincycle Model Tests', ->
   messageRouter = undefined
 
   before (done)->
-    console.log '------------------------------------- before called'
+    #console.log '------------------------------------- before called'
     authMgr         = new AuthenticationManager()
     #messageRouter   = new SpinCycle(authMgr, null, 10, app, 'mongodb')
     messageRouter   = new SpinCycle(authMgr, null, 10, app, 'rethinkdb')
     DB.createDatabases(['foo','bar','dfoo','directbar','hashbar']).then () ->
-      console.log '++++++++++++++++++++++++++++++++++++spec dbs created'
+      #console.log '++++++++++++++++++++++++++++++++++++spec dbs created'
 
       messageRouter.open()
       done()
@@ -232,8 +232,8 @@ describe 'Spincycle Model Tests', ->
             user:
               isAdmin: true
             replyFunc: (ureply)->
-              console.log 'update reply was'
-              console.dir(ureply)
+              #console.log 'update reply was'
+              #console.dir(ureply)
               expect(ureply.status).to.equal('SUCCESS')
               done()
           messageRouter.objectManager._updateObject(umsg)
@@ -273,6 +273,7 @@ describe 'Spincycle Model Tests', ->
     record222 =
       _rev: 71299900099
       id: 174711
+      type: 'Bar'
       name: 'BAR xyzzy'
       theFoo: 17
       foos: [17]
@@ -339,6 +340,22 @@ describe 'Spincycle Model Tests', ->
                 if vals1[i] and vals1[i] != vals2[i] then same = false else same = true
               expect(same).to.equal(true)
 
+  it 'should resolve cold array references to objects not yet in ostore, only in db', (done)->
+    foo = {id: '99008877', name: 'fooname', value: 'name', default:'foo', type: 'Foo'}
+    DB.set 'Foo', foo, (sres) ->
+      #console.log 'foo set in DB'
+      bar =
+        type: 'Bar'
+        id: 444174711
+        name: 'BAR xyzzy'
+        theFoo: 17
+        foos: [99008877]
+
+      new Bar(bar).then (barobj) ->
+        #console.log ' new Bar with cold reference to foo array is...'
+        #console.dir barobj
+        expect(barobj.foos.length).to.equal(1)
+        done()
 
   it 'should filter out crap values in arrays when updating', ()->
     new Fooznaz().then (fz) ->
@@ -356,7 +373,7 @@ describe 'Spincycle Model Tests', ->
       user:
         isAdmin: true
       replyFunc: (reply)->
-        console.log '--------------testing if listObject always returns an array'
+        #console.log '--------------testing if listObject always returns an array'
         #console.dir reply
         expect(reply.payload.length).to.gt(0)
         done()
@@ -505,7 +522,7 @@ describe 'Spincycle Model Tests', ->
         target: 'listcommands'
         user: user
         replyFunc: (reply)->
-          console.log 'reply was '+reply.info
+          #console.log 'reply was '+reply.info
           #console.dir reply
           if reply.status == 'NOT_ALLOWED' then failure = true
           if --count == 0
@@ -525,7 +542,7 @@ describe 'Spincycle Model Tests', ->
             user:
               isAdmin: true
             replyFunc: (ureply)->
-              console.log 'update reply was'
+              #console.log 'update reply was'
               #console.dir(ureply)
           messageRouter.objectManager._updateObject(umsg)
           msg =
@@ -579,12 +596,12 @@ describe 'Spincycle Model Tests', ->
               obj:{id: bar.id, type: 'Bar'}
               user:
                 isAdmin: true
-              replyFunc: (reply)->
+              replyFunc: (reply)->#console.log "we're listening to "+bar.id
 
             messageRouter.objectManager.onRegisterForUpdatesOn(msg)
 
             brecord = bar.toClient()
-            brecord.name = 'Extra Doctored Bar object'
+            brecord.name = '*** Extra Doctored Bar object'
             umsg =
               obj: brecord
               user:
@@ -595,8 +612,8 @@ describe 'Spincycle Model Tests', ->
 
   it 'should be able to get population change callbacks', (done)->
     ClientEndpoints.registerEndpoint 'updateclient',(reply)->
-      console.log '--__--__--__  update client got population change __--__--__--'
-      console.dir reply
+      #console.log '--__--__--__  update client got population change __--__--__--'
+      #console.dir reply
       expect(reply.payload).to.exist
       done()
 
@@ -607,7 +624,7 @@ describe 'Spincycle Model Tests', ->
         isAdmin: true
       replyFunc: (reply)->
         new Bar().then (bar) ->
-          console.log 'bar created. waiting for population change'
+          #console.log 'bar created. waiting for population change'
 
     messageRouter.objectManager.onRegisterForPopulationChanges(msg)
 
