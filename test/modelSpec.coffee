@@ -352,10 +352,9 @@ describe 'Spincycle Model Tests', ->
 
       DB.set 'Bar', bar, (bres) ->
         messageRouter.objectManager.getObjectPullThrough('444174711', 'Bar').then (barobj)->
-          #console.log 'Cold bar with cold foo references is...'
-          #console.dir barobj
           expect(barobj.foos.length).to.equal(1)
           done()
+
 
   it 'should filter out crap values in arrays when updating', ()->
     new Fooznaz().then (fz) ->

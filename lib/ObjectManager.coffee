@@ -161,11 +161,8 @@ class ObjectManager
       if @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user) == no
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to list objects of type '+msg.type, payload: msg.type})
       else
-        #rv = objStore.listObjectsByType(msg.type)
         if msg.query
           if debug then console.log 'executing query for property '+msg.query.property+', value '+msg.query.value
-          #if msg.query.wildcard
-          #  DB.search(msg.type, msg.query.property, msg.query.value).then (records) => @parseList(records, msg)
           if msg.query.limit or msg.query.skip or msg.query.sort or msg.query.wildcard
             if msg.query.value and msg.query.value != ''
               DB.findQuery(msg.type, msg.query).then (records) => @parseList(records, msg)
@@ -216,22 +213,26 @@ class ObjectManager
                 msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
     """
     count = _records.length
+    if debug then console.log 'ObjectManager.parseList resolving '+count+' records'
     if count == 0
       msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: []})
     else
-    _records.forEach (r) =>
-      #console.log 'resolving '+count+' records'
-      DB.get(r.type, [r.id]).then (records) =>
-        #console.log '-- result of getting record '+r.type+' id '+r.id+' is '+records
-        #console.dir records
-        if records and records[0]
-          @messageRouter.resolver.createObjectFrom(records[0]).then (o) =>
-            #console.log '----- resolved object for record '+r.id
-            objStore.storeObject o,false
-            if --count == 0 then msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: records})
-        else
-          #console.log '  oops empty records for '+r.id
-          msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: records})
+      rv = []
+      _records.forEach (r) =>
+        DB.get(r.type, [r.id]).then (records) =>
+          if debug then console.log 'ObjectManager.parseList -- result of getting record '+r.type+' id '+r.id+' is '+records
+          if debug then console.dir records
+          if records and records[0]
+            @messageRouter.resolver.createObjectFrom(records[0]).then (o) =>
+              #console.log '----- resolved object for record '+r.id
+              rv.push o.toClient()
+              objStore.storeObject o,false
+              if --count == 0
+                if debug then console.log 'ObjectManager.parseList returns '+rv.length+' records'
+                msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
+          else
+            #console.log '  oops empty records for '+r.id
+            msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: records})
   #---------------------------------------------------------------------------------------------------------------------
 
   expose: (type) =>
