@@ -26,7 +26,7 @@ class SuperModel
    return rv;
 
   constructor:(@record={})->
-    #console.log 'SuperModel constructor'
+    #console.log 'SuperModel constructor for '+@record?.id
     #console.dir @model
     @id         = @record.id or uuid.v4()
     @record = @unPrettify(@record)
@@ -60,7 +60,7 @@ class SuperModel
       if @postCreate
         @postCreate(q)
       else
-        #if debug then console.log '-- done resolving constructor for '+@constructor.type
+        #console.log '-- done resolving constructor for '+@constructor.type
         q.resolve(@)
     , error)
     return q
@@ -160,7 +160,7 @@ class SuperModel
     record
 
   loadFromIds:(model) =>
-    #if debug then console.log '------------------------------------------------> loadfromIds called for '+@.constructor.type+' '+@id+' '+model.length+' properties'
+    #console.log '------------------------------------------------> loadfromIds called for '+@.constructor.type+' '+@id+' '+model.length+' properties'
     alldone = defer()
     allpromises = []
     if(not model or model.length == 0)
@@ -171,7 +171,7 @@ class SuperModel
     else
       model.forEach (robj) =>
         ((resolveobj) =>
-          #if debug then console.log 'SuperMode::loadFromIds for property '+resolveobj.name
+          #console.log 'SuperMode::loadFromIds for property '+resolveobj.name
           r = defer()
           allpromises.push(r)
           if resolveobj.value
@@ -203,7 +203,7 @@ class SuperModel
               #if debug then console.dir ids
               count = ids.length
               if count == 0
-                #if debug then console.log 'no ids for '+resolveobj.name+' so resolving undefined'
+                if debug then console.log 'no ids for '+resolveobj.name+' so resolving undefined'
                 r.resolve(undefined)
               else
                   ids.forEach (_id) =>
@@ -213,14 +213,14 @@ class SuperModel
                         #console.log '** storedirectly creating array or hash object immediately..'
                         @createObjectFromRecord(r, resolveobj, count, id)
                       else
-                        #if debug then console.log 'SuperModel loadFromIds trying to get '+resolveobj.name+' with id '+id
+                        #console.log 'SuperModel loadFromIds trying to get '+resolveobj.name+' with id '+id
                         @resolveObj(resolveobj, id, r, count)
                     )(_id)
           #if debug then console.log '------- property '+resolveobj.name+' now set to '+@[resolveobj.name]
         )(robj)
 
     all(allpromises, error).then( (results) =>
-      #if debug then console.log '<------------------------------------------------ loadfromIds done for '+@.constructor.type+' '+@id+' '+model.length+' properties'
+      #console.log '<------------------------------------------------ loadfromIds done for '+@.constructor.type+' '+@id+' '+model.length+' properties'
       alldone.resolve(results)
     ,error)
     return alldone
@@ -236,13 +236,14 @@ class SuperModel
           #if debug then console.log 'SuperModel resolving '+resolveobj.name+' type '+resolveobj.type+' immediately'
           r.resolve(oo)
       else
-        if debug then console.log 'SuperModel did not find obj '+resolveobj.name+' ['+id+'] of type '+resolveobj.type+' in OStore. Getting from DB. typeof of id prop is '+(typeof id)
+        #console.log 'SuperModel did not find obj '+resolveobj.name+' ['+id+'] of type '+resolveobj.type+' in OStore. Getting from DB. typeof of id prop is '+(typeof id)
         DB.get(resolveobj.type, [id]).then( (record) =>
+          #console.log 'supermodel resolveObj got back from DB.get '+record
           if not record
-            console.log 'SuperModel::loadFromIds got back null record from DB for type '+resolveobj.type+' and id '+id
+            #console.log 'SuperModel::loadFromIds got back null record from DB for type '+resolveobj.type+' and id '+id
             if count == 0 then r.resolve(null)
           else
-            if debug then console.log '** resolveObj no obj found and no record for id '+id+' type '+resolveobj.type
+            #console.log '** resolveObj no obj found and no record for id '+id+' type '+resolveobj.type
             @createObjectFromRecord(r, resolveobj, count, record)
         , error)
     , error)
@@ -258,9 +259,11 @@ class SuperModel
         #console.dir record
         if count == 0 then r.resolve(null)
       else
-        #if debug then console.log 'object '+resolveobj.name+' type '+resolveobj.type+' created: '+obj.id
+        #console.log 'object '+resolveobj.name+' type '+resolveobj.type+' created: '+obj.id
         @insertObj(resolveobj, obj)
-        if count == 0 then r.resolve(obj)
+        if count == 0
+          #console.log '---- count zero'
+          r.resolve(obj)
     , error)
 
 

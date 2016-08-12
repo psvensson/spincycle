@@ -223,6 +223,7 @@ class ObjectManager
       #console.log 'resolving '+count+' records'
       DB.get(r.type, [r.id]).then (records) =>
         #console.log '-- result of getting record '+r.type+' id '+r.id+' is '+records
+        #console.dir records
         if records and records[0]
           @messageRouter.resolver.createObjectFrom(records[0]).then (o) =>
             #console.log '----- resolved object for record '+r.id

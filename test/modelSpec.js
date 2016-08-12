@@ -578,14 +578,16 @@
         var bar;
         bar = {
           type: 'Bar',
-          id: 444174711,
+          id: '444174711',
           name: 'BAR xyzzy',
-          theFoo: 17,
-          foos: [99008877]
+          theFoo: '',
+          foos: ['99008877']
         };
-        return new Bar(bar).then(function(barobj) {
-          expect(barobj.foos.length).to.equal(1);
-          return done();
+        return DB.set('Bar', bar, function(bres) {
+          return messageRouter.objectManager.getObjectPullThrough('444174711', 'Bar').then(function(barobj) {
+            expect(barobj.foos.length).to.equal(1);
+            return done();
+          });
         });
       });
     });

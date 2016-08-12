@@ -343,19 +343,19 @@ describe 'Spincycle Model Tests', ->
   it 'should resolve cold array references to objects not yet in ostore, only in db', (done)->
     foo = {id: '99008877', name: 'fooname', value: 'name', default:'foo', type: 'Foo'}
     DB.set 'Foo', foo, (sres) ->
-      #console.log 'foo set in DB'
       bar =
         type: 'Bar'
-        id: 444174711
+        id: '444174711'
         name: 'BAR xyzzy'
-        theFoo: 17
-        foos: [99008877]
+        theFoo: ''
+        foos: ['99008877']
 
-      new Bar(bar).then (barobj) ->
-        #console.log ' new Bar with cold reference to foo array is...'
-        #console.dir barobj
-        expect(barobj.foos.length).to.equal(1)
-        done()
+      DB.set 'Bar', bar, (bres) ->
+        messageRouter.objectManager.getObjectPullThrough('444174711', 'Bar').then (barobj)->
+          #console.log 'Cold bar with cold foo references is...'
+          #console.dir barobj
+          expect(barobj.foos.length).to.equal(1)
+          done()
 
   it 'should filter out crap values in arrays when updating', ()->
     new Fooznaz().then (fz) ->

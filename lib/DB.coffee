@@ -175,54 +175,33 @@ class DB
     return q
 
   @get: (type, ids) =>
-    #if debug then console.log 'DB.get called for type "'+type+'" and ids "'+ids+'"'
+    if debug then console.log 'DB.get called for type "'+type+'" and ids "'+ids+'"'
     if not ids.length then ids = [ids]
     q = defer()
-    bam = false
-
-    all(ids.map(
-      (id) =>
-        try
-          rv = @lru.get id
-        catch err
-          console.log '************* ERROR '
-          console.dir arguments
-          console.dir err
-        p = defer()
-        #console.log 'DB found '+id+'  in lru: '+rv
-        if not rv
-          #if debug then console.log ' attempting to use datastore for type '+type+' and id '+id+' typeof = '+(typeof id)
-          if (typeof id == 'object')
-            console.log 'DB.get was served an object instead of an id!!!'
-            console.dir id
-            q.resolve(null)
-          else
-            @getDataStore().then (store)=>
-              #if debug then console.log 'DB.get calling datastore '+store
-              store.get(type, id, (result) =>
-                if not result
-                  if debug
-                    console.log 'DB.get for type '+type+' and id '+id+' got back '+result
-                    bam = false
-                else
-                  @lru.set(id, result)
-                if not bam
-                  #if debug then console.log 'DB.get resolving '+result
-                  p.resolve(result)
-                bam = true
-              )
-        else
-          if not bam then p.resolve(rv)
-          bam = true
-        return p
-    )).then(
-      (result) ->
-        q.resolve(result)
-      ,(err) ->
-        console.log 'DB.get ERROR: '+err
-        console.dir err
-        q.resolve(null)
-    )
+    id = ids[0]
+    if (typeof id == 'object')
+      console.log 'DB.get was served an object instead of an id!!!'
+      console.dir id
+      p.resolve(null)
+    else
+      rv = @lru.get id
+      #console.log 'DB found '+id+'  in lru: '+rv
+      #console.dir rv
+      if rv
+        q.resolve([rv])
+      else
+        #console.log ' attempting to use datastore for type '+type+' and id '+id+' typeof = '+(typeof id)
+        @getDataStore().then (store)=>
+          if debug then console.log 'DB.get calling datastore '+store
+          store.get(type, id, (result) =>
+            if not result
+              if debug
+                console.log 'DB.get for type '+type+' and id '+id+' got back '+result
+            else
+              @lru.set(id, result)
+              #console.log 'DB.get resolving '+result
+            q.resolve([result])
+            )
     return q
 
   @set: (type, obj, cb) =>
