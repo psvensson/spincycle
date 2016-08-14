@@ -182,7 +182,7 @@ class DB
     if (typeof id == 'object')
       console.log 'DB.get was served an object instead of an id!!!'
       console.dir id
-      p.resolve(null)
+      q.resolve(null)
     else
       rv = @lru.get id
       #console.log 'DB found '+id+'  in lru: '+rv

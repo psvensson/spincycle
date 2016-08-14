@@ -337,7 +337,7 @@ class ObjectManager
     else
       console.log 'onUpdateObject got wrong or missing parameters'
       console.dir msg.obj
-      msg.replyFunc({status: e.general.FAILURE, info: 'missing parameter(s) for object update', payload: msg.obj.id})
+      msg.replyFunc({status: e.general.FAILURE, info: 'missing parameter(s) for object update', payload: msg.obj})
 
   areDataTrashed: (obj) ->
     trashed = false
