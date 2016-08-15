@@ -187,28 +187,33 @@ class ObjectManager
       msg.replyFunc({status: e.general.FAILURE, info: '_listObjects missing parameter', payload: null })
 
   parseList: (_records, msg) =>
+
+    checkFinish = (rv)=>
+      if --count == 0
+        if debug then console.log 'ObjectManager.parseList returns '+rv.length+' records'
+        if debug then console.dir rv
+        msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
+
     count = _records.length
     if debug then console.log 'ObjectManager.parseList resolving '+count+' records'
     if count == 0
+      if debug then console.log 'ObjectManager.parseList -- returning empty set'
       msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: []})
     else
       rv = []
       _records.forEach (r) =>
-        DB.get(r.type, [r.id]).then (records) =>
-          if debug then console.log 'ObjectManager.parseList -- result of getting record '+r.type+' id '+r.id+' is '+records
-          if debug then console.dir records
-          if records and records[0]
-            @messageRouter.resolver.createObjectFrom(records[0]).then (o) =>
+        DB.get(r.type, [r.id]).then (record) =>
+          if debug then console.log 'ObjectManager.parseList -- result of getting record '+r.type+' id '+r.id+' is '+record
+          if debug then console.dir record
+          if record and record[0]
+            @messageRouter.resolver.createObjectFrom(record[0]).then (o) =>
               #console.log '----- resolved object for record '+r.id
               rv.push o.toClient()
               objStore.storeObject o,false
-              if --count == 0
-                if debug then console.log 'ObjectManager.parseList returns '+rv.length+' records'
-                msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
+              checkFinish(rv)
           else
-            #console.log '  oops empty records for '+r.id
-            --count
-            msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: records})
+            if debug then console.log '  empty records for '+r.id
+            checkFinish(rv)
   #---------------------------------------------------------------------------------------------------------------------
 
   expose: (type) =>
