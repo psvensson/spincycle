@@ -591,6 +591,41 @@
         });
       });
     });
+    it('should resolve multiple cold array references to objects not yet in ostore, only in db', function(done) {
+      var foo, foo2;
+      foo = {
+        id: '11008877',
+        name: 'fooname',
+        value: 'name',
+        "default": 'foo',
+        type: 'Foo'
+      };
+      foo2 = {
+        id: '77778877',
+        name: 'fooname',
+        value: 'name2',
+        "default": 'foo2',
+        type: 'Foo'
+      };
+      return DB.set('Foo', foo, function(sres) {
+        return DB.set('Foo', foo2, function(sres2) {
+          var bar;
+          bar = {
+            type: 'Bar',
+            id: 'foobarbaz',
+            name: 'ANOTHER BAR xyzzyqq',
+            theFoo: '',
+            foos: ['11008877', '77778877']
+          };
+          return DB.set('Bar', bar, function(bres) {
+            return messageRouter.objectManager.getObjectPullThrough('foobarbaz', 'Bar').then(function(barobj) {
+              expect(barobj.foos.length).to.equal(2);
+              return done();
+            });
+          });
+        });
+      });
+    });
     it('should filter out crap values in arrays when updating', function() {
       return new Fooznaz().then(function(fz) {
         record = fz.toClient();

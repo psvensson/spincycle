@@ -187,31 +187,6 @@ class ObjectManager
       msg.replyFunc({status: e.general.FAILURE, info: '_listObjects missing parameter', payload: null })
 
   parseList: (_records, msg) =>
-    """
-    rv = []
-    #console.log 'found '+records.length+' objects to return'
-    count = records.length
-    if debug then console.dir records
-    if count == 0
-      msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
-    else
-      records.forEach (record) =>
-        objStore.getObject(record.id, record.type).then (oo) =>
-          if oo
-            if debug then console.log 'found list object in OStore'
-            if debug then console.dir(oo.toClient())
-            rv.push(oo.toClient())
-            if --count == 0
-              msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
-          else
-            @messageRouter.resolver.createObjectFrom(record).then (o) =>
-              if debug then console.log 'resolved object '+o.id+' count = '+count
-              console.log 'created list object from resolver'
-              console.dir(o.toClient())
-              rv.push(o.toClient())
-              if --count == 0
-                msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
-    """
     count = _records.length
     if debug then console.log 'ObjectManager.parseList resolving '+count+' records'
     if count == 0
@@ -232,6 +207,7 @@ class ObjectManager
                 msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
           else
             #console.log '  oops empty records for '+r.id
+            --count
             msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: records})
   #---------------------------------------------------------------------------------------------------------------------
 

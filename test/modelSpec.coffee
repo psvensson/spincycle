@@ -355,6 +355,23 @@ describe 'Spincycle Model Tests', ->
           expect(barobj.foos.length).to.equal(1)
           done()
 
+  it 'should resolve multiple cold array references to objects not yet in ostore, only in db', (done)->
+    foo = {id: '11008877', name: 'fooname', value: 'name', default:'foo', type: 'Foo'}
+    foo2 = {id: '77778877', name: 'fooname', value: 'name2', default:'foo2', type: 'Foo'}
+    DB.set 'Foo', foo, (sres) ->
+      DB.set 'Foo', foo2, (sres2) ->
+        bar =
+          type: 'Bar'
+          id: 'foobarbaz'
+          name: 'ANOTHER BAR xyzzyqq'
+          theFoo: ''
+          foos: ['11008877', '77778877']
+
+        DB.set 'Bar', bar, (bres) ->
+          messageRouter.objectManager.getObjectPullThrough('foobarbaz', 'Bar').then (barobj)->
+            expect(barobj.foos.length).to.equal(2)
+            done()
+
 
   it 'should filter out crap values in arrays when updating', ()->
     new Fooznaz().then (fz) ->
