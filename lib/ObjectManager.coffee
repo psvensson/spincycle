@@ -212,7 +212,7 @@ class ObjectManager
               objStore.storeObject o,false
               checkFinish(rv)
           else
-            if debug then console.log '  empty records for '+r.id
+            if debug then console.log ' empty records for '+r.id
             checkFinish(rv)
   #---------------------------------------------------------------------------------------------------------------------
 
