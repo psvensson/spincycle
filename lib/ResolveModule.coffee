@@ -63,7 +63,7 @@ class ResolveModule
         #if debug then console.dir module.prototype
         o = Object.create(module.prototype)
         o._rev = record._rev
-        o.constructor(record[0]).then (finishedobj) -> q.resolve(o)
+        o.constructor(record[0]).then (finishedobj) -> q.resolve(finishedobj)
       else
         @resolve record[0].type, (filename) ->
           if debug then console.log 'ResolveModule resolved module '+record[0].type+" as "+filename
@@ -72,7 +72,7 @@ class ResolveModule
           ResolveModule.modulecache[record[0].type] = module
           o = Object.create(module.prototype)
           o._rev = record._rev
-          o.constructor(record[0]).then (finishedobj) -> q.resolve(o)
+          o.constructor(record[0]).then (finishedobj) -> q.resolve(finishedobj)
     return q
 
 module.exports = ResolveModule

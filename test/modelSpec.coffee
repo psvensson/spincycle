@@ -372,6 +372,60 @@ describe 'Spincycle Model Tests', ->
             expect(barobj.foos.length).to.equal(2)
             done()
 
+  it 'should have multiple cold array references to objects not yet in ostore, and get right amount of references in arrays of search results', (done)->
+    foo = {id: '21008877', name: 'fooname', value: 'namexxxx', default:'foox', type: 'Foo'}
+    foo2 = {id: '27778877', name: 'fooname', value: 'nameyyyy', default:'fooy', type: 'Foo'}
+    DB.set 'Foo', foo, (sres) ->
+      DB.set 'Foo', foo2, (sres2) ->
+        bar =
+          type: 'Bar'
+          id: 'xyzzy17'
+          name: 'YET ANOTHER BAR'
+          theFoo: ''
+          foos: ['21008877', '27778877']
+
+        DB.set 'Bar', bar, (bres) ->
+          msg =
+            type: 'Bar'
+            user:
+              isAdmin: true
+            replyFunc: (reply)->
+              expect(reply.payload.length).to.gt(0)
+              done()
+
+          messageRouter.objectManager._listObjects(msg)
+
+  it 'should cold load an object with a large amount of references in arrays of search results', (done)->
+    foorefs = []
+    max = 29
+    count = max-1
+    count++
+    for _x in [0..max]
+      ((x)->
+        foo = {id: 'foo_'+x+'_21008877', name: 'fooname', value: 'name_'+x, type: 'Foo'}
+        DB.set 'Foo', foo, (sres) ->
+          foorefs.push foo.id
+          if --count == 0
+            bar =
+              type: 'Bar'
+              id: '4711xyzzy17'
+              name: 'SON OF YET ANOTHER BAR'
+              theFoo: ''
+              foos: foorefs
+
+            DB.set 'Bar', bar, (bres) ->
+              msg =
+                type: 'Bar'
+                user:
+                  isAdmin: true
+                replyFunc: (reply)->
+                  reply.payload.forEach (bb)->
+                    if bb.name == bar.name
+                      expect(bb.foos.length).to.equal(foorefs.length)
+                      done()
+
+              messageRouter.objectManager._listObjects(msg)
+      )(_x)
 
   it 'should filter out crap values in arrays when updating', ()->
     new Fooznaz().then (fz) ->
@@ -396,7 +450,7 @@ describe 'Spincycle Model Tests', ->
     setTimeout(
       ()->
         messageRouter.objectManager._listObjects(msg)
-      ,400
+      ,200
     )
 
   it 'should include whole objects when using storedirectly', (done)->
