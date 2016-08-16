@@ -192,7 +192,7 @@ class DB
       else
         #console.log ' attempting to use datastore for type '+type+' and id '+id+' typeof = '+(typeof id)
         @getDataStore().then (store)=>
-          if debug then console.log 'DB.get calling datastore '+store
+          #if debug then console.log 'DB.get calling datastore '+store
           store.get(type, id, (result) =>
             if not result
               if debug

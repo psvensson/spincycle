@@ -187,7 +187,6 @@ class ObjectManager
       msg.replyFunc({status: e.general.FAILURE, info: '_listObjects missing parameter', payload: null })
 
   parseList: (_records, msg) =>
-
     checkFinish = (rv)=>
       if --count == 0
         if debug then console.log 'ObjectManager.parseList returns '+rv.length+' records'
@@ -206,11 +205,15 @@ class ObjectManager
           if debug then console.log 'ObjectManager.parseList -- result of getting record '+r.type+' id '+r.id+' is '+record
           if debug then console.dir record
           if record and record[0]
+            """
             @messageRouter.resolver.createObjectFrom(record[0]).then (o) =>
               #console.log '----- resolved object for record '+r.id
               rv.push o.toClient()
               objStore.storeObject o,false
               checkFinish(rv)
+            """
+            rv.push record[0]
+            checkFinish(rv)
           else
             if debug then console.log ' empty records for '+r.id
             checkFinish(rv)
