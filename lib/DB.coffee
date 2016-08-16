@@ -197,6 +197,7 @@ class DB
             if not result
               if debug
                 console.log 'DB.get for type '+type+' and id '+id+' got back '+result
+                console.dir result
             else
               @lru.set(id, result)
               #console.log 'DB.get resolving '+result

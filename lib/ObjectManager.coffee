@@ -121,14 +121,14 @@ class ObjectManager
     @onUpdateObject(msg)
 
   _getObject: (msg) =>
-    if debug then console.log '_getObject called for type '+msg.type
-    if debug then console.dir msg.obj
+    #if debug then console.log '_getObject called for type '+msg.type
+    #if debug then console.dir msg.obj
     if msg.type and msg.obj and msg.obj.id
       id = msg.obj.id
       if id.indexOf and id.indexOf('all_') > -1
         @getAggregateObjects(msg)
       else
-        if debug then console.log '_getObject calling getObjectPullThrough for type '+msg.type
+        #if debug then console.log '_getObject calling getObjectPullThrough for type '+msg.type
         @getObjectPullThrough(id, msg.type).then (obj) =>
           if debug then '_getObject got back obj from getObjectPullThrough: '
           #if debug then console.dir obj

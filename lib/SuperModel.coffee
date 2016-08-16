@@ -117,7 +117,7 @@ class SuperModel
     return rv
 
   toClient: () =>
-    if debug then console.log '---------------------------------------- toClient -----------------------------------------------'
+    #if debug then console.log '---------------------------------------- toClient -----------------------------------------------'
     #if debug then console.dir @
     r = @getRecord()
     ra = @.constructor.model
