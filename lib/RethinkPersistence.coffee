@@ -223,8 +223,8 @@ class RethinkPersistence
 
   set: (_type, obj, cb)=>
     type = _type.toLowerCase()
-    if debug then console.log 'Rethink.set called for '+type
-    if debug then console.dir obj
+    #if debug then console.log 'Rethink.set called for '+type
+    #if debug then console.dir obj
     @getDbFor(type).then (db)=>
       try
         db.insert(obj, {conflict: "update", return_changes: true}).run @connection, (err, result) ->
@@ -233,7 +233,8 @@ class RethinkPersistence
             console.dir err
             throw err
             cb()
-          cb(result)
+          else
+            cb(result)
       catch ex
         console.log 'caught exception!'
         console.dir ex

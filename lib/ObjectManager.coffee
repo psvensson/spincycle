@@ -135,8 +135,8 @@ class ObjectManager
           if obj
             if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
               tc = obj.toClient()
-              if debug then console.log '_getObject for '+msg.type+' returns'
-              if debug then console.dir tc
+              #if debug then console.log '_getObject for '+msg.type+' returns'
+              #if debug then console.dir tc
               msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: tc})
             else
               console.log '_getObject got NOT ALLOWED for user '+msg.user.id+' for '+msg.type+' id '+obj.id
