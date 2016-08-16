@@ -131,11 +131,11 @@ class ObjectManager
         if debug then console.log '_getObject calling getObjectPullThrough for type '+msg.type
         @getObjectPullThrough(id, msg.type).then (obj) =>
           if debug then '_getObject got back obj from getObjectPullThrough: '
-          if debug then console.dir obj
+          #if debug then console.dir obj
           if obj
             if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
               tc = obj.toClient()
-              #if debug then console.log '_getObject for '+msg.type+' returns'
+              if debug then console.log '_getObject for '+msg.type+' returns '+JSON.stringify(tc)
               #if debug then console.dir tc
               msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: tc})
             else
@@ -191,7 +191,7 @@ class ObjectManager
     checkFinish = (rv)=>
       if --count == 0
         if debug then console.log 'ObjectManager.parseList returns '+rv.length+' records'
-        if debug then console.dir rv
+        if debug then console.log JSON.stringify(rv)
         msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
 
     count = _records.length
@@ -267,10 +267,10 @@ class ObjectManager
             else
               @messageRouter.resolver.createObjectFrom(record).then (oo) =>
                 if debug then console.log '- getObjectPullThrough got object '+oo.id+'  '+oo.type
-                if debug then console.dir oo
+                #if debug then console.dir oo
                 q.resolve(oo)
         else
-          if debug then console.log '- getObjectPullThrough found object in objStore'
+          #if debug then console.log '- getObjectPullThrough found object in objStore'
           q.resolve(o)
     return q
 
