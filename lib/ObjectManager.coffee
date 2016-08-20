@@ -121,22 +121,22 @@ class ObjectManager
     @onUpdateObject(msg)
 
   _getObject: (msg) =>
-    if debug then console.log '_getObject called for type '+msg.type
-    if debug then console.dir msg.obj
+    #if debug then console.log '_getObject called for type '+msg.type
+    #if debug then console.dir msg.obj
     if msg.type and msg.obj and msg.obj.id
       id = msg.obj.id
       if id.indexOf and id.indexOf('all_') > -1
         @getAggregateObjects(msg)
       else
-        if debug then console.log '_getObject calling getObjectPullThrough for type '+msg.type
+        #if debug then console.log '_getObject calling getObjectPullThrough for type '+msg.type
         @getObjectPullThrough(id, msg.type).then (obj) =>
           if debug then '_getObject got back obj from getObjectPullThrough: '
-          if debug then console.dir obj
+          #if debug then console.dir obj
           if obj
             if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
               tc = obj.toClient()
-              if debug then console.log '_getObject for '+msg.type+' returns'
-              if debug then console.dir tc
+              if debug then console.log '_getObject for '+msg.type+' returns '+JSON.stringify(tc)
+              #if debug then console.dir tc
               msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: tc})
             else
               console.log '_getObject got NOT ALLOWED for user '+msg.user.id+' for '+msg.type+' id '+obj.id
@@ -187,11 +187,10 @@ class ObjectManager
       msg.replyFunc({status: e.general.FAILURE, info: '_listObjects missing parameter', payload: null })
 
   parseList: (_records, msg) =>
-
     checkFinish = (rv)=>
       if --count == 0
         if debug then console.log 'ObjectManager.parseList returns '+rv.length+' records'
-        if debug then console.dir rv
+        if debug then console.log JSON.stringify(rv)
         msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
 
     count = _records.length
@@ -206,11 +205,15 @@ class ObjectManager
           if debug then console.log 'ObjectManager.parseList -- result of getting record '+r.type+' id '+r.id+' is '+record
           if debug then console.dir record
           if record and record[0]
+            """
             @messageRouter.resolver.createObjectFrom(record[0]).then (o) =>
               #console.log '----- resolved object for record '+r.id
               rv.push o.toClient()
               objStore.storeObject o,false
               checkFinish(rv)
+            """
+            rv.push record[0]
+            checkFinish(rv)
           else
             if debug then console.log ' empty records for '+r.id
             checkFinish(rv)
@@ -267,10 +270,10 @@ class ObjectManager
             else
               @messageRouter.resolver.createObjectFrom(record).then (oo) =>
                 if debug then console.log '- getObjectPullThrough got object '+oo.id+'  '+oo.type
-                if debug then console.dir oo
+                #if debug then console.dir oo
                 q.resolve(oo)
         else
-          if debug then console.log '- getObjectPullThrough found object in objStore'
+          #if debug then console.log '- getObjectPullThrough found object in objStore'
           q.resolve(o)
     return q
 
