@@ -411,7 +411,7 @@ class ObjectManager
     #if debug then console.dir msg
     if msg.obj or not msg.obj.id or not msg.obj.type
       if debug then console.log 'onRegisterForUpdatesOn called for '+msg.obj.type+' '+msg.obj.id
-      objStore.getObject(msg.obj.id, msg.obj.type).then( (obj) =>
+      DB.getFromStoreOrDB(msg.obj.type, msg.obj.id).then( (obj) =>
         if obj && obj.id
           if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
             rememberedListenerId = undefined
@@ -438,8 +438,7 @@ class ObjectManager
           else
             msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.UPDATE_REGISTER_FAIL, payload: msg.obj.id })
         else
-          if debug then console.log 'User mot allowed getting updates (read) object:'
-          if debug then console.dir obj
+          if debug then console.log 'Could not find object: '+msg.obj.type+' id '+msg.obj.id
           msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id })
       , error)
 
