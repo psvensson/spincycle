@@ -7,6 +7,8 @@ debug = process.env["DEBUG"]
 
 class RethinkPersistence
 
+  if process.env['RETHINKDB_PORT_28015_TCP_PORT'] then madr = 'rethinkdb' else madr = '127.0.0.1'
+  mport = process.env['RETHINKDB_PORT_28015_TCP_PORT'] or '28015'
 
   constructor: (@dburl, @DB) ->
     @connection = undefined
@@ -15,7 +17,7 @@ class RethinkPersistence
   connect: ()=>
     console.log 'connect called...'
     q = defer()
-    r.connect({host: 'localhost', port: 28015}, (err, conn) =>
+    r.connect({host: madr, port: mport}, (err, conn) =>
       if err then throw err
       @connection = conn
       q.resolve(@)
