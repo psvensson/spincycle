@@ -379,7 +379,7 @@ class ObjectManager
           harr = record[property.name] or []
           if not harr.length then harr = []
           hcount = harr.length
-          if hcount == 0
+          if !hcount or hcount == 0
             rv[property.name] = []
             checkFinished(property.name)
           else
