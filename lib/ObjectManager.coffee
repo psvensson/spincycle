@@ -379,6 +379,7 @@ class ObjectManager
           harr = record[property.name] or []
           if not harr.length then harr = []
           if debug then console.dir harr
+          if typeof harr == 'string' then harr = [harr]
           hcount = harr.length
           if !hcount or hcount == 0
             rv[property.name] = []
