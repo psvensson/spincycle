@@ -372,12 +372,13 @@ class ObjectManager
                 rv[property.name] = resolvedarr
                 checkFinished(property.name)
       else if property.hashtable
-        #console.log '======================================== going through hashtable property '+property.name
+        if debug then console.log '======================================== going through hashtable property '+property.name
         #console.dir record[property.name]
         resolvedhash = {}
-        if record[property.name] and record[property.name]
+        if record[property.name]
           harr = record[property.name] or []
           if not harr.length then harr = []
+          if debug then console.dir harr
           hcount = harr.length
           if !hcount or hcount == 0
             rv[property.name] = []
