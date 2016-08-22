@@ -119,12 +119,13 @@ class MongoPersistence
     return q
 
   all: (_type, query, cb)=>
-    if debug then console.log 'Mongo::all called for type '+_type
+    if debug then console.log 'Mongo::all called for type '+_type+' query is'
+    if debug then console.dir query
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>
       if collection
         if debug then console.log 'Mongo.all collection is '+collection
-        collection.find {},(err,res) =>
+        collection.find {}, query, (err,res) =>
           res.toArray (err, items) =>
             if err
               console.log 'MONGO Error getting all: '+err
