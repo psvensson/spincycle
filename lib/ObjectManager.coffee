@@ -279,7 +279,7 @@ class ObjectManager
 
   onUpdateObject: (msg) =>
     #console.log 'onUpdateObject called for '+msg.obj.type+' - '+msg.obj.id
-    if msg.obj and msg.obj.id
+    if msg.obj and msg.obj.type and msg.obj.id
       DB.getFromStoreOrDB(msg.obj.type, msg.obj.id).then( (obj) =>
         #console.log 'onUpdateObject getFromStoreOrDB returned '+obj
         #console.dir obj
