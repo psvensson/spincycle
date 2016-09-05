@@ -93,6 +93,10 @@ class MessageRouter
     for name, method of @methods
       method.expose(type)
 
+  makeRESTful: (type) =>
+    for name, method of @methods
+      if name == 'express' then method.makeRESTful(type)
+
   open: () =>
     MessageRouter.status = 'open'
     console.log 'opening message router'
@@ -143,7 +147,7 @@ class MessageRouter
             exit( -1)
           #console.log 'user found. now calling handler'
           if not m.user.limiter
-            console.log '--- creating new rate limiter for user '+m.user.id+' max request = '+parseInt(@messagesPerSecond)
+            #console.log '--- creating new rate limiter for user '+m.user.id+' max request = '+parseInt(@messagesPerSecond)
             m.user.limiter = new RateLimiter(parseInt(@messagesPerSecond), 1000)
           #console.log 'remaining tokens before call is '+m.user.limiter.getTokensRemaining()
           if m.user.limiter and m.user.limiter.removeTokens

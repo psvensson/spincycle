@@ -89,24 +89,24 @@ class ObjectManager
       msg.replyFunc({status: e.general.FAILURE, info: '_createObject missing parameter', payload: null })
 
   _deleteObject: (msg) =>
-    console.log 'delete called'
+    #console.log 'delete called'
     if msg.obj and msg.obj.type and msg.obj.id
       console.log 'delete got type '+msg.obj.type+', and id '+msg.obj.id
       objStore.getObject(msg.obj.id, msg.obj.type).then (obj) =>
-        console.log 'got object form objstore -> '+obj
+        #console.log 'got object form objstore -> '+obj
         if obj
           if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user, msg.obj)
             #console.log 'user could write this object'
             #console.dir obj
             DB.remove obj, (removestatus) =>
-              console.log 'object removed callback'
+              #console.log 'object removed callback'
               sublist = @populationListeners[msg.type] or {}
               for k,client of sublist
                 if ClientEndpoints.exists(client)
-                  console.log 'updating population changes callback'
+                  #console.log 'updating population changes callback'
                   ClientEndpoints.sendToEndpoint(client, {status: e.general.SUCCESS, info: 'POPULATION_UPDATE', payload: { removed: obj.toClient() } })
               objStore.removeObject(obj)
-              console.log 'object removed from objstore'
+              #console.log 'object removed from objstore'
               msg.replyFunc({status: e.general.SUCCESS, info: 'delete object', payload: obj.id})
           else
             msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to delete object', payload: msg.obj.id})
@@ -278,7 +278,8 @@ class ObjectManager
     return q
 
   onUpdateObject: (msg) =>
-    #console.log 'onUpdateObject called for '+msg.obj.type+' - '+msg.obj.id
+    #console.log 'onUpdateObject called for '+msg
+    #console.dir msg
     if msg.obj and msg.obj.type and msg.obj.id
       DB.getFromStoreOrDB(msg.obj.type, msg.obj.id).then( (obj) =>
         #console.log 'onUpdateObject getFromStoreOrDB returned '+obj

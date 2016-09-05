@@ -3,7 +3,8 @@ SuperModel      = require('../lib/SuperModel')
 ResolveModule   = require('../lib/ResolveModule')
 DB              = require('../lib/DB')
 OStore          = require('../lib/OStore')
-
+request         = require('request')
+unirest         = require('unirest')
 AuthenticationManager = require('../example/AuthenticationManager')
 express         = require("express")
 app             = express()
@@ -14,15 +15,17 @@ describe 'Spincycle Model Tests', ->
 
   authMgr = undefined
   messageRouter = undefined
+  httpMethod = undefined
 
   before (done)->
     #console.log '------------------------------------- before called'
     authMgr         = new AuthenticationManager()
     #messageRouter   = new SpinCycle(authMgr, null, 10, app, 'mongodb')
     messageRouter   = new SpinCycle(authMgr, null, 10, app, 'rethinkdb')
+    httpMethod = new SpinCycle.HttpMethod(messageRouter, app, '/api/')
+    app.listen(8008)
     DB.createDatabases(['foo','bar','dfoo','directbar','hashbar']).then () ->
       #console.log '++++++++++++++++++++++++++++++++++++spec dbs created'
-
       messageRouter.open()
       done()
 
@@ -697,4 +700,72 @@ describe 'Spincycle Model Tests', ->
           #console.log 'bar created. waiting for population change'
 
     messageRouter.objectManager.onRegisterForPopulationChanges(msg)
+
+  it 'should be able call listcommands through HttpMethod', (done)->
+    request.get 'http://localhost:8008/api/?target=listcommands', (req,res,_body)->
+      #console.log('listcommands returns '+body)
+      body = JSON.parse(_body)
+      #console.dir arguments
+      expect(body.status).to.equal('SUCCESS')
+      done()
+
+  it 'should be able to expose an object and access _listObject through HttpMethod', (done)->
+    messageRouter.objectManager.expose('Foo')
+    request.get 'http://localhost:8008/api/?target=_listFoos', (req,res,_body)->
+      #console.log('listcommands returns '+_body)
+      body = JSON.parse(_body)
+      #console.dir arguments
+      expect(body.status).to.equal('SUCCESS')
+      done()
+
+  it 'should be able to restify an already exposed object and access /rest/Object through HttpMethod', (done)->
+    messageRouter.makeRESTful('Foo')
+    request.get 'http://localhost:8008/rest/Foo', (req,res,_body)->
+      #console.log('listcommands returns '+_body)
+      body = JSON.parse(_body)
+      #console.dir arguments
+      expect(body.status).to.equal('SUCCESS')
+      done()
+
+  it 'should be able to access a restified object through /rest/Object/:id and HttpMethod', (done)->
+    #messageRouter.makeRESTful('Foo')
+    request.get 'http://localhost:8008/rest/Foo/21008877', (req,res,_body)->
+      #console.log('listcommands returns '+_body)
+      body = JSON.parse(_body)
+      #console.dir arguments
+      expect(body.status).to.equal('SUCCESS')
+      done()
+
+  it 'should be able to update a restified object through put /rest/Object/:id and HttpMethod', (done)->
+    #messageRouter.makeRESTful('Foo')
+    record =
+      id: 'f117'
+      name: 'foobar'
+    request.put {url:'http://localhost:8008/rest/Foo/21008877', headers:{"Content-Type": "application/json"}, body:JSON.stringify(record)}, (req,res,_body)->
+      #console.log('put returns '+_body)
+      body = JSON.parse(_body)
+      #console.dir arguments
+      expect(body.status).to.equal('SUCCESS')
+      done()
+
+  it 'should be able to delete a restified object through delete /rest/Object/:id and HttpMethod', (done)->
+    #messageRouter.makeRESTful('Foo')
+    request.delete 'http://localhost:8008/rest/Foo/21008877', (req,res,_body)->
+      #console.log('listcommands returns '+_body)
+      body = JSON.parse(_body)
+      #console.dir arguments
+      expect(body.status).to.equal('SUCCESS')
+      done()
+
+  it 'should be able to create a new restified object through post /rest/Object/:id and HttpMethod', (done)->
+    #messageRouter.makeRESTful('Foo')
+    record =
+      id: 'f117'
+      name: 'foobarbaz'
+    request.post {url:'http://localhost:8008/rest/Foo', headers:{"Content-Type": "application/json"}, body:JSON.stringify(record)}, (req,res,_body)->
+      #console.log('put returns '+_body)
+      body = JSON.parse(_body)
+      #console.dir arguments
+      expect(body.status).to.equal('SUCCESS')
+      done()
 

@@ -10,8 +10,10 @@ class HttpMethod
   @props = {}
 
   constructor: (messageRouter, app, basePath) ->
-    #console.log 'HttpMethod called for path '+basePath
- 
+    #console.log 'HttpMethod called for path '+basePath'
+    @app = app
+    @restPath = '/rest/'
+
     doSend = (req, res, url_parts)->
       user  = basicAuth(req)
       if user
@@ -24,7 +26,7 @@ class HttpMethod
             return
       ip    = req.connection.remoteAddress
       port  = req.connection.remotePort
-      #console.log 'express request from '+ip+':'+port+' target is "'+req.query.target+'"'
+      console.log 'express request from '+ip+':'+port+' target is "'+req.query.target+'"'
       #console.dir req.query
       target = HttpMethod.httproutes[req.query.target]
       if target
@@ -37,6 +39,7 @@ class HttpMethod
           res.json(reply)
           if debug then console.log 'HttpMethod calling target '+target
         target(message)
+    @doSend = doSend
 
     app.get basePath, (req, res) ->
       url_parts = req.query
@@ -53,6 +56,60 @@ class HttpMethod
     #console.log 'express registering http route for target '+targetName
     HttpMethod.httproutes[targetName] = targetFunc
 
+  makeRESTful: (type) =>
+    console.log 'HttpMethod.makeRESTful called for type '+type+' restpath is '+@restPath
 
+    listall = (req,res) =>
+      #console.log 'listall'
+      url_parts = req.query
+      req.query.type = type
+      req.query.target = '_list'+type+'s'
+      @doSend(req, res, url_parts)
+
+    createone = (req,res) =>
+      #console.log 'createone'
+      url_parts = req.query
+      req.query.type = type
+      req.query.obj = {type: req.query.type}
+      req.query.target = '_create'+type
+      @doSend(req, res, url_parts)
+
+    getone = (req,res) =>
+      #console.log 'getone'
+      url_parts = req.query
+      req.query.id = req.params.id
+      req.query.type = type
+      req.query.obj = {id: req.query.id, type: req.query.type}
+      req.query.target = '_get'+type
+      @doSend(req, res, url_parts)
+
+    updateone = (req,res) =>
+      #console.log 'updateone'
+      url_parts = req.query
+      #console.dir url_parts
+      req.query.id = req.params.id
+      req.query.type = type
+      req.query.obj = {id: req.query.id, type: req.query.type}
+      req.query.target = '_update'+type
+      @doSend(req, res, url_parts)
+
+    deleteone = (req,res) =>
+      #console.log 'deleteone'
+      url_parts = req.query
+      req.query.id = req.params.id
+      req.query.type = type
+      req.query.obj = {id: req.query.id, type: req.query.type}
+      req.query.target = '_delete'+type
+      @doSend(req, res, url_parts)
+
+    console.log 'adding REST paths for "'+(@restPath+type)+'"'
+    @app.route(@restPath+type).get(listall).post(createone)
+    @app.route(@restPath+type+'/:id').get(getone).put(updateone).delete(deleteone)
+
+    @app.get('/foo', (req,res,next)->
+      console.log 'foo'
+      ,(req,res,next)->
+        console.log 'reject foo'
+    )
 
 module.exports = HttpMethod
