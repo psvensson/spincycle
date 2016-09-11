@@ -12,6 +12,7 @@ debug = process.env["DEBUG"]
 
 class ObjectManager
 
+
   constructor: (@messageRouter) ->
    @updateObjectHooks = []
    @populationListeners = []

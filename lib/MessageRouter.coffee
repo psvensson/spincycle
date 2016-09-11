@@ -15,6 +15,7 @@ RateLimiter     = require('limiter').RateLimiter
 e               = require('./EventManager')
 express         = require("express")
 path            = require('path')
+defer           = require('node-promise').defer
 
 # The MessageRouter registers names on which messages can be sent.
 # The idea is to abstract away different messaging methods (WS, WebRTC, HTTP) from the logic
@@ -88,6 +89,18 @@ class MessageRouter
       ResolveModule.modulecache['SpinModule'] = SpinModule
 
   #---------------------------------------------------------------------------------------------------------------------
+
+  register:(types)=>
+    q = defer()
+    typenames = []
+    types.forEach (type)=>
+      typenames.push type.name
+      ResolveModule.modulecache[type.name] = type.module
+      @objectManager.expose type.name
+      @makeRESTful(type.name)
+    DB.createDatabases(typenames).then ()=>
+      q.resolve()
+    return q
 
   expose: (type) =>
     for name, method of @methods
