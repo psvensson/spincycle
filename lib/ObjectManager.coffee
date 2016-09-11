@@ -130,21 +130,26 @@ class ObjectManager
         @getAggregateObjects(msg)
       else
         #if debug then console.log '_getObject calling getObjectPullThrough for type '+msg.type
-        @getObjectPullThrough(id, msg.type).then (obj) =>
-          if debug then '_getObject got back obj from getObjectPullThrough: '
-          #if debug then console.dir obj
-          if obj
-            if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
-              tc = obj.toClient()
-              if debug then console.log '_getObject for '+msg.type+' returns '+JSON.stringify(tc)
-              #if debug then console.dir tc
-              msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: tc})
+        if typeof id isnt 'object'
+          @getObjectPullThrough(id, msg.type).then (obj) =>
+            if debug then '_getObject got back obj from getObjectPullThrough: '
+            #if debug then console.dir obj
+            if obj
+              if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
+                tc = obj.toClient()
+                if debug then console.log '_getObject for '+msg.type+' returns '+JSON.stringify(tc)
+                #if debug then console.dir tc
+                msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: tc})
+              else
+                console.log '_getObject got NOT ALLOWED for user '+msg.user.id+' for '+msg.type+' id '+obj.id
+                msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: id})
             else
-              console.log '_getObject got NOT ALLOWED for user '+msg.user.id+' for '+msg.type+' id '+obj.id
-              msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: id})
-          else
-            console.log '_getObject No object found with id '+id+' of type '+msg.obj.type
-            msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'no such object', payload: msg.obj.id})
+              console.log '_getObject No object found with id '+id+' of type '+msg.obj.type
+              msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'no such object', payload: msg.obj.id})
+        else
+          console.log '_getObject provided id '+id+' of type '+msg.obj.type+' is an object!!'
+          console.dir id
+          msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'id value is an object!!!', payload: msg.obj.id})
     else
       msg.replyFunc({status: e.general.FAILURE, info: '_getObject for '+msg.type+' missing parameter', payload: null })
 
