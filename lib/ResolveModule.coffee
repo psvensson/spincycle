@@ -31,7 +31,7 @@ class ResolveModule
       #This listens for files found
       finder.on 'file', (origfile) ->
         file = ""+origfile
-        if file.indexOf('node_modules') == -1 and file.indexOf('bower_components') == -1
+        if file.indexOf('node_modules') == -1 and file.indexOf('.csv') == -1 and file.indexOf('bower_components') == -1 and file.indexOf('.zip') == -1 and file.indexOf('.gz') == -1
           if file.indexOf('/') > -1
             file = file.substring(file.lastIndexOf('/')+1, file.length)
           if file.indexOf('.') > -1

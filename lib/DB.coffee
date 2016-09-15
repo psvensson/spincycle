@@ -31,6 +31,7 @@ class DB
 
   @getDataStore: (_name) =>
     name = _name or DB.dbname
+    DB.dbname = name
     #console.log 'DB.getDataStore called name = '+name
     q = defer()
     if not @DataStore
@@ -58,10 +59,43 @@ class DB
       promises = []
       dblist.forEach (dbname) =>
         console.log 'attempting to get table for '+dbname
-        promises.push store.getDbFor(dbname)
+        db = store.getDbFor(dbname)
+        @extendSchemaIfNeeded(DB.DataStore, dbname)
+        promises.push db
       all(promises).then (results) =>
         console.log 'DB.createDatabases all good'
         q.resolve(results)
+    return q
+
+  @extendSchemaIfNeeded:(db,dbname)=>
+    # get schema
+    q = defer()
+    proto = ResolveModule.modulecache[dbname]
+    console.log 'extendSchemaIfNeeded resolve '+dbname+' to '
+    console.dir proto.model
+    db.all dbname,{},(res)=>
+      console.log 'extendSchemaIfNeeded found '+res.length+' objects after call to all()'
+      console.log 'first object is '+res[0]
+      # collect missing properties from first object
+      o = res[0]
+      missing = []
+      lookup = {}
+      for k,v of o
+        lookup[k] = k
+      proto.model.forEach (property)=>
+        if not lookup[property.name] then missing.push property
+      console.log 'found '+missing.length+' missing properties on first object compared to current model : '
+      console.dir missing
+      if missing.length > 0
+        count = res.length
+        console.log 'adding '+missing.length+' missing properties to '+res.length+' existing objects'
+        res.forEach (ro) =>
+          missing.forEach (mprop) =>
+            console.log '   setting new property '+mprop.name+' to default value of '+mprop.default+' on object type '+ro.type
+            ro[mprop.name] = mprop.default or ''
+          @set ro.type, ro, ()=> if --res == 0 then q.resolve()
+      else
+        q.resolve()
     return q
 
   @getFromStoreOrDB: (type, id) =>

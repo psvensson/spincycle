@@ -17,18 +17,6 @@ describe 'Spincycle Model Tests', ->
   messageRouter = undefined
   httpMethod = undefined
 
-  before (done)->
-    #console.log '------------------------------------- before called'
-    authMgr         = new AuthenticationManager()
-    #messageRouter   = new SpinCycle(authMgr, null, 10, app, 'mongodb')
-    messageRouter   = new SpinCycle(authMgr, null, 10, app, 'rethinkdb')
-    httpMethod = new SpinCycle.HttpMethod(messageRouter, app, '/api/')
-    app.listen(8008)
-    DB.createDatabases(['foo','bar','dfoo','directbar','hashbar']).then () ->
-      #console.log '++++++++++++++++++++++++++++++++++++spec dbs created'
-      messageRouter.open()
-      done()
-
   record =
     _rev: 99101020202030303404
     id: '17'
@@ -70,9 +58,9 @@ describe 'Spincycle Model Tests', ->
   class Foo extends SuperModel
     @type = 'Foo'
     @model=
-    [
-      {name: 'name', value: 'name', default:'foo'}
-    ]
+      [
+        {name: 'name', value: 'name', default:'foo'}
+      ]
     constructor:(@record={})->
       return super
 
@@ -90,12 +78,12 @@ describe 'Spincycle Model Tests', ->
   class Bar extends SuperModel
     @type = 'Bar'
     @model=
-    [
-      {name: 'name', public: true, value: 'name', default: 'yohoo'}
-      {name: 'theFoo', value: 'theFoo', type: 'Foo' }
-      {name: 'foos', public: true, array: true, ids: 'foos', type: 'Foo'}
-      {name: 'footable', hashtable: true, ids: 'footable', type: 'Foo'}
-    ]
+      [
+        {name: 'name', public: true, value: 'name', default: 'yohoo'}
+        {name: 'theFoo', value: 'theFoo', type: 'Foo' }
+        {name: 'foos', public: true, array: true, ids: 'foos', type: 'Foo'}
+        {name: 'footable', hashtable: true, ids: 'footable', type: 'Foo'}
+      ]
     constructor: (@record={}) ->
       return super
 
@@ -136,6 +124,27 @@ describe 'Spincycle Model Tests', ->
       ]
     constructor: (@record={}) ->
       return super
+
+
+
+  before (done)->
+    #console.log '------------------------------------- before called'
+    authMgr         = new AuthenticationManager()
+    #messageRouter   = new SpinCycle(authMgr, null, 10, app, 'mongodb')
+    messageRouter   = new SpinCycle(authMgr, null, 10, app, 'rethinkdb')
+    httpMethod = new SpinCycle.HttpMethod(messageRouter, app, '/api/')
+    app.listen(8008)
+    ResolveModule.modulecache['foo'] = Foo
+    ResolveModule.modulecache['bar'] = Bar
+    ResolveModule.modulecache['dfoo'] = DFoo
+    ResolveModule.modulecache['directbar'] = DirectBar
+    ResolveModule.modulecache['hashbar'] = HashBar
+    DB.createDatabases(['foo','bar','dfoo','directbar','hashbar']).then () ->
+      #console.log '++++++++++++++++++++++++++++++++++++spec dbs created'
+      messageRouter.open()
+      done()
+
+
 
   #-----------------------------------------------------------------------
 
@@ -769,3 +778,9 @@ describe 'Spincycle Model Tests', ->
       expect(body.status).to.equal('SUCCESS')
       done()
 
+  it 'should be able to extend a model with a new property', (done)->
+    Foo.model.push {name:'xyzzy', public: true, value:'xyzzy', default:'quux'}
+    DB.extendSchemaIfNeeded(DB.DataStore, 'Foo').then ()=>
+      DB.get('foo',[17]).then (res)=>
+        expect(res[0].xyzzy).to.equal('quux')
+        done()

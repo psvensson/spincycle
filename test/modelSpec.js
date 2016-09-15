@@ -34,16 +34,6 @@
     authMgr = void 0;
     messageRouter = void 0;
     httpMethod = void 0;
-    before(function(done) {
-      authMgr = new AuthenticationManager();
-      messageRouter = new SpinCycle(authMgr, null, 10, app, 'rethinkdb');
-      httpMethod = new SpinCycle.HttpMethod(messageRouter, app, '/api/');
-      app.listen(8008);
-      return DB.createDatabases(['foo', 'bar', 'dfoo', 'directbar', 'hashbar']).then(function() {
-        messageRouter.open();
-        return done();
-      });
-    });
     record = {
       _rev: 99101020202030303404,
       id: '17',
@@ -269,6 +259,21 @@
       return DirectBar;
 
     })(SuperModel);
+    before(function(done) {
+      authMgr = new AuthenticationManager();
+      messageRouter = new SpinCycle(authMgr, null, 10, app, 'rethinkdb');
+      httpMethod = new SpinCycle.HttpMethod(messageRouter, app, '/api/');
+      app.listen(8008);
+      ResolveModule.modulecache['foo'] = Foo;
+      ResolveModule.modulecache['bar'] = Bar;
+      ResolveModule.modulecache['dfoo'] = DFoo;
+      ResolveModule.modulecache['directbar'] = DirectBar;
+      ResolveModule.modulecache['hashbar'] = HashBar;
+      return DB.createDatabases(['foo', 'bar', 'dfoo', 'directbar', 'hashbar']).then(function() {
+        messageRouter.open();
+        return done();
+      });
+    });
     postCreateState = -1;
     this.record3 = {
       id: 42,
@@ -1162,7 +1167,7 @@
         return done();
       });
     });
-    return it('should be able to create a new restified object through post /rest/Object/:id and HttpMethod', function(done) {
+    it('should be able to create a new restified object through post /rest/Object/:id and HttpMethod', function(done) {
       record = {
         id: 'f117',
         name: 'foobarbaz'
@@ -1179,6 +1184,22 @@
         expect(body.status).to.equal('SUCCESS');
         return done();
       });
+    });
+    return it('should be able to extend a model with a new property', function(done) {
+      Foo.model.push({
+        name: 'xyzzy',
+        "public": true,
+        value: 'xyzzy',
+        "default": 'quux'
+      });
+      return DB.extendSchemaIfNeeded(DB.DataStore, 'Foo').then((function(_this) {
+        return function() {
+          return DB.get('foo', [17]).then(function(res) {
+            expect(res[0].xyzzy).to.equal('quux');
+            return done();
+          });
+        };
+      })(this));
     });
   });
 
