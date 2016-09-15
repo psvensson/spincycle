@@ -140,7 +140,7 @@ describe 'Spincycle Model Tests', ->
     ResolveModule.modulecache['directbar'] = DirectBar
     ResolveModule.modulecache['hashbar'] = HashBar
     DB.createDatabases(['foo','bar','dfoo','directbar','hashbar']).then () ->
-      #console.log '++++++++++++++++++++++++++++++++++++spec dbs created'
+      console.log '++++++++++++++++++++++++++++++++++++spec dbs created'
       messageRouter.open()
       done()
 
@@ -779,8 +779,10 @@ describe 'Spincycle Model Tests', ->
       done()
 
   it 'should be able to extend a model with a new property', (done)->
-    Foo.model.push {name:'xyzzy', public: true, value:'xyzzy', default:'quux'}
+    Foo.model.push {name:'xyzzy3', public: true, value:'xyzzy', default:'quux'}
     DB.extendSchemaIfNeeded(DB.DataStore, 'Foo').then ()=>
-      DB.get('foo',[17]).then (res)=>
-        expect(res[0].xyzzy).to.equal('quux')
+      DB.get('foo',['f417']).then (res)=>
+        console.log 'DB.get got back '+res
+        console.dir res
+        expect(res[0].xyzzy2).to.equal('quux')
         done()

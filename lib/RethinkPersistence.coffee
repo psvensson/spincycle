@@ -97,6 +97,14 @@ class RethinkPersistence
         q.resolve(db)
     return q
 
+  extend: (_type, id, field, def) =>
+    q = defer()
+    @get _type,id,(o)=>
+      if o
+        o[field] = def
+        @set _type,o, (setdone)=>q.resolve(o)
+    return q
+
   all: (_type, query, cb)=>
     type = _type.toLowerCase()
     if debug then console.log 'Rethink.all called for '+type

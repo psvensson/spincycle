@@ -60,10 +60,10 @@ class DB
       dblist.forEach (dbname) =>
         console.log 'attempting to get table for '+dbname
         db = store.getDbFor(dbname)
-        @extendSchemaIfNeeded(DB.DataStore, dbname)
         promises.push db
       all(promises).then (results) =>
         console.log 'DB.createDatabases all good'
+        dblist.forEach (dbname2) => @extendSchemaIfNeeded(DB.DataStore, dbname2)
         q.resolve(results)
     return q
 
@@ -76,10 +76,11 @@ class DB
     db.all dbname,{},(res)=>
       console.log 'extendSchemaIfNeeded found '+res.length+' objects after call to all()'
       console.log 'first object is '+res[0]
+      console.dir res[0]
       # collect missing properties from first object
       o = res[0]
       missing = []
-      lookup = {}
+      lookup = {createdAt:true, modifiedAt:true, createdBy:true}
       for k,v of o
         lookup[k] = k
       proto.model.forEach (property)=>
@@ -87,16 +88,29 @@ class DB
       console.log 'found '+missing.length+' missing properties on first object compared to current model : '
       console.dir missing
       if missing.length > 0
-        count = res.length
+        count = res.length*missing.length
         console.log 'adding '+missing.length+' missing properties to '+res.length+' existing objects'
         res.forEach (ro) =>
           missing.forEach (mprop) =>
+            if not mprop.default
+              if mprop.array then mprop.default = []
+              else if mprop.hashtable then mprop.default = {}
+              else if mprop.type then mprop.default = '-1'
             console.log '   setting new property '+mprop.name+' to default value of '+mprop.default+' on object type '+ro.type
-            ro[mprop.name] = mprop.default or ''
-          @set ro.type, ro, ()=> if --res == 0 then q.resolve()
+            #ro[mprop.name] = mprop.default or ''
+            @extend(ro.type, ro.id, mprop.name, mprop.default).then (o)=>
+              @lru.set(o.id, o)
+              if --count == 0
+                console.log 'extendSchemaIfNeeded done for '+res.length+' object'
+                q.resolve()
+          #@set ro.type, ro, ()=> if --count == 0 then q.resolve()
       else
         q.resolve()
     return q
+
+  @extend:(type, id, field, def)=> @getDataStore().then (store)=>
+    console.log 'extending '+type+' id '+id+' with new property '+field+' and default value of '+def
+    store.extend(type, id, field, def)
 
   @getFromStoreOrDB: (type, id) =>
     #console.log 'DB.getFromStoreOrDb called for '+type+' id '+id
@@ -219,8 +233,8 @@ class DB
       q.resolve(null)
     else
       rv = @lru.get id
-      #console.log 'DB found '+id+'  in lru: '+rv
-      #console.dir rv
+      console.log 'DB found '+id+'  in lru: '+rv
+      console.dir rv
       if rv
         q.resolve([rv])
       else
