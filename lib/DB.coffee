@@ -53,7 +53,8 @@ class DB
 
   @createDatabases:(dblist) =>
     q = defer()
-    console.log 'createDatabases called'
+    console.log '*** createDatabases called for list of dbs...'
+    console.dir dblist
     @getDataStore().then (store)=>
       console.log 'DB.createDatabases got back store'
       promises = []
@@ -62,7 +63,7 @@ class DB
         db = store.getDbFor(dbname)
         promises.push db
       all(promises).then (results) =>
-        console.log 'DB.createDatabases all good'
+        console.log '*DB.createDatabases all good'
         dblist.forEach (dbname2) => @extendSchemaIfNeeded(DB.DataStore, dbname2)
         q.resolve(results)
     return q
@@ -71,12 +72,12 @@ class DB
     # get schema
     dbname = _dbname
     q = defer()
-    console.log '* extendSchemaIfNeeded we have the following modules named in cache:'
+    console.log '* extendSchemaIfNeeded for module "'+_dbname+'"we have the following modules named in cache:'
     for k,v of ResolveModule.modulecache
       console.log k
     proto = ResolveModule.modulecache[dbname]
-    console.log 'extendSchemaIfNeeded resolve '+dbname+' to '
-    console.dir proto
+    console.log 'extendSchemaIfNeeded resolve '+dbname+' to '+proto
+    #console.dir proto
     if not proto
       console.log 'found undefined prototype!. modulecache is'
       #console.dir ResolveModule.modulecache
