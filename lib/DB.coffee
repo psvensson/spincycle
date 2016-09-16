@@ -104,12 +104,12 @@ class DB
               if mprop.array then mprop.default = []
               else if mprop.hashtable then mprop.default = {}
               else if mprop.type then mprop.default = '-1'
-            console.log '   setting new property '+mprop.name+' to default value of '+mprop.default+' on object type '+ro.type+' id '+ro.id
+            #console.log '   setting new property '+mprop.name+' to default value of '+mprop.default+' on object type '+ro.type+' id '+ro.id
             #ro[mprop.name] = mprop.default or ''
             @extend(ro.type, ro.id, mprop.name, mprop.default).then (o)=>
               @lru.set(o.id, o)
               if --count == 0
-                console.log 'extendSchemaIfNeeded done for '+res.length+' object'
+                console.log 'extendSchemaIfNeeded done for '+res.length+' objects'
                 q.resolve()
           #@set ro.type, ro, ()=> if --count == 0 then q.resolve()
       else

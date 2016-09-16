@@ -156,7 +156,7 @@ class MongoPersistence
 
   get: (_type, id, cb) =>
     type = _type.toLowerCase()
-    if debug then console.log '--------------------- Mongo.get called for type '+type+' and id '+id
+    #if debug then console.log '--------------------- Mongo.get called for type '+type+' and id '+id
     if typeof id == 'object'
       console.log 'Mongo.get got an object as id instead of string !!!!! '
       console.dir id
@@ -330,7 +330,7 @@ class MongoPersistence
   set: (_type, obj, cb)=>
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>
-      if debug then console.log 'Mongo.set called for type '+type+' and id '+obj.id
+      #if debug then console.log 'Mongo.set called for type '+type+' and id '+obj.id
       if typeof obj.id == 'object' then console.dir obj
       collection.update {id: obj.id}, obj,{ upsert: true }, (err, result, details) =>
         if debug then console.log 'mongo set result was '+result
