@@ -79,7 +79,7 @@ class DB
     console.dir proto
     if not proto
       console.log 'found undefined prototype!. modulecache is'
-      console.dir ResolveModule.modulecache
+      #console.dir ResolveModule.modulecache
     db.all dbname,{},(res)=>
       console.log 'extendSchemaIfNeeded found '+res.length+' objects after call to all()'
       #console.log 'first object is '+res[0]
