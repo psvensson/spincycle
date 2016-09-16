@@ -71,7 +71,7 @@ class DB
     # get schema
     dbname = _dbname
     q = defer()
-    console.log 'extendSchemaIfNeeded we have the following modules named in cache:'
+    console.log '* extendSchemaIfNeeded we have the following modules named in cache:'
     for k,v of ResolveModule.modulecache
       console.log k
     proto = ResolveModule.modulecache[dbname]
