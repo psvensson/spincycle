@@ -67,9 +67,13 @@ class DB
         q.resolve(results)
     return q
 
-  @extendSchemaIfNeeded:(db,dbname)=>
+  @extendSchemaIfNeeded:(db,_dbname)=>
     # get schema
+    dbname = _dbname
     q = defer()
+    console.log 'extendSchemaIfNeeded we have the following modules named in cache:'
+    for k,v of ResolveModule.modulecache
+      console.log k
     proto = ResolveModule.modulecache[dbname]
     console.log 'extendSchemaIfNeeded resolve '+dbname+' to '
     console.dir proto
@@ -78,8 +82,8 @@ class DB
       console.dir ResolveModule.modulecache
     db.all dbname,{},(res)=>
       console.log 'extendSchemaIfNeeded found '+res.length+' objects after call to all()'
-      console.log 'first object is '+res[0]
-      console.dir res[0]
+      #console.log 'first object is '+res[0]
+      #console.dir res[0]
       # collect missing properties from first object
       o = res[0]
       missing = []
@@ -99,7 +103,7 @@ class DB
               if mprop.array then mprop.default = []
               else if mprop.hashtable then mprop.default = {}
               else if mprop.type then mprop.default = '-1'
-            console.log '   setting new property '+mprop.name+' to default value of '+mprop.default+' on object type '+ro.type
+            console.log '   setting new property '+mprop.name+' to default value of '+mprop.default+' on object type '+ro.type+' id '+ro.id
             #ro[mprop.name] = mprop.default or ''
             @extend(ro.type, ro.id, mprop.name, mprop.default).then (o)=>
               @lru.set(o.id, o)
