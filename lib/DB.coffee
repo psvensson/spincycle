@@ -72,7 +72,10 @@ class DB
     q = defer()
     proto = ResolveModule.modulecache[dbname]
     console.log 'extendSchemaIfNeeded resolve '+dbname+' to '
-    console.dir proto.model
+    console.dir proto
+    if not proto
+      console.log 'found undefined prototype!. modulecache is'
+      console.dir ResolveModule.modulecache
     db.all dbname,{},(res)=>
       console.log 'extendSchemaIfNeeded found '+res.length+' objects after call to all()'
       console.log 'first object is '+res[0]
