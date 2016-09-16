@@ -26,7 +26,7 @@ class DB
   @dbname : ''
 
   @onUpdated: (record)=>
-    if record
+    if record and record.type and record.id
       resolver.createObjectFrom(record).then (ooo) =>
         OStore.updateObj(ooo)
 
@@ -118,7 +118,7 @@ class DB
     return q
 
   @extend:(type, id, field, def)=> @getDataStore().then (store)=>
-    console.log 'extending '+type+' id '+id+' with new property '+field+' and default value of '+def
+    #console.log 'extending '+type+' id '+id+' with new property '+field+' and default value of '+def
     store.extend(type, id, field, def)
 
   @getFromStoreOrDB: (type, id) =>

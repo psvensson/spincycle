@@ -104,7 +104,8 @@ class MongoPersistence
                 console.log('insert '+type+' --> '+doc.o._id)
                 #console.dir doc
               oplog.on 'update', (doc) =>
-                console.log('update '+type+' --> '+doc.o.id)
+                console.log('mongo update '+type+' --> '+doc.o.id)
+                if not doc.o.id then console.dir doc.o
                 @DB.onUpdated(doc.o)
                 #console.dir doc
               oplog.on 'delete', (doc) =>
