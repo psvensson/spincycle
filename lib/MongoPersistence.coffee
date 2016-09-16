@@ -168,8 +168,8 @@ class MongoPersistence
           console.dir err
           cb(null)
         else
-          if debug then console.log '------ Mongo get found object'
-          if debug then console.dir item
+          #if debug then console.log '------ Mongo get found object'
+          #if debug then console.dir item
           cb(item)
 
   byProviderId: (_type, pid) =>
