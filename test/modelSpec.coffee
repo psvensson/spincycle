@@ -779,7 +779,7 @@ describe 'Spincycle Model Tests', ->
       done()
 
   it 'should be able to extend a model with a new property', (done)->
-    Foo.model.push {name:'xyzzy3', public: true, value:'xyzzy', default:'quux'}
+    Foo.model.push {name:'xyzzy4', public: true, value:'xyzzy', default:'quux'}
     DB.extendSchemaIfNeeded(DB.DataStore, 'Foo').then ()=>
       DB.get('foo',['f417']).then (res)=>
         console.log 'DB.get got back '+res

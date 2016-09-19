@@ -87,7 +87,7 @@ class DB
       #console.log 'first object is '+res[0]
       #console.dir res[0]
       # collect missing properties from first object
-      o = res[0]
+      o = res[res.length-1]
       missing = []
       lookup = {createdAt:true, modifiedAt:true, createdBy:true}
       for k,v of o
