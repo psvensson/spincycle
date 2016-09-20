@@ -1,6 +1,6 @@
 {
   "name": "spincycle",
-  "version": "1.8.80",
+  "version": "1.8.82",
   "description": "A reactive message router and object manager that lets clients subscribe to object property changes on the server",
   "main": "index.js",
   "directories": {

@@ -104,8 +104,8 @@ class MongoPersistence
                 console.log('insert '+type+' --> '+doc.o._id)
                 #console.dir doc
               oplog.on 'update', (doc) =>
-                console.log('mongo update '+type+' --> '+doc.o.id)
-                if not doc.o.id then console.dir doc.o
+                #console.log('mongo update '+type+' --> '+doc.o.id)
+                #if not doc.o.id then console.dir doc.o
                 @DB.onUpdated(doc.o)
                 #console.dir doc
               oplog.on 'delete', (doc) =>
@@ -186,6 +186,7 @@ class MongoPersistence
         else
           #if debug then console.log 'Mongo byProviderId for '+pid+' got back'
           #if debug then console.dir item
+
           q.resolve(item)
 
     return q
@@ -334,7 +335,7 @@ class MongoPersistence
       #if debug then console.log 'Mongo.set called for type '+type+' and id '+obj.id
       if typeof obj.id == 'object' then console.dir obj
       collection.update {id: obj.id}, obj,{ upsert: true }, (err, result, details) =>
-        if debug then console.log 'mongo set result was '+result
+        #if debug then console.log 'mongo set result was '+result
         if err
           console.log 'MONGO set Error: '+err
           console.dir err

@@ -99,18 +99,21 @@ class DB
       if missing.length > 0
         count = res.length*missing.length
         console.log 'adding '+missing.length+' missing properties to '+res.length+' existing objects'
+        start = Date.now()
         res.forEach (ro) =>
           missing.forEach (mprop) =>
             if not mprop.default
               if mprop.array then mprop.default = []
               else if mprop.hashtable then mprop.default = {}
-              else if mprop.type then mprop.default = '-1'
+              else if mprop.type then mprop.default = ''
             #console.log '   setting new property '+mprop.name+' to default value of '+mprop.default+' on object type '+ro.type+' id '+ro.id
             #ro[mprop.name] = mprop.default or ''
             @extend(ro.type, ro.id, mprop.name, mprop.default).then (o)=>
               @lru.set(o.id, o)
               if --count == 0
-                console.log 'extendSchemaIfNeeded done for '+res.length+' objects'
+                end = Date.now()
+                diff = parseInt((end - start)/1000)
+                console.log 'extendSchemaIfNeeded done for '+res.length+' objects. runtime = '+diff+' seconds'
                 q.resolve()
           #@set ro.type, ro, ()=> if --count == 0 then q.resolve()
       else
@@ -210,6 +213,7 @@ class DB
     q = defer()
     @getDataStore().then (store)=> store.findQuery(type, query).then (results) =>
       if results and results.length and results.length > 0
+
         #if debug then console.log ' DB.findQuery got back '
         #if debug then console.dir results
         results.forEach (result) =>
