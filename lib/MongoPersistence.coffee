@@ -78,7 +78,7 @@ class MongoPersistence
               @foo(q)
             2000)
         else
-          console.log("---- We are connected ----")
+          if debug then console.log("---- We are connected ----")
           @db = db
           q.resolve(db)
 
