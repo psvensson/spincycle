@@ -317,16 +317,18 @@ class MongoPersistence
     type = _type.toLowerCase()
     @getDbFor(type).then (collection) =>
       #if debug then console.log 'Mongo.extend called for type '+type+' new field  '+field+' and default value '+def
-      set = {$set:{}}
-      set['$set'][field] = def
-      collection.update { id: id }, set, { w: 1 }, (err) =>
-        if err
-          throw err
-        #console.log 'entry '+id+' type '+type+' updated'
-        @get _type,id,(o)=>
-          #console.dir o
-          o[field] = def
-          @set _type,o,()=> q.resolve(o)
+      collection.findOne {id: id}, (err, item) =>
+        if not item[field]
+          set = {$set:{}}
+          set['$set'][field] = def
+          collection.update { id: id }, set, { w: 1 }, (err) =>
+            if err
+              throw err
+            #console.log 'entry '+id+' type '+type+' updated'
+            @get _type,id,(o)=>
+              #console.dir o
+              o[field] = def
+              @set _type,o,()=> q.resolve(o)
     return q
 
   set: (_type, obj, cb)=>

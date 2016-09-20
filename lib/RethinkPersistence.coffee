@@ -100,7 +100,7 @@ class RethinkPersistence
   extend: (_type, id, field, def) =>
     q = defer()
     @get _type,id,(o)=>
-      if o
+      if o and not o[field]
         o[field] = def
         @set _type,o, (setdone)=>q.resolve(o)
     return q
