@@ -1,12 +1,12 @@
 defer           = require('node-promise').defer
 debug = process.env["DEBUG"]
 
-console.log 'resolvemodule dirname is '+__dirname
-console.log(__dirname)
+if debug then console.log 'resolvemodule dirname is '+__dirname
+if debug then console.log(__dirname)
 dirname = __dirname.substring(0, __dirname.indexOf('/node_modules'))
 if __dirname.indexOf('node_modules') == -1  then dirname = '..'
 
-console.log 'starting module resolving from path '+dirname
+if debug then console.log 'starting module resolving from path '+dirname
 
 class ResolveModule
 
@@ -14,7 +14,7 @@ class ResolveModule
   @modulepathcache = []
 
   constructor: () ->
-    console.log("+++ new ResolveModule created ++")
+    if debug then console.log("+++ new ResolveModule created ++")
     process.on 'resolvemodule', (name, cb) =>
       @resolve(name, cb) 
 

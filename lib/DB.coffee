@@ -46,7 +46,7 @@ class DB
       else if name == 'google' then @DataStore = new Google(DB.dburl, DB)
       @DataStore.connect().then (ds)=>
         @DataStore = ds
-        console.log 'DB got back datastore for '+name
+        if debug then console.log 'DB got back datastore for '+name
         q.resolve(ds)
     else
       q.resolve(@DataStore)
