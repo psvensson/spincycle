@@ -25,7 +25,7 @@ class MongoPersistence
     q = defer()
     #console.log 'Mongo connect called'
     @getConnection().then () =>
-      console.log '-----Mongo initialized'
+      if debug then console.log '-----Mongo initialized'
       q.resolve(@)
     return q
 
@@ -56,7 +56,7 @@ class MongoPersistence
               @foo(q)
             2000)
         else
-          console.log("---- We are connected ----  *")
+          if debug then console.log("---- We are connected ----  *")
           @db = db
           rs=[]
           rarr = repls.split ","
