@@ -182,7 +182,7 @@ class RethinkPersistence
 
   findQuery: (_type, query) =>
     if debug then console.log 'Rethink findQuery called for type '+_type
-    #console.dir query
+    if debug then console.dir query
     q = defer()
     type = _type.toLowerCase()
     @getDbFor(type).then (db)=>
@@ -191,10 +191,12 @@ class RethinkPersistence
       if query.property
         value = query.value.toString()
         value = value.replace(/[^\w\s@.]/gi, '')
-        if query.wildcard then value = '^'+value else value = '^'+value+'$'
+        if not query.wildcard then value = '^'+value+'$'
         rr = rr.filter( (element)=>
           rv = query.value == 'undefined' or query.value.indexOf('[') > -1 or query.value == 'null' or query.value.indexOf('bject') > -1
-          not rv and element(query.property).match(value)
+          if not rv
+            if debug then console.log 'Rethink findQuery running query...'
+            element(query.property).match(value)
         )
       if query.limit
         rr = rr.skip(query.skip).limit(query.limit)
