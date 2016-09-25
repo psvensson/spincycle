@@ -246,11 +246,10 @@ class DB
       q.resolve(null)
     else
       rv = @lru.get id
-
       if rv
         if debug then console.log 'DB found '+id+'  in lru: '+rv
-        if debug then console.dir rv
-        q.resolve([rv])
+        if debug then console.log rv.name
+        q.resolve(rv)
       else
         #console.log ' attempting to use datastore for type '+type+' and id '+id+' typeof = '+(typeof id)
         @getDataStore().then (store)=>
@@ -261,10 +260,10 @@ class DB
                 console.log 'DB.get for type '+type+' and id '+id+' got back '+result
                 console.dir result
             else
-              #if !Array.isArray(result)
-                #console.dir result
-                #if debug then console.log 'result is not array, so putting it into one..'
-                #result = [result]
+              if !Array.isArray(result)
+                console.dir result
+                if debug then console.log 'result is not array, so putting it into one..'
+                result = [result]
               @lru.set(id, result)
               #console.log 'DB.get resolving '+result
             q.resolve(result)
