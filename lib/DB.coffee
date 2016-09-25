@@ -214,8 +214,8 @@ class DB
     @getDataStore().then (store)=> store.findQuery(type, query).then (results) =>
       if results and results.length and results.length > 0
 
-        #if debug then console.log ' DB.findQuery got back '
-        #if debug then console.dir results
+        if debug then console.log ' DB.findQuery got back '
+        if debug then console.dir results
         results.forEach (result) =>
           #console.dir result
           if result then @lru.set(result.id, result)
@@ -262,12 +262,12 @@ class DB
                 console.dir result
             else
               if !Array.isArray(result)
-                console.dir result
-                if debug then console.log 'result is not array, so putting it into one..'
+                #console.dir result
+                #if debug then console.log 'result is not array, so putting it into one..'
                 result = [result]
               @lru.set(id, result)
               #console.log 'DB.get resolving '+result
-            q.resolve([result])
+            q.resolve(result)
             )
     return q
 
