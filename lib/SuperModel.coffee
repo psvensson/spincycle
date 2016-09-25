@@ -270,8 +270,6 @@ class SuperModel
             #console.log '---- count zero'
             r.resolve(obj)
       , error)
-    else
-      r.resolve()
 
   insertObj: (ro, o) =>
     OMgr.storeObject(o)
