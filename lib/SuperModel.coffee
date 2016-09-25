@@ -253,10 +253,10 @@ class SuperModel
     , error)
 
   createObjectFromRecord: (r, resolveobj, count, record)=>
-    #console.log '################################## supermodel createObjectFromRecord called'
-    #console.dir resolveobj
-    #console.log 'record.....'
-    #console.dir record
+    if debug then console.log '################################## supermodel createObjectFromRecord called'
+    if debug then console.dir resolveobj
+    if debug then console.log 'record.....'
+    if debug then console.dir record
     if record and record.type
       SuperModel.resolver.createObjectFrom(record).then( (obj) =>
         if not obj
