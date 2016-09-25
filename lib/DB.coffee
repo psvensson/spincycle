@@ -236,6 +236,14 @@ class DB
     return q
 
   @get: (type, ids) =>
+
+    toarr = (x)->
+      if !Array.isArray(x)
+        if debug then console.dir x
+        if debug then console.log 'result is not array, so putting it into one..'
+        x = [x]
+      return x
+
     if debug then console.log 'DB.get called for type "'+type+'" and ids "'+ids+'"'
     if not ids.length then ids = [ids]
     q = defer()
@@ -249,7 +257,7 @@ class DB
       if rv
         if debug then console.log 'DB found '+id+'  in lru: '+rv
         if debug then console.log rv.name
-        q.resolve(rv)
+        q.resolve(toarr(rv))
       else
         #console.log ' attempting to use datastore for type '+type+' and id '+id+' typeof = '+(typeof id)
         @getDataStore().then (store)=>
@@ -260,10 +268,7 @@ class DB
                 console.log 'DB.get for type '+type+' and id '+id+' got back '+result
                 console.dir result
             else
-              if !Array.isArray(result)
-                console.dir result
-                if debug then console.log 'result is not array, so putting it into one..'
-                result = [result]
+              result = toarr(result)
               @lru.set(id, result)
               #console.log 'DB.get resolving '+result
             q.resolve(result)
