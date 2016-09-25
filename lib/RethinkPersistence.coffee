@@ -188,27 +188,28 @@ class RethinkPersistence
     @getDbFor(type).then (db)=>
         # { sort: 'name', property: 'name', value: 'BolarsKolars' }
       rr = db.orderBy(query.sort or 'name')
-      if query.property
+      rv = query.value == 'undefined' or query.value.indexOf('[') > -1 or query.value == 'null' or query.value.indexOf('bject') > -1
+      if not rv and query.property
         value = query.value.toString()
         value = value.replace(/[^\w\s@.]/gi, '')
         if not query.wildcard then value = '^'+value+'$'
         rr = rr.filter( (element)=>
-          rv = query.value == 'undefined' or query.value.indexOf('[') > -1 or query.value == 'null' or query.value.indexOf('bject') > -1
-          if not rv
             if debug then console.log 'Rethink findQuery running query...'
             element(query.property).match(value)
         )
-      if query.limit
-        rr = rr.skip(query.skip).limit(query.limit)
+        if query.limit
+          rr = rr.skip(query.skip).limit(query.limit)
 
-      rr.run @connection, (err, cursor) ->
-        if err
-          console.log 'findQuery error: '+err
-          console.dir err
-        cursor.toArray (ce, result)=>
-          #console.log 'findQuery result is '
-          #console.log result
-          q.resolve result
+        rr.run @connection, (err, cursor) ->
+          if err
+            console.log 'findQuery error: '+err
+            console.dir err
+          cursor.toArray (ce, result)=>
+            #console.log 'findQuery result is '
+            #console.log result
+            q.resolve result
+      else
+        q.resolve([])
     return q
 
   search: (_type, property, _value) =>

@@ -237,7 +237,8 @@ class SuperModel
           r.resolve(oo)
       else
         #console.log 'SuperModel did not find obj '+resolveobj.name+' ['+id+'] of type '+resolveobj.type+' in OStore. Getting from DB. typeof of id prop is '+(typeof id)
-        DB.get(resolveobj.type, [id]).then( (record) =>
+        DB.get(resolveobj.type, [id]).then( (records) =>
+          record = records[0]
           #console.log 'supermodel resolveObj got back from DB.get '+record
           if not record
             #console.log 'SuperModel::loadFromIds got back null record from DB for type '+resolveobj.type+' and id '+id
@@ -257,6 +258,9 @@ class SuperModel
     if debug then console.dir resolveobj
     if debug then console.log 'record.....'
     if debug then console.dir record
+    if (Array.isArray(record))
+      throw(new Error('got array instead of record in supermodel createObjectFromRecord !!!'))
+
     if record and record.type
       SuperModel.resolver.createObjectFrom(record).then( (obj) =>
         if not obj
@@ -270,6 +274,8 @@ class SuperModel
             #console.log '---- count zero'
             r.resolve(obj)
       , error)
+    else
+      r.resolve()
 
   insertObj: (ro, o) =>
     OMgr.storeObject(o)

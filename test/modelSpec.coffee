@@ -578,6 +578,8 @@ describe 'Spincycle Model Tests', ->
       dfoo.serialize().then ()->
         query = {sort:'name', property: 'id', value: '[Object object]'}
         DB.findQuery('DFoo', query).then (records) =>
+          #console.log 'bomb query got back'
+          #console.dir records
           expect(records.length).to.equal(0)
           done()
 
