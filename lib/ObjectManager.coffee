@@ -208,7 +208,7 @@ class ObjectManager
       rv = []
       _records.forEach (r) =>
         DB.get(r.type, [r.id]).then (record) =>
-          if debug then console.log 'ObjectManager.parseList -- result of getting record '+r.type+' id '+r.id+' is '+record
+          if debug then console.log 'ObjectManager.parseList --- result of getting record '+r.type+' id '+r.id+' is '+record
           if record and record[0]
             if debug then console.dir record[0]
             rv.push record[0]
