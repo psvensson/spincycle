@@ -261,7 +261,9 @@ class DB
                 console.log 'DB.get for type '+type+' and id '+id+' got back '+result
                 console.dir result
             else
-              if !Array.isArray(result) then result = [result]
+              if !Array.isArray(result)
+                if debug then console.log 'result is not array, so putting it into one..'
+                result = [result]
               @lru.set(id, result)
               #console.log 'DB.get resolving '+result
             q.resolve([result])
