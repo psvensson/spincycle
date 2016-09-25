@@ -257,19 +257,21 @@ class SuperModel
     #console.dir resolveobj
     #console.log 'record.....'
     #console.dir record
-    SuperModel.resolver.createObjectFrom(record).then( (obj) =>
-      if not obj
-        #console.log ' Hmm. Missing object reference. Sad Face.'
-        #console.dir record
-        if count == 0 then r.resolve(null)
-      else
-        #console.log 'object '+resolveobj.name+' type '+resolveobj.type+' created: '+obj.id
-        @insertObj(resolveobj, obj)
-        if count == 0
-          #console.log '---- count zero'
-          r.resolve(obj)
-    , error)
-
+    if record and record.type
+      SuperModel.resolver.createObjectFrom(record).then( (obj) =>
+        if not obj
+          #console.log ' Hmm. Missing object reference. Sad Face.'
+          #console.dir record
+          if count == 0 then r.resolve(null)
+        else
+          #console.log 'object '+resolveobj.name+' type '+resolveobj.type+' created: '+obj.id
+          @insertObj(resolveobj, obj)
+          if count == 0
+            #console.log '---- count zero'
+            r.resolve(obj)
+      , error)
+    else
+      r.resolve()
 
   insertObj: (ro, o) =>
     OMgr.storeObject(o)
