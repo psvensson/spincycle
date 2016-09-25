@@ -262,6 +262,7 @@ class DB
                 console.dir result
             else
               if !Array.isArray(result)
+                console.dir result
                 if debug then console.log 'result is not array, so putting it into one..'
                 result = [result]
               @lru.set(id, result)
