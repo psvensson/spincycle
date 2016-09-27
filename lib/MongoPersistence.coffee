@@ -276,7 +276,6 @@ class MongoPersistence
           console.dir err
           q.resolve(null)
         else
-          arr = []
           cursor.each (err, el) ->
             if el == null
               cursor.toArray (err, items) =>

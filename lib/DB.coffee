@@ -199,8 +199,8 @@ class DB
   @findMany: (type, property, value) =>
     q = defer()
     @getDataStore().then (store) => store.findMany(type, property, value).then (results) =>
-      #if debug then console.log 'DB.findMany results are..'
-      #if debug then console.dir results
+      if debug then console.log 'DB.findMany results are..'
+      if debug then console.dir results
       if not results or not results.length
         console.log 'DB.findMany type '+type+', property '+property+', value '+value+' got back '+results
         q.resolve([])
