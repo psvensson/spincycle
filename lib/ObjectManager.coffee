@@ -301,7 +301,7 @@ class ObjectManager
                   if not res
                     msg.replyFunc({status: e.general.FAILURE, info: 'db error for object update', payload: msg.obj.id})
                   else
-                    record = obj.getRecord()
+                    record = obj.toClient()
                     #objStore.sendUpdatesFor(obj, true)
                     #console.log 'final object update result------>'
                     #console.log record
