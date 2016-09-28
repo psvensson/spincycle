@@ -84,10 +84,7 @@ class MessageRouter
     if @app
       console.log('**************** addServicePage called -> '+p)
       @app.use '/spin',express.static(p)
-      @app.use '/spin/bower_components',express.static(p+'/bower_components')
-
-      #@app.use('/spin', serveStatic(p))
-      #@app.use('/spin', express.static('lib/spin'))
+      @app.use '/spin/bower_components',express.static(path.dirname(__dirname)+'/spin/bower_components')
     else
       console.log 'no app argument provided to MessageRouter! Unable to set up /spin route'
 
