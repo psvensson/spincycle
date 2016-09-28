@@ -1,0 +1,6 @@
+{
+  "name": "spin",
+  "short_name": "spin",
+  "start_url": "/",
+  "display": "standalone"
+}
