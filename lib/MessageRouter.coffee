@@ -84,6 +84,7 @@ class MessageRouter
     if @app
       console.log('**************** addServicePage called -> '+p)
       @app.use '/spin',express.static(p)
+      @app.use '/spin/bower_components',express.static(p+'/bower_components')
 
       #@app.use('/spin', serveStatic(p))
       #@app.use('/spin', express.static('lib/spin'))
@@ -97,7 +98,6 @@ class MessageRouter
       @objectManager.expose 'SpinFunction'
       ResolveModule.modulecache['SpinFunction'] = SpinFunction
       ResolveModule.modulecache['SpinModule'] = SpinModule
-
 
   #---------------------------------------------------------------------------------------------------------------------
 
@@ -123,7 +123,7 @@ class MessageRouter
 
   open: () =>
     MessageRouter.status = 'open'
-    console.log colors.inverse.green('opening message router')
+    console.log colors.inverse.green(' * opening message router * ')
 
   close: () =>
     MessageRouter.status = 'closed'
