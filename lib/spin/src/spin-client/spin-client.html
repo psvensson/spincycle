@@ -1,0 +1,76 @@
+<script src="../../bower_components/q/q.js"></script>
+<script src="../../bower_components/uuid4/lib/browser/index.js"></script>
+<script src="../../bower_components/lrucache/index.js"></script>
+<script src="../../socket.io/socket.io.js"></script>
+<script src="spinclient.js"></script>
+
+<dom-module id="ge-login">
+    <template>
+        <style>
+
+        </style>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'spin-client',
+            properties:
+                {
+                    client:{type:'Object', notify: true},
+                    user: {type:'Object', notify: true, observer: 'onUserChanged'},
+                    failure:{type:'String', notify:true}
+                },
+
+            listeners:
+            {
+                'user-changed': 'onUserChanged'
+            },
+
+
+            ready: function()
+                   {
+
+                   },
+
+            onUserChanged: function ( e )
+                           {
+                               //console.log( '********************* spin-client onUserChanged called.' )
+                               if(e && e.id)
+                               {
+                                   this.set('user', e)
+                                   //console.dir(this.user)
+                                   this.client.emitMessage( {
+                                       target: '_updateGEUser',
+                                       obj:    this.user
+                                   } ).then( function ( ures )
+                                   {
+                                       console.log( 'user update result: ' + ures )
+                                   }.bind( this ) )
+                               }
+                           },
+
+            attached: function()
+                      {
+                          window.spinclient = new window.SpinClient('')
+                          console.log('spin-client attached.')
+                          this.set('client', window.spinclient)
+                          this.client.setUser = this.onUserChanged.bind( this )
+                          this.client.oNfailure = this.onFailure.bind(this)
+                          this.addEventListener('user-changed', this.onUserChanged.bind(this))
+                      },
+
+            onFailure:function(ftext)
+                      {
+                          this.set('failure', ftext)
+                          this.client.failureListeners.forEach(function(cb)
+                          {
+                              cb(ftext)
+                          })
+                      }
+
+        });
+
+    </script>
+
+</dom-module>

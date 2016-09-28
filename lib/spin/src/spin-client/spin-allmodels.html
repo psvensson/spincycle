@@ -1,0 +1,188 @@
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="./spin-list.html">
+
+<dom-module id="spin-allmodels">
+
+    <template>
+
+        <style>
+            
+        </style>
+
+        <div>
+            <h4>{{model}}</h4>
+            <paper-button raised on-tap="newModel">New {{model}}</paper-button>
+            <spin-list client="{{client}}" delete="true" model="[[model]]" incallbacks="[[outCallbacks]]" spinitems="{{shownItems}}"></spin-list>
+            <template is="dom-repeat" items="[[listpages]]" as="p">
+                <paper-button on-tap="selectPage" value="{{p.foo}}"> {{p.foo}}</paper-button>
+            </template>
+        </div>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'spin-allmodels',
+            properties:
+            {
+                client:{type:'Object'},
+                model: {type: 'String', observer: 'onModelChange'},
+                incallbacks: {type: 'Object'}
+            },
+
+            ready: function()
+            {
+                // set up defaults
+                this.itemsPerPage = 20
+                this.listpages = []
+                this.currentPage = 0
+                this.outCallbacks =
+                {
+                    onSelect: this.onSelect.bind(this),
+                    onDelete: this.onDelete.bind(this)
+                }
+                this.renderStuff()
+            },
+
+            onModelChange: function()
+            {
+                if(this.model)
+                {
+                    this.renderStuff()
+                }
+            },
+
+            renderStuff: function()
+             {
+                 if(this.client && this.model)
+                 {
+                     if(this.listenerid)
+                     {
+                         this.client.deRegisterPopulationChangesSubscriber({ type: this.oldmodel, listenerid: this.listenerid})
+                     }
+                     this.oldmodel = this.model
+                     // Draw quick-select bar
+                     this.drawQuickSelectBar()
+                     // Retrieve itemsPerPage items and send array if ids to list
+                     this.fetchPage()
+                     // registerForPopulationChangesFor
+                     this.client.registerPopulationChangeSubscriber({ type: this.model, cb: function(popchange)
+                     {
+                         console.log('spin-allmodels --------------------population change callback for '+this.model)
+                         console.dir(arguments)
+                         this.client.emitMessage({target: '_count' + this.model + 's'}).then(function (count) {
+                             console.log('spin-allmodels .. count is now '+count)
+                         })
+                         this.fetchPage()
+                     }.bind(this)}).then(function(listenid)
+                     {
+                         this.listenerid = listenid
+                     }.bind(this))
+                 }
+             },
+
+            onSelect: function(item)
+            {
+                //console.log('onSelect called at spin-allmodels')
+                if(this.incallbacks && this.incallbacks.onSelect)
+                {
+                    this.incallbacks.onSelect(item)
+                }
+            },
+
+            onDelete:function(item)
+            {
+                console.log('onDelete called at spin-allmodels')
+                console.dir(item)
+                if(this.incallbacks && this.incallbacks.onDelete)
+                {
+                    this.incallbacks.onDelete(item)
+                }
+                if(confirm('Really delete object '+item.name+' ?'))
+                {
+                    this.client.emitMessage({target: '_delete' + this.model, obj:{type: item.type, id: item.id}}).then(function (count)
+                    {
+                        console.log(item.type+' id '+item.id+' deleted')
+                        this.fetchPage()
+                    }.bind(this))
+                }
+            },
+
+            drawQuickSelectBar: function()
+                                {
+                // Call count for model
+                                    //console.log('drawQuickSelectbar. this is')
+                                    //console.dir(this)
+                this.client.emitMessage({target: '_count' + this.model + 's'}).then(function (count) {
+                    //console.log('spin-allmodels count ' + this.model + ' got ' + count + ' back')
+                    var pagecount = parseInt(count/this.itemsPerPage) + (count % parseInt(this.itemsPerPage/2) > 0 ? 1 : 0)
+                    this.splice('listpages', 0, this.listpages.length)
+                    for(var i = 0; i < pagecount; i++)
+                    {
+                        this.push('listpages', {foo:i})
+                    }
+                }.bind(this))
+            },
+
+            fetchPage: function()
+            {
+                if(this.model)
+                {
+                    //console.log('------------------------------------- spin-allmodels fetchpage called for '+this.model)
+                    var q = {property: this.searchPropName, value: this.searchpropVal, limit:this.itemsPerPage, skip: this.itemsPerPage*this.currentPage}
+                    this.client.emitMessage({ target:'_list'+this.model+'s', query: q}).then(function(newlist)
+                    {
+                        //console.log('spin-allmodels fetchpage got '+newlist.length+' items back')
+                        //console.dir(newlist)
+                        newlist.sort(function(a,b)
+                        {
+                            return a.name == b.name ? 0 : a.name < b.name ? -1 : 1
+                        })
+                        if(!this.shownItems)
+                        {
+                            this.shownItems = newlist
+                        }
+                        else
+                        {
+                            this.splice('shownItems', 0, this.shownItems.length)
+                            newlist.forEach(function(el){this.push('shownItems', el)}.bind(this))
+                            this.drawQuickSelectBar()
+                        }
+                    }.bind(this))
+                }
+
+            },
+
+            attached: function()
+            {
+
+            },
+
+            selectPage: function(e,o)
+            {
+                console.log('------------------------------------- spin-allmodels selectPage called')
+                console.dir(e.model)
+                var w = e.model.p.foo
+                this.currentPage = w
+                this.fetchPage()
+            },
+
+            newModel: function()
+            {
+                //console.log('newModel called')
+                this.client.emitMessage({target: '_create' + this.model, obj:{type: this.model}}).then(function (newModel)
+                {
+                    //console.log('new model of type '+this.model+' created')
+                    //console.dir(newModel)
+                }.bind(this))
+            }
+
+        });
+
+    </script>
+
+</dom-module>

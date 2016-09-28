@@ -28,17 +28,10 @@
       DB.createDatabases(['SampleGame', 'SamplePlayer']).then((function(_this) {
         return function() {
           console.log(' SampleLogic DB init done..');
-          return DB.getOrCreateObjectByRecord({
-            id: 17,
-            name: 'fooGame',
-            type: 'SampleGame',
-            createdBy: 'SYSTEM',
-            createdAt: Date.now()
-          }).then(function(game) {
-            console.log('got first game');
-            game.serialize();
+          setTimeout(function() {
             return _this.messageRouter.open();
-          });
+          }, 20);
+          return "DB.getOrCreateObjectByRecord({id:17, name: 'fooGame', type: 'SampleGame', createdBy: 'SYSTEM', createdAt: Date.now()}).then (game)=>\n  console.log 'got first game'\n  game.serialize()\n  @messageRouter.open()";
         };
       })(this));
     }

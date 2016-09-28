@@ -1,0 +1,80 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="my-objarray">
+    <script>
+        (function() {
+            'use strict';
+
+            class Objarray {
+                beforeRegister() {
+                    this.is = 'my-objarray';
+                    this.properties = {
+                        array:{
+                            notify:true,
+                            type:Array,
+                            value:function() {return new Array();}
+                        },
+                        object:{
+                            notify:true,
+                            type:Object
+                        }
+                    };
+                    this.observers = ['_onArray(array.*)', '_onObject(object.*)'];
+                }
+                _onObject(change) {
+                    //console.log('--------my-objarray _onObject called')
+                    //console.dir(change)
+                    if(this._setting) return;
+                    if(change.path == "object") this._rewriteArray();
+                    else this._writeElement(change);
+                }
+
+                _rewriteArray() {
+                    this.splice("array", 0, this.array.length);
+                    for(let i in this.object) {
+                        this.push("array", {key:i, value:this.object[i]});
+                    }
+                }
+
+                _writeElement(change) {
+                    const path = change.path.match(/^object\.([^\.]+)(.*)$/);
+                    const key = path[1];
+                    const objectPath = "object." + key + (path[2] || "");
+                    const id = this._getId(key);
+                    const arrayPath = "array." + id + ".value" + (path[2] || "");
+                    this.set(arrayPath, this.get(objectPath));
+                }
+
+                _getId(key) {
+                    const collection = Polymer.Collection.get(this.array);
+                    for(const element of this.array) {
+                        if((element && element.key) === key) {
+                            return collection.getKey(element);
+                        }
+                    }
+                }
+
+                _onArray(change) {
+                    let path = change.path.match(/^array\.(#\d+)\.([^\.]+)(\.|$)/);
+                    if(!path) return;
+                    let id = path[1], field = path[2];
+                    if(field == "key") throw new Error("my-objarray: Must not change key!");
+                    if(field != "value") throw new Error("my-objarray: Only change inside value!");
+                    this._setting = true;
+                    this.set(this._getPath(change, id), change.value);
+                    delete this._setting;
+                }
+
+                _getPath(change, id) {
+                    let collection = Polymer.Collection.get(change.base);
+                    let index = change.base.indexOf(collection.getItem(id));
+                    let key = change.base[index].key;
+                    return change.path.replace("array." + id + ".value", "object." + key);
+                }
+
+            }
+
+            Polymer(Objarray);
+        })();
+    </script>
+</dom-module>

@@ -1,0 +1,324 @@
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+
+<link rel="import" href="spin-directreference.html">
+<link rel="import" href="my-objarray.html">
+
+<dom-module id="spin-model">
+    <template>
+        <style>
+            paper-button.fancy {
+                background: #0062A2;
+                color: white;
+                width: 250px;
+                margin-bottom: 10px;
+                text-transform:none;
+                box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+            }
+        </style>
+        <div>
+            <h4>{{model.name}}</h4> <paper-button raised class="fancy" on-tap="saveModel">Save</paper-button>
+            <paper-listbox>
+                <!-- <paper-button on-tap="saveModel">Save</paper-button> -->
+                <my-objarray object="{{model}}" array="{{array}}"></my-objarray>
+                <template id="modeltemplate" is="dom-repeat" items="{{array}}">
+                    <div style="display:flex; flex-direction:row">
+                        <paper-item >
+                            <template is="dom-if" if="{{isType(item,'array')}}">
+                                <spin-list propname="{{item.key}}" delete="true" incallbacks="[[outCallbacks]]" client="{{client}}" user="{{user}}" model="{{getTypeFor(item)}}" spinids="{{item.value}}"></spin-list>
+                                <paper-button raised on-tap="addModel">Add {{getTypeFor(item)}}</paper-button>
+                                <paper-dialog style="padding:20px;overflow:auto"  id="addmodeldialog_{{getModelId()}}_{{getTypeFor(item)}}">
+                                    <h2>Add {{item.type}}</h2>
+                                    <spin-allmodels client="{{client}}" user="{{user}}" incallbacks="{{dialogCallbacks}}" model="{{getTypeFor(item)}}"></spin-allmodels>
+                                    <div class="buttons">
+                                        <paper-button dialog-dismiss>Cancel</paper-button>
+                                        <paper-button dialog-confirm>Accept</paper-button>
+                                    </div>
+                                </paper-dialog>
+                            </template>
+                            <template is="dom-if" if="{{isType(item,'ref')}}">
+                                <spin-directreference client="{{client}}" user="{{user}}" incallbacks="{{dialogCallbacks}}" propname="{{item.key}}" modelid="{{item.value}}" modeltype="{{getTypeFor(item)}}"></spin-directreference>
+                            </template>
+                            <template is="dom-if" if="{{isType(item,'scalar')}}">
+                                <paper-textarea id="{{item.key}}" label="{{item.key}}" disabled="{{item.disabled}}" type="text"  value="{{item.value::input}}" on-keyup="onInputChange" autoSave="true" stopKeyboardEventPropagation="true" style="width:600px">
+                                </paper-textarea>
+                            </template>
+                        </paper-item>
+                    </div>
+                </template>
+            </paper-listbox>
+
+        </div>
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'spin-model',
+            properties:
+            {
+                client:{type:'Object'},
+                model:          {type: 'Object',  notify:true, value: function() {return new Object()} },
+                modelproperties: {type: 'Array', observer: '_onArray'},
+                incallbacks:    {type: 'Object'},
+                readonlyproperties: {type: 'Array', value: ['id']}
+            },
+
+            beforeRegister: function()
+                            {
+                                this.observers =
+                                [
+                                    '_onModel(model.*)',
+                                    '_onArray(array.*)'
+                                ]
+                            },
+
+            _onModel: function(change)
+                      {
+                          //console.log("test._onItems", change.path);
+                          //console.dir(change)
+                      },
+
+            _onArray: function(change)
+                      {
+                          //console.log("test._onArray", change.path);
+                          //console.dir(change)
+                      },
+
+            onInputChange:function(e)
+                          {
+                            console.log('onInputChange called')
+                            console.dir(e)
+                            var key = e.model.item.key
+                            var value = e.path[0].value
+                            console.log('key = '+key+', value = '+value)
+                              this.set('model.'+key, value)
+                          },
+
+            getTypeFor:function(item)
+                       {
+                           //console.log('getTypeFor '+item.key+' called')
+                           var rv = ''
+                           this.modelproperties.forEach(function(prop)
+                           {
+                               if(prop.name == item.key)
+                               {
+                                   rv = prop.type
+                               }
+                           })
+                           //console.log('getTypeFor '+item.key+' return '+rv+' modelprops =')
+                           //console.dir(this.modelproperties)
+                           return rv
+                       },
+
+            getModelId:function()
+                       {
+                           var rv = ''
+                           for(var k in this.model)
+                           {
+                               if(k == 'id')
+                               {
+                                   rv = this.model[k]
+                               }
+                           }
+                           return rv
+                       },
+
+            isType: function(item, what)
+            {
+                //console.log('isType called for '+item+' and '+what)
+                //console.dir(item)
+                var rv = false
+                this.modelproperties.forEach(function(prop)
+                {
+                    if(prop.name == item.key)
+                    {
+                        //console.log('found '+prop.name)
+                        if(what == 'scalar' && !prop.array && !prop.type)
+                        {
+                            rv = true
+                        }
+                        if(what == 'array' && prop.array == true)
+                        {
+                            rv = true
+                        }
+                        if(what == 'ref' && prop.type && !(prop.array == true))
+                        {
+                            rv = true
+                        }
+                    }
+                })
+                //console.log('isType called for '+item.key+' and '+what+' returning '+rv)
+                return rv
+            },
+
+            textAreaAutoSave:function(e)
+                             {
+                                console.log('textAreaAutoSave called')
+                                console.dir(e)
+
+                             },
+
+            ready: function()
+            {
+                this.subscriptions = []
+                this.dialogCallbacks =
+                {
+                    onSelect: this.onDialogSelect.bind(this),
+                    onSelectReference: this.onSelectReference.bind(this)
+                }
+                this.outCallbacks =
+                {
+                    onDelete: this.onDeleteListElement.bind(this)
+                }
+            },
+
+            addModel: function(e)
+            {
+                var item = e.model.item
+                this.modeldialogitem = item
+                var id = "addmodeldialog_"+this.model.id+"_"+this.getTypeFor(item)
+                var dialog = this.$$('#'+id)
+                dialog.open()
+            },
+
+            onDeleteListElement: function(item, propname)
+                                 {
+                                     console.log('spin-model got delete list item callback for property '+propname)
+                                     console.dir(item)
+                                     if(confirm('Really remove list item '+item.name+' from '+propname+' list?'))
+                                     {
+                                         var list = this.model[propname]
+                                         console.log( 'current list is ' )
+                                         console.dir( list )
+                                         var idx = -1
+                                         list.forEach( function ( id, i )
+                                         {
+                                             if (id == item.id)
+                                             {
+                                                 idx = i
+                                             }
+                                         } )
+                                         if (idx > -1)
+                                         {
+                                             list.splice( idx, 1 )
+                                             this.changeValueInArrayFor(propname, [])
+                                             this.changeValueInArrayFor(propname, list)
+                                             console.log( 'list after is' )
+                                             console.dir( this.model[propname] )
+                                             this.onItemChange( {model: {item: this.model}} )
+                                         }
+                                     }
+                                     this.onModelChanged(this.model)
+                                 },
+
+            onSelectReference: function(propname, item)
+            {
+                console.log('=======*** spin-model onSelectReference called')
+                console.dir(item)
+                this.model[propname] = item.id
+                this.onItemChange({model:{item:this.model}})
+            },
+
+            onDialogSelect: function(item)
+            {
+                console.log('======= spin-model onDialogSelect called')
+                console.dir(item)
+                var prop = this.modeldialogitem
+                //this.model[prop.name].push(item)
+                console.log('======= pushing '+item.type+' '+item.id+' onto array property '+prop.key)
+                var i = this.getIndexInArrayFor(prop.key)
+                console.log('index for '+prop.key+' is '+i)
+                var arr = this.array[i].value
+                console.log('existing array for '+prop.key+' is '+arr)
+                arr.push(item.id)
+                this.changeValueInArrayFor(prop.key, [])
+                this.changeValueInArrayFor(prop.key, arr)
+                //this.notifyPath('array.'+i+'.value')
+                var type = this.getTypeFor(prop)
+                console.log('======= spin-model added new object to array property '+type)
+                console.dir(this.model[prop.key])
+
+
+                var id = "addmodeldialog_"+this.model.id+"_"+type
+                var dialog = this.$$('#'+id)
+                dialog.close()
+            },
+
+            changeValueInArrayFor:function(propname, value)
+                                  {
+                                        var idx = this.getIndexInArrayFor(propname)
+                                        if(idx > -1)
+                                        {
+                                            this.set('array.'+idx+'.value', value)
+                                        }
+                                  },
+
+            getIndexInArrayFor:function(propname)
+                               {
+                                   var idx = -1
+                                   this.array.forEach(function(el, i)
+                                   {
+                                       if(el.key == propname)
+                                       {
+                                           idx = i
+                                       }
+                                   })
+                                   return idx
+                               },
+
+            saveModel: function()
+                       {
+                         this.onItemChange({model:{item: {}}})
+                       },
+
+            onItemChange: function(e)
+            {
+                console.log('-------------------- spin-model onItemChange called.')
+                console.dir(this.model)
+
+                this.client.emitMessage({target: '_update'+this.model.type, obj: this.model, type: this.model.type}).then(function(ures)
+                {
+                    console.log('spin-model update result: '+ures)
+                }.bind(this))
+            },
+
+            onModelChanged: function(newmodel)
+            {
+                console.log('spin-model onModelChanged called')
+                console.dir(newmodel)
+
+            },
+
+            onSelect: function(e)
+            {
+                console.log('onSelect called at spin-model')
+                var item = e.model.p
+                if(this.incallbacks && this.incallbacks.onSelect)
+                {
+                    this.incallbacks.onSelect(item)
+                }
+            },
+
+            onDelete:function(e)
+            {
+                console.log('onDelete called at spin-model')
+                var item = e.model.p
+                if(this.incallbacks && this.incallbacks.onDelete)
+                {
+                    this.incallbacks.onDelete(item)
+                }
+            },
+
+        });
+
+    </script>
+
+</dom-module>

@@ -1,0 +1,189 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="spin-allmodels.html">
+<link rel="import" href="spin-alltypes.html">
+<link rel="import" href="spin-model.html">
+<link rel="import" href="spin-client.html">
+
+<dom-module id="spin-admin">
+
+    <template>
+
+        <style>
+            :host {
+                display: block;
+                padding: 10px;
+            }
+            .card {
+                box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+                padding: 16px;
+                margin: 24px;
+                border-radius: 5px;
+                background-color: #fff;
+                color: #757575;
+            }
+            .circle {
+                display: inline-block;
+                height: 64px;
+                width: 64px;
+                border-radius: 50%;
+                background: #ddd;
+                line-height: 64px;
+                font-size: 30px;
+                color: #555;
+                text-align: center;
+            }
+            h1 {
+                font-size: 22px;
+                margin: 16px 0;
+                color: #212121;
+            }
+            .fail
+            {
+                color:red;
+                font-weight: bold;
+            }
+        </style>
+        <spin-client client="{{client}}" user="{{user}}" failure="{{failure}}"></spin-client>
+        <div class="card">
+            loggedin = {{loggedin}} fail={{fail}}
+            <template is="dom-if" if="{{!fail}}">
+                <div class="fail" on-tap="clearFail">{{failure}}</div>
+            </template>
+            <p>
+            <div style="display:flex; flex-direction: row">
+                <template is="dom-if" if="{{!reject}}">
+                    <spin-alltypes client="{{client}}" style="padding:20px" incallbacks="{{typeSelectCallbacks}}"></spin-alltypes>
+                    <div style="display:flex; flex-direction: row">
+                        <template is="dom-if" if="{{selectedType}}">
+                            <spin-allmodels client="{{client}}" style="padding:20px" incallbacks="{{outCallbacks}}" model="{{selectedType}}"></spin-allmodels>
+                            <spin-model client="{{client}}" style="padding:20px"  model="{{selectedmodel}}" modelproperties="{{selectedmodelproperties}}"></spin-model>
+                        </template>
+                    </div>
+                </template>
+            </div>
+            </p>
+        </div>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            properties:
+            {
+                client:{type:'Object', notify: true, observer: 'onClientChanged'},
+                user:{type:'Object', notify: true},
+                reject:{type: Boolean, notify:true},
+                loggedin:{type: Boolean, notify:true}
+            },
+
+            listeners:
+            {
+                'user-changed': 'onUserChanged',
+                'itemChanged': 'onItemChanged',
+                'failure-changed': 'onFailure'
+            },
+
+            observers: ["rejectedChanged(rejected)"],
+
+
+            is: 'spin-admin',
+
+            onFailure:function(f)
+                      {
+                        console.log('on failure changed: '+f)
+                          this.fail = true
+                      },
+
+            clearFail:function(f)
+                      {
+                          console.log('on clearfail')
+                          this.fail = false
+                      },
+
+            rejectedChanged: function(r)
+                        {
+                            console.log('++ spin-admin onRejected r = '+r)
+                        },
+
+
+            onClientChanged: function(newc, old)
+                             {
+                                console.log('spin-admin onClientChanged')
+                                console.dir(this.client)
+                             },
+
+            onUserChanged: function(newu, old)
+                             {
+                                 console.log('spin-admin onUserChanged')
+                                 console.dir(this.user)
+                             },
+
+            clearFailure: function()
+                          {
+                              this.set('client.failure', false)
+                          },
+
+            ready: function()
+                   {
+                        this.fail = false
+                       this.outCallbacks =
+                       {
+                           onSelect: this.onSelect.bind(this),
+                           onDelete: this.onDelete.bind(this)
+                       }
+
+                       this.typeSelectCallbacks =
+                       {
+                           onSelect: this.onSelectType.bind(this)
+                       }
+                   },
+
+            attached: function()
+                      {
+                          //console.log('spin-admin attached')
+                          //console.dir(this.client)
+                      },
+
+            onSelect: function(item)
+                      {
+                          console.log('onSelected called in spin-admin')
+                          this.client.emitMessage({target: 'getModelFor', modelname: item.type}).then(function(mprops)
+                                  {
+                                      console.log('setting modelprops to')
+                                      console.dir(mprops)
+                                      this.set('selectedmodelproperties', mprops)
+                                      this.set('selectedmodel', item)
+                                  }.bind(this))
+
+                      },
+
+            onSelectType: function(item)
+                          {
+                              //console.log('onSelectetype called in spin-admin')
+                              //console.dir(item)
+                              //this.selectedType = item
+                              this.set('selectedType', item)
+                          },
+
+            onDelete: function(item)
+                      {
+
+                      }
+
+        });
+
+    </script>
+
+</dom-module>

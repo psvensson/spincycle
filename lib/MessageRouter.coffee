@@ -17,6 +17,7 @@ express         = require("express")
 path            = require('path')
 defer           = require('node-promise').defer
 serveStatic     = require('serve-static')
+colors          = require('colors/safe')
 
 
 # The MessageRouter registers names on which messages can be sent.
@@ -46,7 +47,9 @@ class MessageRouter
     DB.getDataStore(dbtype)
     pjson = require('../package.json');
     @messagesPerSecond = msgPS or 100
-    console.log 'SpinCycle messageRouter constructor. Version - '+pjson.version+' messages per second limit = '+@messagesPerSecond
+    console.log colors.blue.inverse('----------------------------------------------------------------------------------------')
+    console.log colors.blue.inverse(' SpinCycle messageRouter constructor. Version - '+pjson.version+' messages per second limit = '+@messagesPerSecond+' ')
+    console.log colors.blue.inverse('----------------------------------------------------------------------------------------')
     #console.dir @authMgr
     @authMgr.messagerouter = @
     @resolver = new ResolveModule()
@@ -77,7 +80,7 @@ class MessageRouter
 
   addServicePage: () =>
     #p = path.join(__dirname, 'spin')
-    p = __dirname + '/spin'
+    p = __dirname + '/spin/'
     if @app
       console.log('**************** addServicePage called -> '+p)
       @app.use '/spin',express.static(p)
@@ -120,7 +123,7 @@ class MessageRouter
 
   open: () =>
     MessageRouter.status = 'open'
-    console.log 'opening message router'
+    console.log colors.inverse.green('opening message router')
 
   close: () =>
     MessageRouter.status = 'closed'

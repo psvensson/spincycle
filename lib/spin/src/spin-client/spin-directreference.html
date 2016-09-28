@@ -1,0 +1,95 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+
+
+<dom-module id="spin-directreference">
+
+    <template>
+
+        <style>
+
+        </style>
+
+        <div>
+            <h4>{{modeltype}}: {{name}}</h4>
+            <paper-button raised on-tap="changeModel">Change</paper-button>
+            <paper-dialog style="padding:20px"  id="addmodeldialog">
+                <h2>Add {{item.type}}</h2>
+                <spin-allmodels client="{{client}}" user="{{user}}" incallbacks="{{dialogCallbacks}}" model="{{modeltype}}"></spin-allmodels>
+                <div class="buttons">
+                    <paper-button dialog-dismiss>Cancel</paper-button>
+                    <paper-button dialog-confirm>Accept</paper-button>
+                </div>
+            </paper-dialog>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'spin-directreference',
+            properties:
+            {
+                client:{type:'Object', notify: true},
+                user:{type:'Object', notify: true},
+                modelid:        {type: 'String'},
+                modeltype:      {type: 'String'},
+                propname:       {type: 'String'},
+                incallbacks:    {type: 'Object'},
+                name:           {type: 'String'}
+            },
+
+            changeModel: function(e)
+            {
+              console.log('spin-directreference changeModel called')
+
+              var id = "addmodeldialog"
+              var dialog = this.$$('#'+id)
+              dialog.open()
+            },
+
+            onDialogSelect: function(item)
+            {
+                console.log('======= spin-directreference onDialogSelect called')
+                console.dir(item)
+                this.set('name', item.name)
+                this.object = item
+                if(this.incallbacks.onSelectReference)
+                {
+                    this.incallbacks.onSelectReference(this.propname, item)
+                }
+                var id = "addmodeldialog"
+                var dialog = this.$$('#'+id)
+                dialog.close()
+            },
+
+            ready: function()
+            {
+                this.dialogCallbacks =
+                {
+                    onSelect: this.onDialogSelect.bind(this)
+                }
+                this.name = '<undefined>'
+            },
+
+            attached: function()
+            {
+                this.getObjectForId()
+            },
+
+            getObjectForId: function()
+            {
+                if(this.modelid)
+                {
+                    this.client.emitMessage({target: '_get'+this.modeltype, type: this.modeltype, obj: {id: this.modelid, type: this.modeltype}}).then(function(obj)
+                    {
+                        this.set('name', obj.name)
+                        this.object = obj
+                    }.bind(this))
+                }
+            }
+        })
+        </script>
+    </dom-module>

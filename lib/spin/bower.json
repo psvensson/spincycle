@@ -2,7 +2,15 @@
   "name": "spin",
   "main": "index.html",
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.4.0"
+    "polymer": "Polymer/polymer#^1.4.0",
+    "paper-dialog": "^1.1.0",
+    "paper-input": "^1.1.20",
+    "paper-listbox": "^1.1.2",
+    "paper-item": "^1.2.1",
+    "lrucache": "^1.0.2",
+    "q": "1.0.0",
+    "uuid4": "^3.0.0",
+    "socket.io": "^1.4.8"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",

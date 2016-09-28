@@ -1,0 +1,69 @@
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+
+
+<dom-module id="spin-alltypes">
+
+    <template>
+        <style>
+        </style>
+        <div>
+            <h4>List of SpinCycle model types</h4>
+            <paper-listbox>
+                <template id="listtemplate" is="dom-repeat" items="{{spintypes}}">
+                    <div style="display:flex; flex-direction:row">
+                        <paper-item on-tap="onSelect">{{item}}</paper-item>
+                    </div>
+                </template>
+            </paper-listbox>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'spin-alltypes',
+            properties:
+            {
+                client:{type:'Object'},
+                incallbacks:    {type: 'Object'},
+                spintype:{type:'Array'}
+            },
+
+
+
+            ready: function()
+           {
+                this.spintypes=[]
+           },
+
+            attached: function()
+              {
+                  //console.log('spin-alltypes attached. model = '+this.model)
+                  this.client.emitMessage({target: 'listTypes'}).then(function (types)
+                  {
+                      //console.log('spin-alltypes got back')
+                      //console.dir(types)
+                      this.set('spintypes', types)
+                  }.bind(this))
+              },
+
+
+            onSelect: function(e)
+                      {
+                          //console.log('onSelect called at spin-alltypes')
+                          var item = e.model.item
+
+                          if(this.incallbacks && this.incallbacks.onSelect)
+                          {
+                              this.incallbacks.onSelect(item)
+                          }
+                      }
+        });
+
+    </script>
+
+</dom-module>

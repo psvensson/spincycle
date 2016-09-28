@@ -20,9 +20,17 @@ class SampleLogic
 
     DB.createDatabases(['SampleGame','SamplePlayer']).then ()=>
       console.log ' SampleLogic DB init done..'
+      setTimeout(
+        ()=>
+          @messageRouter.open()
+        ,20
+      )
+
+      """
       DB.getOrCreateObjectByRecord({id:17, name: 'fooGame', type: 'SampleGame', createdBy: 'SYSTEM', createdAt: Date.now()}).then (game)=>
         console.log 'got first game'
         game.serialize()
         @messageRouter.open()
+      """
 
 module.exports = SampleLogic
