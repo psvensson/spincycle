@@ -10,10 +10,6 @@ cors            = require('cors')
 app             = express()
 server          = require("http").createServer(app)
 
-port = process.env.PORT or 3001
-server.listen port, ->
-  console.log "Server listening at port %d", port
-  return
 
 app.use express.static("app")
 app.use(cors)
@@ -24,7 +20,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 #--------------------------------------------------> Set up Message Router
 authMgr         = new AuthenticationManager()
-messageRouter   = new SpinCycle(authMgr)
+messageRouter   = new SpinCycle(authMgr, null, 1000, app)
 #--------------------------------------------------> Express Routing
 new SpinCycle.HttpMethod(messageRouter, app, '/api/')
 #<-------------------------------------------------- Express Routing
@@ -33,4 +29,13 @@ new SpinCycle.WsMethod(messageRouter, server)
 #<-------------------------------------------------- WS Routing
 # Adding sample logic
 logic = new SampleLogic(messageRouter)
+port = process.env.PORT or 6601
+setTimeout(
+  ()->
+    server.listen port, ->
+      console.log "Server listening at port %d", port
+    return
+  ,1000
+)
+
 

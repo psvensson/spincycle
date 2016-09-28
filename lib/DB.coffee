@@ -73,51 +73,54 @@ class DB
     # get schema
     dbname = _dbname
     q = defer()
-    console.log '* extendSchemaIfNeeded for module "'+_dbname+'"we have the following modules named in cache:'
-    for k,v of ResolveModule.modulecache
-      console.log k
+    #console.log 'extendSchemaIfNeeded for module "'+_dbname+'"we have the following modules named in cache:'
+    #for k,v of ResolveModule.modulecache
+    #  console.log k
     proto = ResolveModule.modulecache[dbname]
-    console.log 'extendSchemaIfNeeded resolve '+dbname+' to '+proto
+    #console.log '+++++++++++++++++++++++++++++++++++++extendSchemaIfNeeded resolve '+dbname+' to '+proto
     #console.dir proto
     if not proto
       console.log 'found undefined prototype!. modulecache is'
-      #console.dir ResolveModule.modulecache
-    db.all dbname,{},(res)=>
-      console.log 'extendSchemaIfNeeded found '+res.length+' objects after call to all()'
-      #console.log 'first object is '+res[0]
-      #console.dir res[0]
-      # collect missing properties from first object
-      o = res[res.length-1]
-      missing = []
-      lookup = {createdAt:true, modifiedAt:true, createdBy:true}
-      for k,v of o
-        lookup[k] = k
-      proto.model.forEach (property)=>
-        if not lookup[property.name] then missing.push property
-      console.log 'found '+missing.length+' missing properties on first object compared to current model : '
-      console.dir missing
-      if missing.length > 0
-        count = res.length*missing.length
-        console.log 'adding '+missing.length+' missing properties to '+res.length+' existing objects'
-        start = Date.now()
-        res.forEach (ro) =>
-          missing.forEach (mprop) =>
-            if not mprop.default
-              if mprop.array then mprop.default = []
-              else if mprop.hashtable then mprop.default = {}
-              else if mprop.type then mprop.default = ''
-            #console.log '   setting new property '+mprop.name+' to default value of '+mprop.default+' on object type '+ro.type+' id '+ro.id
-            #ro[mprop.name] = mprop.default or ''
-            @extend(ro.type, ro.id, mprop.name, mprop.default).then (o)=>
-              @lru.set(o.id, o)
-              if --count == 0
-                end = Date.now()
-                diff = parseInt((end - start)/1000)
-                console.log 'extendSchemaIfNeeded done for '+res.length+' objects. runtime = '+diff+' seconds'
-                q.resolve()
-          #@set ro.type, ro, ()=> if --count == 0 then q.resolve()
-      else
-        q.resolve()
+      console.dir ResolveModule.modulecache
+      q.resolve()
+    else
+      db.all dbname,{},(res)=>
+        if res.length > 0
+          console.log 'extendSchemaIfNeeded found '+res.length+' objects after call to all()'
+          #console.log 'first object is '+res[0]
+          #console.dir res[0]
+          # collect missing properties from first object
+          o = res[res.length-1]
+          missing = []
+          lookup = {createdAt:true, modifiedAt:true, createdBy:true}
+          for k,v of o
+            lookup[k] = k
+          proto.model.forEach (property)=>
+            if not lookup[property.name] then missing.push property
+          console.log 'found '+missing.length+' missing properties on first object of '+dbname+' compared to current model : '
+          #console.dir missing
+          if missing.length > 0
+            count = res.length*missing.length
+            console.log 'adding '+missing.length+' missing properties to '+res.length+' existing objects'
+            start = Date.now()
+            res.forEach (ro) =>
+              missing.forEach (mprop) =>
+                if not mprop.default
+                  if mprop.array then mprop.default = []
+                  else if mprop.hashtable then mprop.default = {}
+                  else if mprop.type then mprop.default = ''
+                #console.log '   setting new property '+mprop.name+' to default value of '+mprop.default+' on object type '+ro.type+' id '+ro.id
+                #ro[mprop.name] = mprop.default or ''
+                @extend(ro.type, ro.id, mprop.name, mprop.default).then (o)=>
+                  @lru.set(o.id, o)
+                  if --count == 0
+                    end = Date.now()
+                    diff = parseInt((end - start)/1000)
+                    console.log 'extendSchemaIfNeeded done for '+res.length+' objects. runtime = '+diff+' seconds'
+                    q.resolve()
+              #@set ro.type, ro, ()=> if --count == 0 then q.resolve()
+          else
+            q.resolve()
     return q
 
   @extend:(type, id, field, def)=> @getDataStore().then (store)=>

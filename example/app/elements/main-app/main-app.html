@@ -1,5 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/core-input/core-input.html">
+<link rel="import" href="../../bower_components/iron-input/iron-input.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
 <link rel="import" href="../../elements/message-router/message-router.html">
@@ -20,7 +20,7 @@
     <ul id="gamelist">
         <template repeat="{{game in generatedgames}}">
             <li>
-                <input is="core-input" gameid="{{game.id}}" value="{{game.name}}" on-change="{{onGameNameChange}}"> </input> <paper-button raised on-click="{{selectGame}}" gameid="{{game.id}}">Select</paper-button>
+                <input is="iron-input" gameid="{{game.id}}" value="{{game.name}}" on-change="{{onGameNameChange}}"> </input> <paper-button raised on-click="{{selectGame}}" gameid="{{game.id}}">Select</paper-button>
             </li>
         </template>
     </ul>
@@ -37,7 +37,7 @@
         {
             console.log('main app starting up');
             this.socket = io();
-            this.asyncFire('core-signal', {name: "emit", data: {target:'listGames', callback: this.onListGames.bind(this) }});
+            this.asyncFire('iron-signal', {name: "emit", data: {target:'listGames', callback: this.onListGames.bind(this) }});
         },
 
       gameById: function(id)
@@ -48,14 +48,14 @@
         newGame: function()
         {
             console.log('new game clicked');
-            this.asyncFire('core-signal', {name: "emit", data: {target:'newGame', callback: this.onNewGame.bind(this) }});
+            this.asyncFire('iron-signal', {name: "emit", data: {target:'newGame', callback: this.onNewGame.bind(this) }});
         },
 
         onNewGame: function(reply)
         {
             console.log('onNewGame called. reply is');
             console.dir(reply);
-            this.asyncFire('core-signal', {name: "emit", data: {target:'listGames', callback: this.onListGames.bind(this) }});
+            this.asyncFire('iron-signal', {name: "emit", data: {target:'listGames', callback: this.onListGames.bind(this) }});
         },
 
         onListGames: function(games)
@@ -66,7 +66,7 @@
             this.generatedgames = [];
             this.gameids.forEach(function(gameid)
             {
-                this.asyncFire('core-signal', {name: "emit", data: {target:'_getSampleGame', obj:{id: gameid, type: 'samplegame'}, callback: this.onGameDetails.bind(this) } });
+                this.asyncFire('iron-signal', {name: "emit", data: {target:'_getSampleGame', obj:{id: gameid, type: 'samplegame'}, callback: this.onGameDetails.bind(this) } });
             }.bind(this))
         },
 
@@ -83,7 +83,7 @@
           var name = el.value;
           var gameid = el.attributes['gameid'].value;
           console.log("new name is "+name);
-          this.asyncFire('core-signal', {name: "emit", data: {target:'updateObject', obj: {id: gameid, type: 'samplegame', name: name }, callback: function(msg) { console.log('updatedObject said:');console.dir(msg); }} });
+          this.asyncFire('iron-signal', {name: "emit", data: {target:'updateObject', obj: {id: gameid, type: 'samplegame', name: name }, callback: function(msg) { console.log('updatedObject said:');console.dir(msg); }} });
         },
 
         selectGame: function(e, detail, el)
@@ -92,7 +92,7 @@
           var gameid = el.attributes['gameid'].value;
           console.log("gameid = "+gameid);
           this.selectedgame = this.gameById(gameid);
-          this.asyncFire('core-signal', {name: "objectsubscribe", data: {obj:{id: this.selectedgame.id, type: 'samplegame'}, callback: this.onGameUpdate.bind(this) } });
+          this.asyncFire('iron-signal', {name: "objectsubscribe", data: {obj:{id: this.selectedgame.id, type: 'samplegame'}, callback: this.onGameUpdate.bind(this) } });
         },
 
         onGameUpdate: function(game)

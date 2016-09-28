@@ -1,26 +1,13 @@
 {
   "name": "spin",
-  "homepage": "https://github.com/psvensson/spincycle",
-  "authors": [
-    "Peter Svensson <psvenson@gmail.com>"
-  ],
-  "description": "",
-  "main": "",
-  "moduleType": [],
-  "license": "MIT",
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "example/app/bower_components",
-    "test",
-    "tests"
-  ],
+  "main": "index.html",
   "dependencies": {
-    "ractive": "^0.7.3",
-    "requirejs": "^2.1.22",
-    "q": "1.0.1",
-    "uuid4": "^2.0.0",
-    "socket.io": "^1.4.5"
+    "polymer": "Polymer/polymer#^1.4.0"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
+    "web-component-tester": "^4.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
   }
 }

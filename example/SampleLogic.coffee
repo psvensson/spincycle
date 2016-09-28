@@ -11,16 +11,15 @@ class SampleLogic
 
   constructor: (@messageRouter) ->
     @games = []
-    DB.createDatabases(['samplegame', 'sampleplayer']).then (results)=>
-      console.log ' DB init done..'
+    console.log '--------------------------------- SampleLogic contructor -------------------------------'
+    @messageRouter.objectManager.expose('SampleGame')
+    @messageRouter.objectManager.expose('SamplePlayer')
 
+    ResolveModule.modulecache['SampleGame'] = SampleGame
+    ResolveModule.modulecache['SamplePlayer'] = SamplePlayer
 
-      @messageRouter.objectManager.expose('SampleGame')
-      @messageRouter.objectManager.expose('SamplePlayer')
-
-      ResolveModule.modulecache['SampleGame'] = SampleGame
-      ResolveModule.modulecache['SamplePlayer'] = SamplePlayer
-
+    DB.createDatabases(['SampleGame','SamplePlayer']).then ()=>
+      console.log ' SampleLogic DB init done..'
       DB.getOrCreateObjectByRecord({id:17, name: 'fooGame', type: 'SampleGame', createdBy: 'SYSTEM', createdAt: Date.now()}).then (game)=>
         console.log 'got first game'
         game.serialize()

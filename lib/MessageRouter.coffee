@@ -16,6 +16,8 @@ e               = require('./EventManager')
 express         = require("express")
 path            = require('path')
 defer           = require('node-promise').defer
+serveStatic     = require('serve-static')
+
 
 # The MessageRouter registers names on which messages can be sent.
 # The idea is to abstract away different messaging methods (WS, WebRTC, HTTP) from the logic
@@ -69,17 +71,22 @@ class MessageRouter
         #console.log 'adding target '+name
         rv[name] = @args[name]
       msg.replyFunc({status: EventManager.general.SUCCESS, info: 'list of available targets', payload: rv})
-    @addServicePage()
+    setTimeout @addServicePage.bind(@),1
 
   #---------------------------------------------------------------------------------------------------------------------
 
   addServicePage: () =>
-    p = path.join(__dirname, 'spin')
-    console.log('**************** addServicePage called -> '+p)
+    #p = path.join(__dirname, 'spin')
+    p = __dirname + '/spin'
     if @app
-      #@app.use '/_spin',express.static(path.join(__dirname, 'spin'))
-      @app.use('/spin/', express.static(path.join(__dirname, 'spin')))
-      #@app.use('/spin/', express.static('spin'))
+      console.log('**************** addServicePage called -> '+p)
+      @app.use '/spin',express.static(p)
+
+      #@app.use('/spin', serveStatic(p))
+      #@app.use('/spin', express.static('lib/spin'))
+    else
+      console.log 'no app argument provided to MessageRouter! Unable to set up /spin route'
+
     console.log('**************** exposing SpinModule and SpinFunction')
     DB.createDatabases(['SpinModule', 'SpinFunction']).then ()=>
       console.log ' DB init done..'
@@ -87,6 +94,7 @@ class MessageRouter
       @objectManager.expose 'SpinFunction'
       ResolveModule.modulecache['SpinFunction'] = SpinFunction
       ResolveModule.modulecache['SpinModule'] = SpinModule
+
 
   #---------------------------------------------------------------------------------------------------------------------
 

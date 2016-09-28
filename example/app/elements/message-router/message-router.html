@@ -1,13 +1,13 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/core-signals/core-signals.html">
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
 
 <link rel="import" href="../../elements/message-router/message-router.html">
 
 <polymer-element name="message-router" attributes="io">
   <template>
-    <core-signals on-core-signal-register="{{registerListener}}"></core-signals>
-    <core-signals on-core-signal-objectsubscribe="{{registerObjectSubscriber}}"></core-signals>
-    <core-signals on-core-signal-emit="{{emitMessage}}"></core-signals>
+    <iron-signals on-iron-signal-register="{{registerListener}}"></iron-signals>
+    <iron-signals on-iron-signal-objectsubscribe="{{registerObjectSubscriber}}"></iron-signals>
+    <iron-signals on-iron-signal-emit="{{emitMessage}}"></iron-signals>
   </template>
   <script>
     (function ()

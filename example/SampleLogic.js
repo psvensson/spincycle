@@ -20,13 +20,14 @@
     function SampleLogic(messageRouter) {
       this.messageRouter = messageRouter;
       this.games = [];
-      DB.createDatabases(['samplegame', 'sampleplayer']).then((function(_this) {
-        return function(results) {
-          console.log(' DB init done..');
-          _this.messageRouter.objectManager.expose('SampleGame');
-          _this.messageRouter.objectManager.expose('SamplePlayer');
-          ResolveModule.modulecache['SampleGame'] = SampleGame;
-          ResolveModule.modulecache['SamplePlayer'] = SamplePlayer;
+      console.log('--------------------------------- SampleLogic contructor -------------------------------');
+      this.messageRouter.objectManager.expose('SampleGame');
+      this.messageRouter.objectManager.expose('SamplePlayer');
+      ResolveModule.modulecache['SampleGame'] = SampleGame;
+      ResolveModule.modulecache['SamplePlayer'] = SamplePlayer;
+      DB.createDatabases(['SampleGame', 'SamplePlayer']).then((function(_this) {
+        return function() {
+          console.log(' SampleLogic DB init done..');
           return DB.getOrCreateObjectByRecord({
             id: 17,
             name: 'fooGame',

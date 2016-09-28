@@ -20,12 +20,6 @@
 
   server = require("http").createServer(app);
 
-  port = process.env.PORT || 3001;
-
-  server.listen(port, function() {
-    console.log("Server listening at port %d", port);
-  });
-
   app.use(express["static"]("app"));
 
   app.use(cors);
@@ -42,13 +36,21 @@
 
   authMgr = new AuthenticationManager();
 
-  messageRouter = new SpinCycle(authMgr);
+  messageRouter = new SpinCycle(authMgr, null, 1000, app);
 
   new SpinCycle.HttpMethod(messageRouter, app, '/api/');
 
   new SpinCycle.WsMethod(messageRouter, server);
 
   logic = new SampleLogic(messageRouter);
+
+  port = process.env.PORT || 6601;
+
+  setTimeout(function() {
+    server.listen(port, function() {
+      return console.log("Server listening at port %d", port);
+    });
+  }, 1000);
 
 }).call(this);
 
