@@ -18,19 +18,13 @@ console.log = (msg)->
 port = process.env.PORT or 6602
 
 #app.use express.static("app")
-app.use(cors)
+app.use(cors())
 
 app.use(session({ secret: 'shhhhhhhhh' }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-"""
-setTimeout(
-  ()=>
-    app.use(serveStatic(__dirname + '/app'))
-  ,2000
-)
-"""
+
 
 app.use(cors())
 

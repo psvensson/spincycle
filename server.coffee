@@ -12,8 +12,8 @@ server.listen port, ->
   console.log "Server listening at port %d", port
   return
 
-app.use express.static("lib")
-app.use(cors)
+#app.use express.static("lib")
+app.use(cors())
 app.options('*', cors())
 
 #--------------------------------------------------> Set up Message Router

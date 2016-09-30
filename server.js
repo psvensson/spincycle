@@ -20,9 +20,7 @@
     console.log("Server listening at port %d", port);
   });
 
-  app.use(express["static"]("lib"));
-
-  app.use(cors);
+  app.use(cors());
 
   app.options('*', cors());
 

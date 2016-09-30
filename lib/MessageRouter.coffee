@@ -47,9 +47,9 @@ class MessageRouter
     DB.getDataStore(dbtype)
     pjson = require('../package.json');
     @messagesPerSecond = msgPS or 100
-    console.log colors.blue.inverse('----------------------------------------------------------------------------------------')
+    console.log colors.blue.inverse('---------------------------------------------------------------------------------------')
     console.log colors.blue.bold.inverse(' SpinCycle messageRouter constructor. Version - '+pjson.version+' messages per second limit = '+@messagesPerSecond+' ')
-    console.log colors.blue.inverse('----------------------------------------------------------------------------------------')
+    console.log colors.blue.inverse('---------------------------------------------------------------------------------------')
     #console.dir @authMgr
     @authMgr.messagerouter = @
     @resolver = new ResolveModule()

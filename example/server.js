@@ -32,7 +32,7 @@
 
   port = process.env.PORT || 6602;
 
-  app.use(cors);
+  app.use(cors());
 
   app.use(session({
     secret: 'shhhhhhhhh'
@@ -43,8 +43,6 @@
   app.use(bodyParser.urlencoded({
     extended: true
   }));
-
-  "setTimeout(\n  ()=>\n    app.use(serveStatic(__dirname + '/app'))\n  ,2000\n)";
 
   app.use(cors());
 
