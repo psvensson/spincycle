@@ -6,6 +6,7 @@ DB              = require('./DB')
 ClientEndpoints = require('./ClientEndpoints')
 objStore        = require('./OStore')
 error           = require('./Error').error
+ResolveModule   = require('./ResolveModule')
 uuid            = require('node-uuid')
 
 debug = process.env["DEBUG"]
@@ -61,7 +62,7 @@ class ObjectManager
     if msg.modelname
       @messageRouter.resolver.resolve msg.modelname, (path) =>
         if debug then console.log 'onGetModelFor '+msg.modelname+' got back require path '+path
-        model = require(path)
+        model = ResolveModule.modulecache[msg.modelname]
         if debug then console.log 'got model resolved to'
         if debug then console.dir model.model
         rv = []

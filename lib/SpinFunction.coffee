@@ -19,5 +19,6 @@ class SpinFunction extends SuperModel
     q.resolve(@) 
 
 
+    
 
 module.exports = SpinFunction

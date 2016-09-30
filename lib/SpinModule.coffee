@@ -17,6 +17,7 @@ class SpinModule extends SuperModel
 
   constructor: (@record) ->
     return super
+    
 
   postCreate: (q) =>
       q.resolve(@) 
