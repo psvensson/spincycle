@@ -18,7 +18,7 @@
             <paper-button raised on-tap="changeModel">Change</paper-button>
             <paper-dialog style="padding:20px"  id="addmodeldialog">
                 <h2>Add {{item.type}}</h2>
-                <spin-allmodels client="{{client}}" user="{{user}}" incallbacks="{{dialogCallbacks}}" model="{{modeltype}}"></spin-allmodels>
+                <spin-allmodels client="{{client}}" user="{{user}}" incallbacks="{{dialogCallbacks}}" model="{{modeltype}}" itemselected="{{listitemselected}}"></spin-allmodels>
                 <div class="buttons">
                     <paper-button dialog-dismiss>Cancel</paper-button>
                     <paper-button dialog-confirm>Accept</paper-button>
@@ -38,7 +38,8 @@
                 modeltype:      {type: 'String'},
                 propname:       {type: 'String'},
                 incallbacks:    {type: 'Object'},
-                name:           {type: 'String'}
+                name:           {type: 'String'},
+                listitemselected:{type:'Object',notify:true, observer: 'onListItemSelected'}
             },
 
             changeModel: function(e)
@@ -50,9 +51,16 @@
               dialog.open()
             },
 
+            onListItemSelected: function(item)
+                                {
+                                    console.log('spin-directreference got listitemselected')
+                                    console.dir(item)
+                                    this.onDialogSelect(item)
+                                },
+
             onDialogSelect: function(item)
             {
-                console.log('======= spin-directreference onDialogSelect called')
+                console.log('======= spin-directreference onDialogSelect called. propname = '+this.propname)
                 console.dir(item)
                 this.set('name', item.name)
                 this.object = item
@@ -81,7 +89,7 @@
 
             getObjectForId: function()
             {
-                if(this.modelid)
+                if(this.modelid && this.modelid.length > 2)
                 {
                     this.client.emitMessage({target: '_get'+this.modeltype, type: this.modeltype, obj: {id: this.modelid, type: this.modeltype}}).then(function(obj)
                     {

@@ -1,7 +1,9 @@
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
-<link rel="import" href="./spin-list.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="spin-list.html">
 
 <dom-module id="spin-allmodels">
 
@@ -14,7 +16,17 @@
         <div>
             <h4>{{model}}</h4>
             <paper-button raised on-tap="newModel">New {{model}}</paper-button>
-            <spin-list client="{{client}}" delete="true" model="[[model]]" incallbacks="[[outCallbacks]]" spinitems="{{shownItems}}"></spin-list>
+            <div style="display:flex;flex-direction: row">
+                <paper-dropdown-menu value="{{searchproperty}}" label="Search property" style="margin-right:10px">
+                    <paper-menu class="dropdown-content" selected="name" attr-for-selected="data-value">
+                        <template is="dom-repeat" items="[[modelproperties]]">
+                            <paper-item data-value="{{item.name}}">{{item.name}}</paper-item>
+                        </template>
+                    </paper-menu>
+                </paper-dropdown-menu>
+                <paper-input label="Search Value" value="{{searchvalue}}"></paper-input>
+            </div>
+            <spin-list client="{{client}}" delete="true" model="[[model]]" itemselected="{{listitemselected}}" spinitems="{{shownItems}}"></spin-list>
             <template is="dom-repeat" items="[[listpages]]" as="p">
                 <paper-button on-tap="selectPage" value="{{p.foo}}"> {{p.foo}}</paper-button>
             </template>
@@ -31,12 +43,17 @@
             {
                 client:{type:'Object'},
                 model: {type: 'String', observer: 'onModelChange'},
-                incallbacks: {type: 'Object'}
+                incallbacks: {type: 'Object'},
+                listitemselected:    {type: 'Object', notify:true, observer: 'onListItemSelected'},
+                itemselected:    {type: 'Object', notify:true},
+                searchvalue:    {type:'String',observer:'onSearchChange'},
+                searchproperty:    {type:'String',observer:'onSearchChange' }
             },
 
             ready: function()
             {
                 // set up defaults
+
                 this.itemsPerPage = 20
                 this.listpages = []
                 this.currentPage = 0
@@ -46,6 +63,27 @@
                     onDelete: this.onDelete.bind(this)
                 }
                 this.renderStuff()
+            },
+
+            onListItemSelected: function(item)
+            {
+                console.log('spin-allmodels onListItemSelected for "'+this.model+'"')
+                console.dir(item)
+                this.set('itemselected', item)
+            },
+
+            onSearchChange:function(e)
+            {
+                console.dir('spin-allmodels onSearchChange called')
+                console.dir(e)
+                if(this.searchproperty && this.searchvalue)
+                {
+                    console.log('do search for '+this.searchproperty+' and '+this.searchvalue)
+                    if(this.client)
+                    {
+                        this.fetchPage()
+                    }
+                }
             },
 
             onModelChange: function()
@@ -60,6 +98,20 @@
              {
                  if(this.client && this.model)
                  {
+                     this.client.emitMessage({target: 'getModelFor', modelname: this.model}).then(function(mprops)
+                     {
+                         var props = []
+                         mprops.forEach(function(p)
+                         {
+                             if(p != 'kind' && p != 'order')
+                             {
+                                 props.push(p)
+                             }
+                         })
+                         props.push({name:'id'})
+
+                         this.set('modelproperties', props)
+                     }.bind(this))
                      if(this.listenerid)
                      {
                          this.client.deRegisterPopulationChangesSubscriber({ type: this.oldmodel, listenerid: this.listenerid})
@@ -133,7 +185,7 @@
                 if(this.model)
                 {
                     //console.log('------------------------------------- spin-allmodels fetchpage called for '+this.model)
-                    var q = {property: this.searchPropName, value: this.searchpropVal, limit:this.itemsPerPage, skip: this.itemsPerPage*this.currentPage}
+                    var q = {property: this.searchproperty, wildcard:true, value: this.searchvalue, limit:this.itemsPerPage, skip: this.itemsPerPage*this.currentPage}
                     this.client.emitMessage({ target:'_list'+this.model+'s', query: q}).then(function(newlist)
                     {
                         //console.log('spin-allmodels fetchpage got '+newlist.length+' items back')

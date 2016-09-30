@@ -1,0 +1,131 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+
+<link rel="import" href="spin-model.html">
+
+<dom-module id="spin-explorer">
+
+    <template>
+
+        <style>
+
+        </style>
+
+        <div>
+            <h4>Spin Explorer</h4>
+            <paper-listbox>
+                <paper-item>
+                    <template is="dom-repeat" items="{{breadcrumbs}}">
+                        <span on-tap="onClickBreadcrumb">{{item.name}} &gt;&nbsp; </span>
+                    </template>
+                </paper-item>
+                <spin-model client="{{client}}" style="padding:20px" selectedlistitem="{{selectedlistitem}}"
+                            model="{{selectedmodel}}" modelproperties="{{modelproperties}}"></spin-model>
+            </paper-listbox>
+        </div>
+    </template>
+
+    <script>
+        Polymer( {
+            is:         'spin-explorer',
+            properties: {
+                client:           {type: 'Object', observer: 'onClient'},
+                model:            {type: 'Object', observer: 'onModel'},
+                modelproperties:  {type: 'Array'},
+                breadcrumbs:      {
+                    type:  'Array',
+                    value: function ()
+                           {
+                               return [];
+                           }
+                },
+                selectedlistitem: {type: 'Object', observer: 'onSelectedListItem'}
+            },
+
+            onClickBreadcrumb: function ( e )
+                               {
+                                   var bc = e.model.item
+                                   if(bc.id != this.selectedmodel.id)
+                                   {
+                                       console.log( 'onClickBreadcrumb called' )
+                                       console.dir( bc )
+                                       this.cutBreadCrumbsAt( bc )
+                                       this.getModelpropertiesFor(bc)
+                                   }
+                               },
+
+            cutBreadCrumbsAt: function ( item )
+                              {
+                                  console.log('------------------------------------ breadcrumbs before')
+                                  console.dir(this.breadcrumbs)
+                                    var idx = -1
+                                    this.breadcrumbs.forEach(function(bc, i)
+                                    {
+                                        if(item.id == bc.id)
+                                        {
+                                            idx = i
+                                        }
+                                    })
+                                  if(idx > -1 && idx+1 < this.breadcrumbs.length)
+                                  {
+                                      console.log('cuttingbreadcrumbs at index '+idx)
+                                      this.splice('breadcrumbs',idx+1,1)
+                                  }
+                                  console.log('breadcrumbs after')
+                                  console.dir(this.breadcrumbs)
+                              },
+
+            onSelectedListItem: function ( item )
+                                {
+                                    console.log( 'spin-explorer onSelectedListitem called' )
+                                    console.dir( item )
+                                    if (this.model)
+                                    {
+                                        this.push('breadcrumbs', item)
+                                        this.getModelpropertiesFor(item)
+                                    }
+                                },
+
+            getModelpropertiesFor:function(item)
+                                  {
+                                      this.client.emitMessage({target: 'getModelFor', modelname: item.type}).then(function(mprops)
+                                      {
+                                          console.log('---------------------------------------------------spin-explorer setting modelprops to')
+                                          console.dir(mprops)
+                                          this.set( 'selectedmodel', item )
+                                          this.set('modelproperties', mprops)
+                                      }.bind(this))
+                                  },
+
+            ready: function ()
+                   {
+                       //console.log('*** spin-explorer ready. model = '+this.model)
+                   },
+
+            attached: function ()
+                      {
+                          this.listeners = {}
+                      },
+
+            onClient: function ()
+                      {
+                          if (this.client)
+                          {
+
+                          }
+                      },
+
+            onModel: function (item)
+                     {
+                         console.log( 'spin-explorer ****************************************************** onModel')
+                         this.onSelectedListItem(item)
+                            this.set('breadcrumbs',[item])
+                     }
+        } );
+
+    </script>
+
+</dom-module>

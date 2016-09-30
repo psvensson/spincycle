@@ -6,10 +6,9 @@
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
-<link rel="import" href="../bower_components/paper-input/paper-textarea.html">
 
 <link rel="import" href="spin-directreference.html">
-<link rel="import" href="my-objarray.html">
+<link rel="import" href="./my-objarray.html">
 
 <dom-module id="spin-model">
     <template>
@@ -32,11 +31,11 @@
                     <div style="display:flex; flex-direction:row">
                         <paper-item >
                             <template is="dom-if" if="{{isType(item,'array')}}">
-                                <spin-list propname="{{item.key}}" delete="true" incallbacks="[[outCallbacks]]" client="{{client}}" user="{{user}}" model="{{getTypeFor(item)}}" spinids="{{item.value}}"></spin-list>
+                                <spin-list propname="{{item.key}}" delete="true" incallbacks="[[outCallbacks]]" client="{{client}}" user="{{user}}" model="{{getTypeFor(item)}}" spinids="{{item.value}}" itemselected="{{selectedlistitem}}"></spin-list>
                                 <paper-button raised on-tap="addModel">Add {{getTypeFor(item)}}</paper-button>
                                 <paper-dialog style="padding:20px;overflow:auto"  id="addmodeldialog_{{getModelId()}}_{{getTypeFor(item)}}">
                                     <h2>Add {{item.type}}</h2>
-                                    <spin-allmodels client="{{client}}" user="{{user}}" incallbacks="{{dialogCallbacks}}" model="{{getTypeFor(item)}}"></spin-allmodels>
+                                    <spin-allmodels client="{{client}}" user="{{user}}" incallbacks="{{dialogCallbacks}}" listitemselected="{{dialoglistitemselected}}" model="{{getTypeFor(item)}}"></spin-allmodels>
                                     <div class="buttons">
                                         <paper-button dialog-dismiss>Cancel</paper-button>
                                         <paper-button dialog-confirm>Accept</paper-button>
@@ -44,7 +43,7 @@
                                 </paper-dialog>
                             </template>
                             <template is="dom-if" if="{{isType(item,'ref')}}">
-                                <spin-directreference client="{{client}}" user="{{user}}" incallbacks="{{dialogCallbacks}}" propname="{{item.key}}" modelid="{{item.value}}" modeltype="{{getTypeFor(item)}}"></spin-directreference>
+                                <spin-directreference client="{{client}}" user="{{user}}" incallbacks="{{dialogCallbacks}}" propname="{{item.key}}" modelid="{{item.value}}" modeltype="{{getTypeFor(item)}}" ></spin-directreference>
                             </template>
                             <template is="dom-if" if="{{isType(item,'scalar')}}">
                                 <paper-textarea id="{{item.key}}" label="{{item.key}}" disabled="{{item.disabled}}" type="text"  value="{{item.value::input}}" on-keyup="onInputChange" autoSave="true" stopKeyboardEventPropagation="true" style="width:600px">
@@ -66,9 +65,12 @@
             properties:
             {
                 client:{type:'Object'},
-                model:          {type: 'Object',  notify:true, value: function() {return new Object()} },
-                modelproperties: {type: 'Array', observer: '_onArray'},
+                model:          {type: 'Object',  notify:true, value: function() {return new Object()}, observer: 'onModelChanged' },
+                modelproperties: {type: 'Array', observer: 'onModelProperties'},
                 incallbacks:    {type: 'Object'},
+                selectedlistitem:{type:'Object', notify:true, observer:'onListItemSelect'},
+                dialoglistitemselected:{type:'Object', observer:'onDialogSelect'},
+
                 readonlyproperties: {type: 'Array', value: ['id']}
             },
 
@@ -92,6 +94,19 @@
                           //console.log("test._onArray", change.path);
                           //console.dir(change)
                       },
+
+            onModelProperties:function(props)
+                              {
+                                    console.log('spin-model ------ onModelProperties')
+                                    console.dir(props)
+                              },
+
+            onListItemSelect: function(item)
+            {
+                console.log('spin-model onListitemSelected')
+                //console.dir(item)
+                //this.onDialogSelect(item)
+            },
 
             onInputChange:function(e)
                           {
@@ -185,7 +200,10 @@
             {
                 var item = e.model.item
                 this.modeldialogitem = item
+                console.log('spin-model addModel called. opening dialog for item')
+                console.dir(item)
                 var id = "addmodeldialog_"+this.model.id+"_"+this.getTypeFor(item)
+                console.log('dialog id -> '+id)
                 var dialog = this.$$('#'+id)
                 dialog.open()
             },
@@ -233,6 +251,8 @@
                 console.log('======= spin-model onDialogSelect called')
                 console.dir(item)
                 var prop = this.modeldialogitem
+                console.log('saved prop is')
+                console.dir(prop)
                 //this.model[prop.name].push(item)
                 console.log('======= pushing '+item.type+' '+item.id+' onto array property '+prop.key)
                 var i = this.getIndexInArrayFor(prop.key)
@@ -306,6 +326,7 @@
                 {
                     this.incallbacks.onSelect(item)
                 }
+                this.set('selectedlistitem', item)
             },
 
             onDelete:function(e)
