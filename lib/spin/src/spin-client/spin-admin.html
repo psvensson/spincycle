@@ -13,6 +13,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="spin-alltypes.html">
 <link rel="import" href="spin-model.html">
 <link rel="import" href="spin-client.html">
+<link rel="import" href="spin-explorer.html">
 
 <dom-module id="spin-admin">
 
@@ -65,11 +66,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <spin-alltypes client="{{client}}" style="padding:20px" incallbacks="{{typeSelectCallbacks}}"></spin-alltypes>
                     <div style="display:flex; flex-direction: row">
                         <template is="dom-if" if="{{selectedType}}">
-                            <spin-allmodels client="{{client}}" style="padding:20px" incallbacks="{{outCallbacks}}" model="{{selectedType}}"></spin-allmodels>
-                            <spin-model client="{{client}}" style="padding:20px"  model="{{selectedmodel}}" modelproperties="{{selectedmodelproperties}}"></spin-model>
+                            <spin-allmodels client="{{client}}" style="padding:20px;width:300px" incallbacks="{{outCallbacks}}" model="{{selectedType}}" itemselected="{{selecteditem}}"></spin-allmodels>
+                            <spin-explorer client="{{client}}" style="padding:20px"  model="{{selectedmodel}}" modelproperties="{{selectedmodelproperties}}"></spin-explorer>
                         </template>
                     </div>
                 </template>
+                <template is="dom-if" if="{{reject}}">
+                    Ouch! Rejected.
+                </template>
+                <div>
+                    <ge-login client="{{client}}" user="{{user}}" reject="{{reject}}" on-reject-changed="rejectedChanged" loggedin="{{loggedin}}"></ge-login>
+                    <template is="dom-if" if="{{loggedin}}">
+                        <ge-navigation client="{{client}}" user="{{user}}"></ge-navigation>
+                    </template>
+                </div>
             </div>
             </p>
         </div>
@@ -85,7 +95,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 client:{type:'Object', notify: true, observer: 'onClientChanged'},
                 user:{type:'Object', notify: true},
                 reject:{type: Boolean, notify:true},
-                loggedin:{type: Boolean, notify:true}
+                loggedin:{type: Boolean, notify:true},
+                selecteditem:{type:'Object',observer:'onSelect'}
             },
 
             listeners:
