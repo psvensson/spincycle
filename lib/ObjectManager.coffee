@@ -44,7 +44,10 @@ class ObjectManager
     @updateObjectHooks.push hook
 
   onListTypes: (msg) =>
-    msg.replyFunc({status: e.general.SUCCESS, info: 'list types', payload: objStore.listTypes()})
+    types = []
+    for k,v of ResolveModule.modulecache
+      types.push k
+    msg.replyFunc({status: e.general.SUCCESS, info: 'list types', payload: types})
 
   onGetAccessTypesFor: (msg) =>
     if msg.modelname

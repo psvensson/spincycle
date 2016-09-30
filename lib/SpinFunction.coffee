@@ -8,7 +8,8 @@ class SpinFunction extends SuperModel
   @model =
     [
       {name: 'name',        public: true,   value: 'name',    default: 'Spin Function' }
-      {name: 'code',        public: true,   value: 'code',    default: ' ' }
+      {name: 'comment',     public: true,   value: 'comment',    default: ' ' }
+      {name: 'code',        public: true,   value: 'code',    default: ' ', code:true }
       {name: 'version',     public: true,   value: 'version', default: '0.1' }
     ]
 
