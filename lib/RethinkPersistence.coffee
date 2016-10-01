@@ -7,7 +7,7 @@ debug = process.env["DEBUG"]
 
 class RethinkPersistence
 
-  if process.env['RETHINKDB_PORT_28015_TCP_PORT'] then madr = 'rethinkdb' else madr = '127.0.0.1'
+  if process.env['RETHINKDB_HOST'] then madr = process.env['RETHINKDB_HOST'] else madr = '127.0.0.1'
   mport = process.env['RETHINKDB_PORT_28015_TCP_PORT'] or '28015'
 
   constructor: (@dburl, @DB) ->
