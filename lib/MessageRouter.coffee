@@ -68,7 +68,7 @@ class MessageRouter
 
   setup: () =>
     @addTarget 'listcommands', '<noargs>', (msg) =>
-      #console.log 'listCommands called'
+      #console.log 'listCommands  called'
       rv = {listcommands: '<noarg>'}
       for name, target of @targets
         #console.log 'adding target '+name
@@ -87,7 +87,7 @@ class MessageRouter
       @app.use '/spin/bower_components',express.static(p+'/bower_components')
       #if debug then console.dir @app._router
     else
-      console.log 'no app argument provided to MessageRouter! Unable to set up /spin route'
+      console.log 'no app  argument provided to MessageRouter! Unable to set up /spin route'
 
     console.log('**************** exposing SpinModule and SpinFunction')
     DB.createDatabases(['SpinModule', 'SpinFunction']).then ()=>
