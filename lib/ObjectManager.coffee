@@ -52,10 +52,10 @@ class ObjectManager
   onGetAccessTypesFor: (msg) =>
     if msg.modelname
       rv =
-        create: @messageRouter.authMgr.canUserCreateThisObject(msg.modelname, msg.user)
-        read:   @messageRouter.authMgr.canUserReadFromThisObject(msg.modelname, msg.user)
-        write:  @messageRouter.authMgr.canUserWriteToThisObject(msg.modelname, msg.user)
-        list:   @messageRouter.authMgr.canUserListTheseObjects(msg.modelname, msg.user)
+        create: @messageRouter.authMgr.canUserCreateThisObject(msg.modelname, msg.user, msg.sessionId)
+        read:   @messageRouter.authMgr.canUserReadFromThisObject(msg.modelname, msg.user, msg.sessionId)
+        write:  @messageRouter.authMgr.canUserWriteToThisObject(msg.modelname, msg.user, msg.sessionId)
+        list:   @messageRouter.authMgr.canUserListTheseObjects(msg.modelname, msg.user, msg.sessionId)
 
       msg.replyFunc({status: e.general.SUCCESS, info: 'access types for '+msg.modelname, payload: rv})
     else
@@ -158,7 +158,7 @@ class ObjectManager
       msg.replyFunc({status: e.general.FAILURE, info: '_getObject for '+msg.type+' missing parameter', payload: null })
 
   getAggregateObjects: (msg) =>
-    if not @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user)
+    if not @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user, msg.sessionId)
       msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to list objects of type '+msg.type, payload: msg.type})
     else
       rv = objStore.listObjectsByType(msg.obj.type)
@@ -422,7 +422,7 @@ class ObjectManager
       if debug then console.log 'onRegisterForUpdatesOn  called for '+msg.obj.type+' '+msg.obj.id
       DB.getFromStoreOrDB(msg.obj.type, msg.obj.id).then( (obj) =>
         if obj && obj.id
-          if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
+          if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user, msg.sessionId)
             rememberedListenerId = undefined
             listenerId = objStore.addListenerFor(msg.obj.id, msg.obj.type, (uobj) =>
               #console.log '--------------------- onRegisterForUpdates on callback sending update of object '+msg.obj.id+' type '+msg.obj.type+' to client'
