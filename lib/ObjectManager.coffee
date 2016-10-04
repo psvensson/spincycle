@@ -77,7 +77,7 @@ class ObjectManager
   #---------------------------------------------------------------------------------------------------------------------
   _createObject: (msg) =>
     if msg.obj and msg.obj.type
-      if @messageRouter.authMgr.canUserCreateThisObject(msg.obj.type, msg.user)
+      if @messageRouter.authMgr.canUserCreateThisObject(msg.obj.type, msg.user, msg.sessionId)
         if debug then console.log 'objmgr.createObject called'
         if debug then console.dir msg
         msg.obj.createdAt = Date.now()
@@ -100,7 +100,7 @@ class ObjectManager
       objStore.getObject(msg.obj.id, msg.obj.type).then (obj) =>
         #console.log 'got object form objstore -> '+obj
         if obj
-          if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user, msg.obj)
+          if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user, msg.obj, msg.sessionId)
             #console.log 'user could write this object'
             #console.dir obj
             DB.remove obj, (removestatus) =>
@@ -139,7 +139,7 @@ class ObjectManager
             if debug then '_getObject got back obj from getObjectPullThrough: '
             #if debug then console.dir obj
             if obj
-              if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user)
+              if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user, msg.sessionId)
                 tc = obj.toClient()
                 if debug then console.log '_getObject for '+msg.type+' returns '+JSON.stringify(tc)
                 #if debug then console.dir tc
@@ -168,7 +168,7 @@ class ObjectManager
   _listObjects: (msg) =>
     if debug then console.log 'listObjects called for type '+msg.type
     if typeof msg.type != 'undefined'
-      if @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user) == no
+      if @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user, msg.sessionId) == no
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to list objects of type '+msg.type, payload: msg.type})
       else
         if msg.query
@@ -188,7 +188,7 @@ class ObjectManager
   _countObjects: (msg) =>
     console.log 'countObjects called for type '+msg.type
     if typeof msg.type != 'undefined'
-      if @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user) == no
+      if @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user, msg.sessionId) == no
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to count objects of type '+msg.type, payload: msg.type})
       else
         DB.count(msg.type).then (v)=>
@@ -289,7 +289,7 @@ class ObjectManager
         #console.dir obj
         if obj
           #console.log 'have an object'
-          canwrite = @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user, msg.obj)
+          canwrite = @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user, msg.obj, msg.sessionId)
           if canwrite
             #console.log 'can write'
             # Make sure to resolve object references in arrays and hashtables
