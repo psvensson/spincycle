@@ -6,12 +6,13 @@
 
 <link rel="import" href="../bower_components/polymer-cookie/polymer-cookie.html">
 
-<dom-module id="ge-login">
+<dom-module id="spin-client">
     <template>
         <style>
 
         </style>
-        <polymer-cookie id="sidcookie" name="sid"></polymer-cookie>
+        foo
+        <polymer-cookie id="sidcookie" name="sid" auto-set="true"></polymer-cookie>
     </template>
 
     <script>
@@ -59,8 +60,10 @@
                           this.set('client', window.spinclient)
                           this.client.setUser = this.onUserChanged.bind( this )
                           this.client.onFailure = this.onFailure.bind(this)
-                          cookie = Polymer.dom(document).querySelector('#sidcookie')
-                          this.client.setSessionId(cookie)
+                          cookie = this.$.sidcookie
+                          sid = cookie.readCookie()
+                          console.log('existing sid cookie = '+sid)
+                          this.client.setSessionId(sid)
                           this.addEventListener('user-changed', this.onUserChanged.bind(this))
                       },
 
