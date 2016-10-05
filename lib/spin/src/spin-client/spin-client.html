@@ -12,7 +12,7 @@
 
         </style>
         foo
-        <polymer-cookie id="sidcookie" name="sid" auto-set="true"></polymer-cookie>
+        <polymer-cookie id="sidcookie" name="sid" ></polymer-cookie>
     </template>
 
     <script>
@@ -33,7 +33,25 @@
 
             ready: function()
                    {
+                       (function(){
+                           var cookies;
 
+                           function readCookie(name,c,C,i){
+                               if(cookies){ return cookies[name]; }
+
+                               c = document.cookie.split('; ');
+                               cookies = {};
+
+                               for(i=c.length-1; i>=0; i--){
+                                   C = c[i].split('=');
+                                   cookies[C[0]] = C[1];
+                               }
+
+                               return cookies[name];
+                           }
+
+                           window.readCookie = readCookie; // or expose it however you want
+                       })();
                    },
 
             onUserChanged: function ( e )
@@ -61,8 +79,11 @@
                           this.client.setUser = this.onUserChanged.bind( this )
                           this.client.onFailure = this.onFailure.bind(this)
                           cookie = this.$.sidcookie
-                          sid = cookie.readCookie()
+                          var sid = cookie.readCookie()
+                          console.log('all cookies are: '+document.cookie)
                           console.log('existing sid cookie = '+sid)
+                          var wsid = window.readCookie('sid')
+                          console.log('window.readcookie says... '+wsid)
                           this.client.setSessionId(sid)
                           this.addEventListener('user-changed', this.onUserChanged.bind(this))
                       },
