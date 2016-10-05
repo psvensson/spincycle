@@ -4,12 +4,14 @@
 <script src="/socket.io/socket.io.js"></script>
 <script src="spinclient.js"></script>
 
+<link rel="import" href="../bower_components/polymer-cookie/polymer-cookie.html">
+
 <dom-module id="ge-login">
     <template>
         <style>
 
         </style>
-
+        <polymer-cookie id="sidcookie" name="sid"></polymer-cookie>
     </template>
 
     <script>
@@ -56,7 +58,9 @@
                           console.log('spin-client attached.')
                           this.set('client', window.spinclient)
                           this.client.setUser = this.onUserChanged.bind( this )
-                          this.client.oNfailure = this.onFailure.bind(this)
+                          this.client.onFailure = this.onFailure.bind(this)
+                          cookie = Polymer.dom(document).querySelector('#sidcookie')
+                          this.client.setSessionId(cookie)
                           this.addEventListener('user-changed', this.onUserChanged.bind(this))
                       },
 
