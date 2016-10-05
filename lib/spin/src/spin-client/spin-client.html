@@ -44,8 +44,13 @@
 
                                for(i=c.length-1; i>=0; i--){
                                    C = c[i].split('=');
-                                   cookies[C[0]] = C[1];
+                                   if(C[1])
+                                   {
+                                       cookies[C[0]] = C[1];
+                                   }
                                }
+                               console.log('---- cookies----')
+                               console.dir(cookies)
 
                                return cookies[name];
                            }
