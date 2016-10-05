@@ -1,6 +1,7 @@
 uuid            = require('node-uuid')
 url             = require('url')
 basicAuth       = require('basic-auth')
+cookies         = require('cookies')
 
 debug = process.env["DEBUG"]
 
@@ -26,11 +27,12 @@ class HttpMethod
             return
       ip    = req.connection.remoteAddress
       port  = req.connection.remotePort
+      cookies = cookie.parse(req.headers.cookie or '')
       console.log 'express request from '+ip+':'+port+' target is "'+req.query.target+'"'
       #console.dir req.query
       target = HttpMethod.httproutes[req.query.target]
       if target
-        message = { client: ip+':'+port, target: req.query.target, messageId: url_parts.messageId || uuid.v4() }
+        message = { client: ip+':'+port, target: req.query.target, messageId: url_parts.messageId || cookies.sid || uuid.v4() }
         for p, part of url_parts
           message[p] = part # TODO: Guard against hax0r dataz
         #console.log 'message is now'
