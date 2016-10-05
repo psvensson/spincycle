@@ -32,7 +32,7 @@ class HttpMethod
       #console.dir req.query
       target = HttpMethod.httproutes[req.query.target]
       if target
-        message = { client: ip+':'+port, target: req.query.target, messageId: url_parts.messageId || cookies.sid || uuid.v4() }
+        message = { client: ip+':'+port, target: req.query.target, messageId: url_parts.messageId || uuid.v4(), sessionId: cookies.sid }
         for p, part of url_parts
           message[p] = part # TODO: Guard against hax0r dataz
         #console.log 'message is now'
