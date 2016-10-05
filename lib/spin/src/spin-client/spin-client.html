@@ -89,7 +89,7 @@
                           console.log('existing sid cookie = '+sid)
                           var wsid = window.readCookie('sid')
                           console.log('window.readcookie says... '+wsid)
-                          this.client.setSessionId(sid)
+                          this.client.setSessionId(sid || wsid)
                           this.addEventListener('user-changed', this.onUserChanged.bind(this))
                       },
 
