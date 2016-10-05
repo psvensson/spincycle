@@ -1,6 +1,7 @@
 IO              = require("socket.io")
 uuid            = require('node-uuid')
 ClientEndpoints = require('./ClientEndpoints')
+cookies         = require('cookies')
 
 debug = process.env["DEBUG"]
 
@@ -31,6 +32,8 @@ class WsMethod
 
         data.client    = ip+':'+port
         data.messageId = data.messageId || uuid.v4()
+        cookies = cookie.parse(req.headers.cookie or '')
+        data.sessionId = cookies.sessionId
         data.replyFunc = (replydata) ->
           replydata.messageId = data.messageId
           #if debug then console.log 'replyFunc replying with'
