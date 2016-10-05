@@ -28,7 +28,7 @@ class HttpMethod
       ip    = req.connection.remoteAddress
       port  = req.connection.remotePort
       cookies = cookie.parse(req.headers.cookie or '')
-      console.log 'express request from '+ip+':'+port+' target is "'+req.query.target+'"'
+      console.log 'express request from '+ip+':'+port+' target is "'+req.query.target+'" cookies are '+req.headers.cookie
       #console.dir req.query
       target = HttpMethod.httproutes[req.query.target]
       if target
