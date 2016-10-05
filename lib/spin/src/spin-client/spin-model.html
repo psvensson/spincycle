@@ -50,6 +50,9 @@
                                 <paper-textarea id="{{item.key}}" label="{{item.key}}" disabled="{{item.disabled}}" type="text"  value="{{item.value::input}}" on-keyup="onInputChange" autoSave="true" stopKeyboardEventPropagation="true" style="width:600px">
                                 </paper-textarea>
                             </template>
+                            <template is="dom-if" if="{{isType(item,'time')}}">
+                                <paper-input type="date" label="{{item.key}}" value="{{getDateFor(item.value)}}"></paper-input>
+                            </template>
                         </paper-item>
                     </div>
                 </template>
@@ -75,6 +78,28 @@
                 readonlyproperties: {type: 'Array', value: ['id']}
             },
 
+            getDateFor: function(dstr)
+            {
+                console.log('getDateFor for '+dstr)
+                var d = new Date(dstr)
+                var yyyy = d.getUTCFullYear()
+                var _month = (d.getUTCMonth()+1).toString()
+                var month = _month
+                if (_month.length == 1)
+                {
+                    month = "0"+_month
+                }
+                var _day = d.getUTCDate().toString()
+                var day = _day
+                if (_day.length == 1)
+                {
+                    day = "0"+_day
+                }
+                var date = yyyy+'-'+month+'-'+day
+                console.log('d = '+date)
+                return date
+            },
+
             beforeRegister: function()
                             {
                                 this.observers =
@@ -98,7 +123,7 @@
 
             onModelProperties:function(props)
                               {
-                                    console.log('spin-model ------ onModelProperties')
+                                    console.log('spin-model *------ onModelProperties')
                                     console.dir(props)
                               },
 
@@ -158,7 +183,7 @@
                     if(prop.name == item.key)
                     {
                         //console.log('found '+prop.name)
-                        if(what == 'scalar' && !prop.array && !prop.type)
+                        if(what == 'scalar' && !prop.array && !prop.type && prop.name.indexOf('At') == -1)
                         {
                             rv = true
                         }
@@ -167,6 +192,10 @@
                             rv = true
                         }
                         if(what == 'ref' && prop.type && !(prop.array == true))
+                        {
+                            rv = true
+                        }
+                        if(what == 'time' && prop.name.indexOf('At') > -1)
                         {
                             rv = true
                         }
