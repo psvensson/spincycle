@@ -1,7 +1,7 @@
 uuid            = require('node-uuid')
 url             = require('url')
 basicAuth       = require('basic-auth')
-cookies         = require('cookies')
+cookie         = require('cookie')
 
 debug = process.env["DEBUG"]
 
@@ -41,6 +41,8 @@ class HttpMethod
           res.json(reply)
           if debug then console.log 'HttpMethod calling target '+target
         target(message)
+      else
+        res.json({error:'target not found'})
     @doSend = doSend
 
     app.get basePath, (req, res) ->
