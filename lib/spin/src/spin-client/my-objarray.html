@@ -34,13 +34,13 @@
                     for(let i in this.object) {
                         console.log('objarray converting property '+i+': '+this.object[i])
                         var val = this.object[i]
-                        /*
-                        if(this.object[i].toString().indexOf('{"') > -1)
+                        var sobj = this.object[i].toString()
+                        if(sobj.indexOf('{') > -1 && sobj.indexOf('}') > -1)
                         {
-                            val = JSON.parse(this.object[i].toString())
+                            val = this.object[i].toString()
                             console.log('  parsing val to '+val)
                         }
-                        */
+
                         this.push("array", {key:i, value:val});
                     }
                 }
