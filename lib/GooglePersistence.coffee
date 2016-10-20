@@ -1,4 +1,4 @@
-gcloud  = require('gcloud')
+gcloud  = require('google-cloud')
 defer   = require('node-promise').defer
 debug   = process.env["DEBUG"]
 
@@ -38,7 +38,8 @@ class GooglePersistence
           cb()
         else
           if debug then console.log 'Google.all returns '+entities.length+' entities'
-          result = entities.map (el)->el.data
+          #if debug then console.dir entities
+          result = entities
           #if debug then console.dir result
           cb(result)
 
@@ -66,20 +67,32 @@ class GooglePersistence
 
   get: (_type, id, cb) =>
     type = _type.toLowerCase()
-    #if debug then console.log 'Google.get called type = '+type+' id = '+id
+    if debug then console.log 'Google.get called type = '+type+' id = '+id
     @getDbFor(type).then (db)=>
       key = db.key([type, id])
       #if debug then console.log '-- Google.get key for '+type+' became '
       #if debug then console.dir key
-      db.get {key:key}, (err, entity) =>
-        if err
-          if debug then console.log 'Google.get ERROR: '+err
-          if debug then console.dir err
-          cb()
-        else
-          if debug then console.log 'Google.get returns entity for '+type+' id = '+id
-          if debug then console.dir entity
-          cb(entity.value)
+      try
+        db.get key,(err, entity) =>
+          if err
+            if debug then console.log 'Google.get ERROR: '+err
+            if debug then console.dir err
+            cb()
+          else
+            if debug then console.log 'Google.get returns entity for '+type+' id = '+id
+            if debug then console.dir entity
+            cb(entity.value)
+      catch ee
+        console.log 'get error '+ee+' for key '
+        console.dir key
+
+  extend: (_type, id, field, def) =>
+    q = defer()
+    @get _type,id,(o)=>
+      if o and not o[field]
+        o[field] = def
+        @set _type,o, (setdone)=>q.resolve(o)
+    return q
 
   find: (_type, property, _value) =>
     @findMany(_type, property, _value)
@@ -88,19 +101,21 @@ class GooglePersistence
     q = defer()
     value = _value or ""
     type = _type.toLowerCase()
-    if debug then console.log 'Google.findMany called for '+type+' filtering on '+property+' = '+value
+    console.log '=============== Google.findMany called for '+type+' filtering on '+property+' = '+value
     @getDbFor(type).then (db)=>
       query = db.createQuery(type).limit(10000).filter(property, '=', value)
-      db.runQuery query, (err, entities) ->
+      db.runQuery query, (err, entities, info) ->
+        console.log 'google.findMany result info: '+info
+        console.dir info
         if err
           if debug then console.log 'Google.findMany ERROR: '+err
           if debug then console.dir err
           q.resolve()
         else
-          if debug then console.log 'Google.all returns '+entities.length+' entities'
-          #if debug then console.dir entities
-          result = entities.map (el)->el.data
-          q.resolve(result)
+          console.log 'Google.all returns '+entities.length+' entities'
+          console.dir entities
+          #result = entities.map (el)->el.data
+          q.resolve(entities)
     return q
 
   findQuery: (_type, query) =>
@@ -116,8 +131,8 @@ class GooglePersistence
     #if debug then console.dir obj
     @getDbFor(type).then (db)=>
       if not obj.id
-        key = db.key(type)
-        obj.id = key.path[1]
+        if debug then console.log '-- Google.set called for '+type+' - '+JSON.stringify(obj)
+        xyzzy
       else
         key = db.key([type, obj.id])
       if debug then console.log '-- Google.set key for '+type+' became '

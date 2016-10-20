@@ -131,7 +131,8 @@ describe 'Spincycle Model Tests', ->
     #console.log '------------------------------------- before called'
     authMgr         = new AuthenticationManager()
     #messageRouter   = new SpinCycle(authMgr, null, 10, app, 'mongodb')
-    messageRouter   = new SpinCycle(authMgr, null, 10, app, 'rethinkdb')
+    #messageRouter   = new SpinCycle(authMgr, null, 10, app, 'rethinkdb')
+    messageRouter   = new SpinCycle(authMgr, null, 10, app, 'google')
     httpMethod = new SpinCycle.HttpMethod(messageRouter, app, '/api/')
     app.listen(8008)
     ResolveModule.modulecache['foo'] = Foo

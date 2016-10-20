@@ -197,6 +197,8 @@ class ObjectManager
       msg.replyFunc({status: e.general.FAILURE, info: '_listObjects missing parameter', payload: null })
 
   parseList: (_records, msg) =>
+    #console.log 'parseList for records..'
+    #console.dir _records
     checkFinish = (rv)=>
       if --count == 0
         if debug then console.log 'ObjectManager.parseList returns '+rv.length+' records'

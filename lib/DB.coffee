@@ -111,13 +111,14 @@ class DB
                   else if mprop.type then mprop.default = ''
                 #console.log '   setting new property '+mprop.name+' to default value of '+mprop.default+' on object type '+ro.type+' id '+ro.id
                 #ro[mprop.name] = mprop.default or ''
-                @extend(ro.type, ro.id, mprop.name, mprop.default).then (o)=>
-                  @lru.set(o.id, o)
-                  if --count == 0
-                    end = Date.now()
-                    diff = parseInt((end - start)/1000)
-                    console.log 'extendSchemaIfNeeded done for '+res.length+' objects. runtime = '+diff+' seconds'
-                    q.resolve()
+                if ro
+                  @extend(ro.type, ro.id, mprop.name, mprop.default).then (o)=>
+                    @lru.set(ro.id, ro)
+                    if --count == 0
+                      end = Date.now()
+                      diff = parseInt((end - start)/1000)
+                      console.log 'extendSchemaIfNeeded done for '+res.length+' objects. runtime = '+diff+' seconds'
+                      q.resolve()
               #@set ro.type, ro, ()=> if --count == 0 then q.resolve()
           else
             q.resolve()
@@ -201,6 +202,8 @@ class DB
 
   @findMany: (type, property, value) =>
     q = defer()
+    console.log 'DB.findMany called'
+    console.dir arguments
     @getDataStore().then (store) => store.findMany(type, property, value).then (results) =>
       if debug then console.log 'DB.findMany results are..'
       if debug then console.dir results
@@ -208,6 +211,8 @@ class DB
         console.log 'DB.findMany type '+type+', property '+property+', value '+value+' got back '+results
         q.resolve([])
       else
+        #console.log 'DB.findMany got back'
+        #console.dir results
         results.forEach (result) => @lru.set(result.id, result)
         q.resolve(results)
     return q
@@ -216,7 +221,6 @@ class DB
     q = defer()
     @getDataStore().then (store)=> store.findQuery(type, query).then (results) =>
       if results and results.length and results.length > 0
-
         if debug then console.log ' DB.findQuery got back '
         if debug then console.dir results
         results.forEach (result) =>
@@ -239,7 +243,8 @@ class DB
     return q
 
   @get: (type, ids) =>
-
+    if not type or not ids
+      xyzzy
     toarr = (x)->
       if !Array.isArray(x)
         if debug then console.dir x
@@ -256,6 +261,7 @@ class DB
       console.dir id
       q.resolve(null)
     else
+      #console.log 'DB.get id is '+id
       rv = @lru.get id
       if rv
         if debug then console.log 'DB found '+id+'  in lru: '+rv
