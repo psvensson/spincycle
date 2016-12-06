@@ -87,6 +87,7 @@ class ObjectManager
         if debug then console.dir msg.obj
         SuperModel.resolver.createObjectFrom(msg.obj).then (o) =>
           o.serialize().then () =>
+            @messageRouter.gaugeMetric('create',1,{type:  msg.obj.type,'username': msg.user.name, 'useremail': msg.user.email, 'provider': msg.user.provider, 'organization': msg.user.organization})
             msg.replyFunc({status: e.general.SUCCESS, info: 'new '+msg.obj.type, payload: o})
       else
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to create objects of that type', payload: msg.obj.type})
@@ -104,6 +105,7 @@ class ObjectManager
             #console.log 'user could write this object'
             #console.dir obj
             DB.remove obj, (removestatus) =>
+              @messageRouter.gaugeMetric('delete', 1, {type:  msg.obj.type, 'username': msg.user.name, 'useremail': msg.user.email, 'provider': msg.user.provider, 'organization': msg.user.organization})
               #console.log 'object removed callback'
               sublist = @populationListeners[msg.type] or {}
               for k,client of sublist
@@ -143,6 +145,7 @@ class ObjectManager
                 tc = obj.toClient()
                 if debug then console.log '_getObject for '+msg.type+' returns '+JSON.stringify(tc)
                 #if debug then console.dir tc
+                @messageRouter.gaugeMetric('get', 1, {type:msg.type,'username': msg.user.name, 'useremail': msg.user.email, 'provider': msg.user.provider, 'organization': msg.user.organization})
                 msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: tc})
               else
                 console.log '_getObject got NOT ALLOWED for user '+msg.user.id+' for '+msg.type+' id '+obj.id
@@ -189,6 +192,7 @@ class ObjectManager
     console.log 'countObjects called for type '+msg.type
     if typeof msg.type != 'undefined'
       if @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user, msg.sessionId) == no
+        @messageRouter.gaugeMetric('count', 1, {type: msg.type, 'username': msg.user.name, 'useremail': msg.user.email, 'provider': msg.user.provider, 'organization': msg.user.organization})
         msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to count objects of type '+msg.type, payload: msg.type})
       else
         DB.count(msg.type).then (v)=>
@@ -199,6 +203,7 @@ class ObjectManager
   parseList: (_records, msg) =>
     #console.log 'parseList for records..'
     #console.dir _records
+    @messageRouter.gaugeMetric('list', 1, {type: msg.type, 'username': msg.user.name, 'useremail': msg.user.email, 'provider': msg.user.provider, 'organization': msg.user.organization})
     checkFinish = (rv)=>
       if --count == 0
         if debug then console.log 'ObjectManager.parseList returns '+rv.length+' records'
@@ -312,6 +317,7 @@ class ObjectManager
                     #console.log 'final object update result------>'
                     #console.log record
                     @updateObjectHooks.forEach (hook) => hook(record)
+                    @messageRouter.gaugeMetric('update', 1, {type: msg.obj.type,'username': msg.user.name, 'useremail': msg.user.email, 'provider': msg.user.provider, 'organization': msg.user.organization})
                     msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
             else
               console.log 'object update fail: data is TRASHED!!!!'

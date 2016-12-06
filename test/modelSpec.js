@@ -261,7 +261,8 @@
     })(SuperModel);
     before(function(done) {
       authMgr = new AuthenticationManager();
-      messageRouter = new SpinCycle(authMgr, null, 10, app, 'google');
+      messageRouter = new SpinCycle(authMgr, null, 10, app, 'rethinkdb');
+      "options = {\n  api_key: \"8a8c68a6193ac76c501f49b08e3a105f\",\n  app_key: \"1b9c45f6638bd01d8ef4c474ec87e15487f644a2\",\n  #api_version: 'v1.5',\n  api_host: 'app.datadoghq.com'\n}\nmessageRouter   = new SpinCycle(authMgr, null, 10, app, 'google', options)";
       httpMethod = new SpinCycle.HttpMethod(messageRouter, app, '/api/');
       app.listen(8008);
       ResolveModule.modulecache['foo'] = Foo;
@@ -421,7 +422,9 @@
             umsg = {
               obj: bar,
               user: {
-                isAdmin: true
+                isAdmin: true,
+                email: 'foo@bar.com',
+                name: 'Mr. Xyzzy'
               },
               replyFunc: function(ureply) {
                 expect(ureply.status).to.equal('SUCCESS');
@@ -968,6 +971,45 @@
           })(this));
         });
       });
+    });
+    it('should be able to do an ordered search', function(done) {
+      var _x, count, foorefs, j, max, ref, results;
+      foorefs = [];
+      max = 10;
+      count = max - 1;
+      count++;
+      results = [];
+      for (_x = j = 0, ref = max; 0 <= ref ? j <= ref : j >= ref; _x = 0 <= ref ? ++j : --j) {
+        results.push((function(x) {
+          var foo;
+          foo = {
+            id: 'order_foo_' + x,
+            name: 'order_foo_' + x,
+            value: 'name_' + x,
+            type: 'Foo'
+          };
+          return new Foo(foo).then(function(sres) {
+            return sres.serialize().then(function() {
+              var query;
+              if (--count === 0) {
+                query = {
+                  sort: 'createdBy',
+                  skip: 0,
+                  limit: '10'
+                };
+                return DB.all('Foo', query, (function(_this) {
+                  return function(records) {
+                    console.log('---------------------orderBy search result');
+                    console.dir(records);
+                    return done();
+                  };
+                })(this));
+              }
+            });
+          });
+        })(_x));
+      }
+      return results;
     });
     it('should get an error message when sending too many requests per second', function(done) {
       var count, failure, i, j, msg, results, user;

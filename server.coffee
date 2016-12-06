@@ -15,10 +15,17 @@ server.listen port, ->
 #app.use express.static("lib")
 app.use(cors())
 app.options('*', cors())
+ddoptions = {
+  api_key: "8a8c68a6193ac76c501f49b08e3a105f",
+  app_key: "1b9c45f6638bd01d8ef4c474ec87e15487f644a2",
+  #api_version: 'v1.5',
+  api_host: 'app.datadoghq.com'
+}
+
 
 #--------------------------------------------------> Set up Message Router
 authMgr         = new AuthenticationManager()
-messageRouter   = new SpinCycle(authMgr, null, null, app, 'rethinkdb')
+messageRouter   = new SpinCycle(authMgr, null, null, app, 'rethinkdb', ddoptions)
 #--------------------------------------------------> Express Routing
 new SpinCycle.HttpMethod(messageRouter, app, '/api/')
 #<-------------------------------------------------- Express Routing

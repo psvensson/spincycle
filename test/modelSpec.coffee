@@ -131,8 +131,16 @@ describe 'Spincycle Model Tests', ->
     #console.log '------------------------------------- before called'
     authMgr         = new AuthenticationManager()
     #messageRouter   = new SpinCycle(authMgr, null, 10, app, 'mongodb')
-    #messageRouter   = new SpinCycle(authMgr, null, 10, app, 'rethinkdb')
-    messageRouter   = new SpinCycle(authMgr, null, 10, app, 'google')
+    messageRouter   = new SpinCycle(authMgr, null, 10, app, 'rethinkdb')
+    """
+    options = {
+      api_key: "8a8c68a6193ac76c501f49b08e3a105f",
+      app_key: "1b9c45f6638bd01d8ef4c474ec87e15487f644a2",
+      #api_version: 'v1.5',
+      api_host: 'app.datadoghq.com'
+    }
+    messageRouter   = new SpinCycle(authMgr, null, 10, app, 'google', options)
+    """
     httpMethod = new SpinCycle.HttpMethod(messageRouter, app, '/api/')
     app.listen(8008)
     ResolveModule.modulecache['foo'] = Foo
@@ -244,6 +252,8 @@ describe 'Spincycle Model Tests', ->
             obj: bar
             user:
               isAdmin: true
+              email: 'foo@bar.com'
+              name: 'Mr. Xyzzy'
             replyFunc: (ureply)->
               #console.log 'update reply was'
               #console.dir(ureply)
@@ -597,6 +607,24 @@ describe 'Spincycle Model Tests', ->
           #console.dir records
           expect(records.length).to.equal(1)
           done()
+
+  it 'should be able to do an ordered search', (done)->
+    foorefs = []
+    max = 10
+    count = max-1
+    count++
+    for _x in [0..max]
+      ((x)->
+        foo = {id: 'order_foo_'+x, name: 'order_foo_'+x, value: 'name_'+x, type: 'Foo'}
+        new Foo(foo).then (sres) ->
+          sres.serialize().then ()->
+            if --count == 0
+              query = {sort:'createdBy', skip:0, limit:'10'}
+              DB.all 'Foo', query, (records) =>
+                console.log '---------------------orderBy search result'
+                console.dir records
+                done()
+      )(_x)
 
   it 'should get an error message when sending too many requests per second', (done)->
     user = { name: 'foo', id:17}

@@ -48,10 +48,19 @@ class GooglePersistence
     type = _type.toLowerCase()
     q = defer()
     @getDbFor(type).then (db)=>
-      query = db.createQuery('__Stat_spincycle_'+type+'__')
-      count = query.getproeprties('count')
-      console.log 'Google.count return '+count
-      q.resolve(count)
+      #qq = '__Stat_spincycle_'+type+'__'
+      qq = type
+      console.dir '---------------------------------------query is '+qq
+      query = db.createQuery(qq).select('__key__')
+      db.runQuery query, (err, entities, endCursor)=>
+        if err
+          console.log 'Google.count error: '+err
+          console.dir err
+          q.resolve()
+        else
+          console.log 'Google.count returns '+entities.length
+          #console.dir arguments
+          q.resolve(entities.length)
       """
       db.runQuery query, (err, entities) ->
         if err
@@ -67,7 +76,7 @@ class GooglePersistence
 
   get: (_type, id, cb) =>
     type = _type.toLowerCase()
-    if debug then console.log 'Google.get called type = '+type+' id = '+id
+    #console.log 'Google.get called type = '+type+' id = '+id
     @getDbFor(type).then (db)=>
       key = db.key([type, id])
       #if debug then console.log '-- Google.get key for '+type+' became '
@@ -85,25 +94,32 @@ class GooglePersistence
       catch ee
         console.log 'get error '+ee+' for key '
         console.dir key
+        cb()
 
   extend: (_type, id, field, def) =>
+    #console.log 'google extend called'
     q = defer()
     @get _type,id,(o)=>
+      #console.log 'google.get done'
       if o and not o[field]
         o[field] = def
-        @set _type,o, (setdone)=>q.resolve(o)
+        @set _type,o,(setdone)=>
+          #console.log 'google set done'
+          q.resolve(o)
+      else
+        q.resolve(o)
     return q
 
   find: (_type, property, _value) =>
     @findMany(_type, property, _value)
 
-  findMany: (_type, property, _value) =>
+  findMany: (_type, property, _value, query) =>
     q = defer()
     value = _value or ""
     type = _type.toLowerCase()
     console.log '=============== Google.findMany called for '+type+' filtering on '+property+' = '+value
     @getDbFor(type).then (db)=>
-      query = db.createQuery(type).limit(10000).filter(property, '=', value)
+      query = db.createQuery(type).limit(query?.limit or 10000).filter(property, '=', value)
       db.runQuery query, (err, entities, info) ->
         console.log 'google.findMany result info: '+info
         console.dir info
@@ -119,7 +135,7 @@ class GooglePersistence
     return q
 
   findQuery: (_type, query) =>
-    @findMany(_type, query.property, query.value)
+    @findMany(_type, query.property, query.value, query)
 
   # datastore doesn't support wildcard text searches :/
   search: (_type, property, _value) =>

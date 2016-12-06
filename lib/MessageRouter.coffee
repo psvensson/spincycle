@@ -18,7 +18,8 @@ path            = require('path')
 defer           = require('node-promise').defer
 serveStatic     = require('serve-static')
 colors          = require('colors/safe')
-
+DDAPI           = require('./DDAPI')
+StatsD          = require('node-statsd').StatsD
 
 # The MessageRouter registers names on which messages can be sent.
 # The idea is to abstract away different messaging methods (WS, WebRTC, HTTP) from the logic
@@ -36,10 +37,11 @@ class MessageRouter
   @OStore = OStore
   @ResolveModule = ResolveModule
   @status = 'closed'
+  @dogstatsd = undefined
 
   debug = process.env["DEBUG"]
 
-  constructor: (@authMgr, dburl, msgPS, @app, dbtype = 'mongodb') ->
+  constructor: (@authMgr, dburl, msgPS, @app, dbtype = 'mongodb', @datadogOptions) ->
     #console.log 'MessageRouter dbtype = '+dbtype
     # console.dir arguments
     MessageRouter.DB.dburl = dburl
@@ -50,6 +52,12 @@ class MessageRouter
     console.log colors.blue.inverse('---------------------------------------------------------------------------------------')
     console.log colors.blue.bold.inverse(' SpinCycle messageRouter constructor. Version - '+pjson.version+' messages per second limit = '+@messagesPerSecond+' ')
     console.log colors.blue.inverse('---------------------------------------------------------------------------------------')
+    if @datadogOptions
+      console.log 'datadog options are'
+      console.dir @datadogOptions
+      @dogstatsd  = new StatsD()
+      DDAPI.init(@datadogOptions)
+      #DDAPI.writePoint('swkjekjewjoew', 17, {xyz:42, abc:4711}, 'gauge')
     #console.dir @authMgr
     @authMgr.messagerouter = @
     @resolver = new ResolveModule()
@@ -74,6 +82,21 @@ class MessageRouter
         #console.log 'adding target '+name
         rv[name] = @args[name]
       msg.replyFunc({status: EventManager.general.SUCCESS, info: 'list of available targets', payload: rv})
+    if @datadogOptions
+      @addTarget 'ddapi', 'metric,value,tags', (msg) =>
+        console.log 'ddapi got call'
+        console.dir msg
+        if msg.metric and msg.value
+          if typeof msg.tags == 'string'
+            try
+              msg.tags = JSON.parse(msg.tags)
+            catch err
+              msg.replyFunc({status: 'FAILURE', info: 'lossy JSON format of tags', payload: msg.metric})
+              return
+          @gaugeMetric(msg.metric, msg.value, msg.tags or {})
+          msg.replyFunc({status: 'SUCCESS', info: 'datadog metric sent', payload: msg.metric})
+        else
+          msg.replyFunc({status: 'FAILURE', info: 'missing parameter(s)', payload: msg.metric})
     setTimeout @addServicePage.bind(@),1
 
   #---------------------------------------------------------------------------------------------------------------------
@@ -185,6 +208,21 @@ class MessageRouter
         )
       else
         console.log '--- could not find registered target for message! ---'
+
+  incrementMetric: (metric, tags) =>
+    if @datadogOptions
+      DDAPI.writePoint(metric, tags, 'increment')
+      #@dogstatsd.increment(metric, tags)
+
+  gaugeMetric: (metric, val, tags) =>
+    if @datadogOptions
+      DDAPI.writePoint(metric, val, tags, 'gauge')
+      #@dogstatsd.gauge(metric, val, tags)
+
+  uniqueMetric: (metric, val, tags) =>
+    if @datadogOptions
+      DDAPI.writePoint(metric, val, tags, 'unique')
+
 
 module.exports = MessageRouter
 

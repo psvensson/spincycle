@@ -1,6 +1,6 @@
 {
   "name": "spincycle",
-  "version": "1.9.44",
+  "version": "1.9.47",
   "description": "A reactive message router and object manager that lets clients subscribe to object property changes on the server",
   "main": "index.js",
   "directories": {
@@ -37,6 +37,7 @@
     "cookie": "^0.3.1",
     "cookies": "^0.6.2",
     "cors": "^2.5.3",
+    "dogapi": "^2.5.0",
     "express": "^4.11.1",
     "express-session": "^1.14.2",
     "felix-couchdb": "^1.0.7",
@@ -52,8 +53,10 @@
     "mongo-oplog": "^1.0.1",
     "mongo-watch": "^0.2.8",
     "mongodb": "^2.2.11",
+    "node-dogstatsd": "0.0.6",
     "node-google-api": "^0.3.0",
     "node-promise": "^0.5.11",
+    "node-statsd": "^0.1.1",
     "node-uuid": "^1.4.2",
     "pg": "^4.3.0",
     "redis": "^0.12.1",

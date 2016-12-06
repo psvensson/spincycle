@@ -84,7 +84,7 @@ class DB
       console.dir ResolveModule.modulecache
       q.resolve()
     else
-      db.all dbname,{},(res)=>
+      db.all dbname,{skip:0,limit:10},(res)=>
         if res.length > 0
           console.log 'extendSchemaIfNeeded found '+res.length+' objects after call to all()'
           #console.log 'first object is '+res[0]
@@ -100,26 +100,50 @@ class DB
           console.log 'found '+missing.length+' missing properties on first object of '+dbname+' compared to current model : '
           #console.dir missing
           if missing.length > 0
-            count = res.length*missing.length
-            console.log 'adding '+missing.length+' missing properties to '+res.length+' existing objects'
-            start = Date.now()
-            res.forEach (ro) =>
-              missing.forEach (mprop) =>
-                if not mprop.default
-                  if mprop.array then mprop.default = []
-                  else if mprop.hashtable then mprop.default = {}
-                  else if mprop.type then mprop.default = ''
-                #console.log '   setting new property '+mprop.name+' to default value of '+mprop.default+' on object type '+ro.type+' id '+ro.id
-                #ro[mprop.name] = mprop.default or ''
-                if ro
-                  @extend(ro.type, ro.id, mprop.name, mprop.default).then (o)=>
-                    @lru.set(ro.id, ro)
-                    if --count == 0
-                      end = Date.now()
-                      diff = parseInt((end - start)/1000)
-                      console.log 'extendSchemaIfNeeded done for '+res.length+' objects. runtime = '+diff+' seconds'
-                      q.resolve()
-              #@set ro.type, ro, ()=> if --count == 0 then q.resolve()
+            @count(dbname).then (modelcount)=>
+              count = modelcount
+              cursor = 0
+              console.log 'adding '+missing.length+' missing properties to '+modelcount+' existing objects'
+
+              getThese = (where)=>
+                console.log 'getThese called with skip '+where
+                r = defer()
+                start = Date.now()
+                db.all dbname,{skip:where,limit:1000},(objs)=>
+                  console.log 'getThese got '+objs.length+' objs'
+                  cnt = objs.length*missing.length
+                  objs.forEach (ro) =>
+                    missing.forEach (mprop) =>
+                      if not mprop.default
+                        if mprop.array then mprop.default = []
+                        else if mprop.hashtable then mprop.default = {}
+                        else if mprop.type then mprop.default = ''
+
+                      #ro[mprop.name] = mprop.default or ''
+                      if ro
+                        @extend(ro.type, ro.id, mprop.name, mprop.default).then (o)=>
+                          #console.log '   setting new property '+mprop.name+' to default value of '+mprop.default+' on object type '+ro.type+' id '+ro.id+' cnt = '+cnt
+                          @lru.set(ro.id, ro)
+                          if --cnt == 0
+                            end = Date.now()
+                            diff = parseInt((end - start)/1000)
+                            console.log 'extendSchemaIfNeeded done for '+res.length+' objects. runtime = '+diff+' seconds'
+                            r.resolve()
+                return r
+
+              loopThrough = ()=>
+                console.log 'loopThrough called cursor = '+cursor+', count = '+count
+                getThese(cursor).then ()=>
+                  setTimeout(
+                    ()=>
+                      if cursor < count
+                        cursor += 1000
+                        loopThrough()
+                    ,100
+                  )
+
+                #@set ro.type, ro, ()=> if --count == 0 then q.resolve()
+              loopThrough()
           else
             q.resolve()
     return q

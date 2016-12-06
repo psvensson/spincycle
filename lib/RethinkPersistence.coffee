@@ -17,7 +17,8 @@ class RethinkPersistence
   connect: ()=>
     console.log 'connect called...'
     q = defer()
-    r.connect({host: madr, port: mport}, (err, conn) =>
+    ccc = @dburl or {host: madr, port: mport}
+    r.connect(ccc, (err, conn) =>
       if err then throw err
       @connection = conn
       q.resolve(@)
@@ -113,7 +114,7 @@ class RethinkPersistence
       if debug then console.dir query
       rr = db
       if query?.limit
-        if debug then console.log 'skipping '+query.skip+' limiting '+query.limit
+        console.log 'skipping '+query.skip+' limiting '+query.limit
         rr = rr.skip(parseInt(query.skip)).limit(parseInt(query.limit))
       if query?.sort then rr = db.orderBy(query?.sort or 'name')
       rr.run @connection, (err, cursor) ->
@@ -122,7 +123,7 @@ class RethinkPersistence
           console.dir err
           throw err
         cursor.toArray (ce, result)=>
-          if debug then console.log 'all result is '+result.length+' records'
+          console.log 'all result is '+result.length+' records'
           #if debug then console.dir result
           cb result
 
@@ -181,32 +182,39 @@ class RethinkPersistence
     return q
 
   findQuery: (_type, query) =>
-    if debug then console.log 'Rethink findQuery called for type '+_type
-    if debug then console.dir query
+    console.log 'Rethink findQuery called for type '+_type
+    console.dir query
+    if not query.property then query.property = 'name'
     q = defer()
     type = _type.toLowerCase()
     @getDbFor(type).then (db)=>
         # { sort: 'name', property: 'name', value: 'BolarsKolars' }
       rr = db.orderBy(query.sort or 'name')
       rv = query.value == 'undefined' or query.value.indexOf('[') > -1 or query.value == 'null' or query.value.indexOf('bject') > -1
-      if not rv and query.property
+      console.log 'rv = '+rv
+      console.log 'not rv and query.property ---> '+(not rv and query.property isnt undefined and query.property isnt null)
+      if not rv and query.property isnt undefined and query.property isnt null
+        console.log '1'
         value = query.value.toString()
         value = value.replace(/[^\w\s@.]/gi, '')
         if not query.wildcard then value = '^'+value+'$'
+        console.log '2'
         rr = rr.filter( (element)=>
             if debug then console.log 'Rethink findQuery running query...'
             element(query.property).match(value)
         )
+        console.log '3'
         if query.limit
           rr = rr.skip(query.skip).limit(query.limit)
-
+        console.log '4'
         rr.run @connection, (err, cursor) ->
+          console.log '5'
           if err
             console.log 'findQuery error: '+err
             console.dir err
           cursor.toArray (ce, result)=>
-            #console.log 'findQuery result is '
-            #console.log result
+            console.log 'findQuery result is '
+            console.log result
             q.resolve result
       else
         q.resolve([])
