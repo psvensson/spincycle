@@ -1,6 +1,6 @@
 {
   "name": "spincycle",
-  "version": "1.9.48",
+  "version": "1.9.49",
   "description": "A reactive message router and object manager that lets clients subscribe to object property changes on the server",
   "main": "index.js",
   "directories": {
@@ -29,7 +29,6 @@
   },
   "homepage": "https://github.com/psvensson/spincycle",
   "dependencies": {
-    "aws4": "^1.5.0",
     "basic-auth": "^1.0.4",
     "body-parser": "^1.15.2",
     "chai": "^2.2.0",
@@ -45,7 +44,6 @@
     "glob": "^4.3.5",
     "google-cloud": "^0.42.2",
     "googleapis": "^1.1.1",
-    "influx": "^3.3.0",
     "limiter": "^1.1.0",
     "lodash": "^4.17.0",
     "lru-cache": "^2.5.0",

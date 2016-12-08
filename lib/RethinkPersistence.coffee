@@ -16,6 +16,7 @@ class RethinkPersistence
 
   connect: ()=>
     console.log 'connect called...  dburl = '+@dburl
+    console.dir @dburl
     q = defer()
     ccc = @dburl or {host: madr, port: mport}
     r.connect(ccc, (err, conn) =>
@@ -32,7 +33,7 @@ class RethinkPersistence
       #if debug then console.log '========================================================changes result is '+cursor
       #if debug then console.dir cursor
       if cursor
-        cursor.each (el)->
+        cursor.each (el)=>
           if debug then console.log 'Rethink changes update --- --- ---'
           if debug then console.dir el
           if el
