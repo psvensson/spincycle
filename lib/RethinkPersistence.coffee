@@ -36,8 +36,11 @@ class RethinkPersistence
         cursor.each (el)=>
           if debug then console.log 'Rethink changes update --- --- ---'
           if debug then console.dir el
-          if el
-            @DB.onUpdated(el)
+          if @DB
+            if el
+              @DB.onUpdated(el)
+          else
+            console.log '@DB not defined in rethinkPersistence!!'
 
   _dogetDBFor: (_type)=>
     q = defer()
