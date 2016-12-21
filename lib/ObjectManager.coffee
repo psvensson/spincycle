@@ -83,6 +83,7 @@ class ObjectManager
         msg.obj.createdAt = Date.now()
         msg.obj.modifiedAt = Date.now()
         msg.obj.createdBy = msg.user.id
+        msg.obj.userRef = msg.user.id
         if debug then console.log 'objmgr.createObject called. record is now'
         if debug then console.dir msg.obj
         SuperModel.resolver.createObjectFrom(msg.obj).then (o) =>
