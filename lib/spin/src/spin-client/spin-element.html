@@ -1,0 +1,78 @@
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+
+<dom-module id="spin-element">
+
+    <template>
+        <style>
+        </style>
+        <div>
+            <div dom-if="edit" style="display:flex; flex-direction:row">
+                <paper-button raised on-tap="doSave">{{captions['save_button']}}</paper-button>
+            </div>
+            <content></content>
+        </div>
+    </template>
+
+    <script>
+			Polymer({
+				is: 'spin-element',
+				properties:
+				    {
+					    client:{type:'Object'},
+					    spintype:{type:String, observer:'onStuff'},
+                        spinid:{type:String, observer:'onStuff'},
+                        model:{type:Object, notify:true},
+                        edit:{type: Boolean},
+                        captions:{type:Object}
+				    },
+
+				ready: function()
+				       {
+
+				       },
+
+                getModelProperties: function()
+                                    {
+	                                    this.client.emitMessage({target: 'getModelFor', modelname: this.spintype}).then(function(mprops)
+	                                    {
+		                                    console.log('======================= spin-element.onModelChanged getModelFor returns ')
+		                                    console.dir(mprops)
+
+		                                    this.set('modelproperties', mprops)
+		                                    this.set('model', this.model)
+                                            this.client.emitMessage({target: '_get'+this.spintype, type: this.spintype, obj: {id: this.spinid, type: this.spintype}}).then(function(obj)
+                                            {
+                                                this.set('model', obj)
+                                            }.bind(this))
+	                                    }.bind(this))
+                                    },
+
+				attached: function()
+				          {
+
+				          },
+
+                onStuff:function()
+                        {
+                            if(this.spintype && this.spinid)
+                            {
+                                this.getModelProperties()
+                            }
+                        },
+
+
+				onSelect: function(e)
+				          {
+
+				          }
+			});
+
+    </script>
+
+</dom-module>

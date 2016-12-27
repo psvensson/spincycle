@@ -7,9 +7,15 @@
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/ace-widget/ace-widget.html">
+
+<link rel="import" href="../bower_components/carbon-i18n-behavior/carbon-i18n-behavior.html">
+
+<script src="../i18n/spin-model.en.i18.js"></script>
+<script src="../i18n/spin-model.se.i18.js"></script>
 
 <link rel="import" href="spin-directreference.html">
-<link rel="import" href="./my-objarray.html">
+<link rel="import" href="my-objarray.html">
 
 <dom-module id="spin-model">
     <template>
@@ -24,6 +30,7 @@
             }
         </style>
         <div>
+            <div dom-if="{{modelproperties.length>0}}">
             <h4>{{model.name}}</h4> <paper-button raised class="fancy" on-tap="saveModel">Save</paper-button>
             <paper-listbox>
                 <!-- <paper-button on-tap="saveModel">Save</paper-button> -->
@@ -31,15 +38,16 @@
                 <template id="modeltemplate" is="dom-repeat" items="{{array}}">
                     <div style="display:flex; flex-direction:row">
                         <paper-item >
+                            <!-- {{item.key}}__ -->
                             <template is="dom-if" if="{{isType(item,'array')}}">
                                 <spin-list propname="{{item.key}}" delete="true" incallbacks="[[outCallbacks]]" client="{{client}}" user="{{user}}" model="{{getTypeFor(item)}}" spinids="{{item.value}}" itemselected="{{selectedlistitem}}"></spin-list>
-                                <paper-button raised on-tap="addModel">Add {{getTypeFor(item)}}</paper-button>
+                                <paper-button raised on-tap="addModel">[[i18n.add]] {{getTypeFor(item)}}</paper-button>
                                 <paper-dialog style="padding:20px;overflow:auto"  id="addmodeldialog_{{getModelId()}}_{{getTypeFor(item)}}">
-                                    <h2>Add {{item.type}}</h2>
+                                    <h2>[[i18n.add]] {{item.type}}</h2>
                                     <spin-allmodels client="{{client}}" user="{{user}}" incallbacks="{{dialogCallbacks}}" listitemselected="{{dialoglistitemselected}}" model="{{getTypeFor(item)}}"></spin-allmodels>
                                     <div class="buttons">
-                                        <paper-button dialog-dismiss>Cancel</paper-button>
-                                        <paper-button dialog-confirm>Accept</paper-button>
+                                        <paper-button dialog-dismiss>[[i18n.cancel]]</paper-button>
+                                        <paper-button dialog-confirm>[[i18n.accept]]</paper-button>
                                     </div>
                                 </paper-dialog>
                             </template>
@@ -47,17 +55,24 @@
                                 <spin-directreference client="{{client}}" user="{{user}}" incallbacks="{{dialogCallbacks}}" propname="{{item.key}}" modelid="{{item.value}}" modeltype="{{getTypeFor(item)}}" ></spin-directreference>
                             </template>
                             <template is="dom-if" if="{{isType(item,'scalar')}}">
-                                <paper-textarea id="{{item.key}}" label="{{item.key}}" disabled="{{item.disabled}}" type="text"  value="{{item.value::input}}" on-keyup="onInputChange" autoSave="true" stopKeyboardEventPropagation="true" style="width:600px">
+                                <paper-textarea id="{{item.key}}" label="[[getLabelFor(item.key)]]" disabled="{{item.disabled}}" type="text"  value="{{item.value::input}}" on-keyup="onInputChange" autoSave="true" stopKeyboardEventPropagation="true" style="width:600px">
                                 </paper-textarea>
                             </template>
-                            <template is="dom-if" if="{{isType(item,'time')}}">
-                                <paper-input type="date" label="{{item.key}}" value="{{getDateFor(item.value)}}"></paper-input>
+                            <template is="dom-if" if="{{isType(item,'timestamp')}}">
+                                <paper-textarea label="[[getLabelFor(item.key)]]" disabled="{{item.disabled}}" type="text"  value="{{getDateFor(item.value)}}" on-keyup="onInputChange" autoSave="true" stopKeyboardEventPropagation="true" style="width:600px">
+                                </paper-textarea>
+                            </template>
+                            <template is="dom-if" if="{{isType(item,'code')}}">
+                                <div style="display:flex;flex-direction: row; justify-content: space-between;width:600px">
+                                    <strong style="padding-right:20px;">[[getLabelFor(item.key)]]</strong>
+                                    <ace-widget on-editor-content="onEditorContent" style="width:500px;height:300px;">{{item.value}}</ace-widget>
+                                </div>
                             </template>
                         </paper-item>
                     </div>
                 </template>
             </paper-listbox>
-
+            </div>
         </div>
     </template>
 
@@ -74,31 +89,38 @@
                 incallbacks:    {type: 'Object'},
                 selectedlistitem:{type:'Object', notify:true, observer:'onListItemSelect'},
                 dialoglistitemselected:{type:'Object', observer:'onDialogSelect'},
-
                 readonlyproperties: {type: 'Array', value: ['id']}
             },
 
-            getDateFor: function(dstr)
+            locale:
             {
-                console.log('getDateFor for '+dstr)
-                var d = new Date(dstr)
-                var yyyy = d.getUTCFullYear()
-                var _month = (d.getUTCMonth()+1).toString()
-                var month = _month
-                if (_month.length == 1)
-                {
-                    month = "0"+_month
-                }
-                var _day = d.getUTCDate().toString()
-                var day = _day
-                if (_day.length == 1)
-                {
-                    day = "0"+_day
-                }
-                var date = yyyy+'-'+month+'-'+day
-                console.log('d = '+date)
-                return date
+                type: String,
+                value: 'en'
             },
+
+            behaviors: [
+                Polymer.CarbonI18nBehavior
+            ],
+
+          onEditorContent:function(i)
+                          {
+                          	console.log('onEditorContent called for '+i)
+                            console.dir(i)
+                            var key = i.model.item.key
+                            var value = i.detail.value
+                            console.log('setting mode property '+key+' to '+value)
+                            this.set('model.'+key, value)
+                          },
+
+          getLabelFor:function(key)
+                      {
+                      	return this.i18n[key]
+                      },
+
+          getDateFor:function(v)
+          {
+            return new Date(v).toString()
+          },
 
             beforeRegister: function()
                             {
@@ -123,7 +145,7 @@
 
             onModelProperties:function(props)
                               {
-                                    console.log('spin-model *------ onModelProperties')
+                                    console.log('spin-model ------ onModelProperties')
                                     console.dir(props)
                               },
 
@@ -175,33 +197,41 @@
 
             isType: function(item, what)
             {
-                //console.log('isType called for '+item+' and '+what)
+                //console.log('isType called for '+item+' and '+what+' modelproperties = '+this.modelproperties)
                 //console.dir(item)
                 var rv = false
-                this.modelproperties.forEach(function(prop)
+                if(this.modelproperties)
                 {
-                    if(prop.name == item.key)
-                    {
+                  this.modelproperties.forEach( function ( prop )
+                  {
+                      if (prop.name == item.key)
+                      {
                         //console.log('found '+prop.name)
-                        if(what == 'scalar' && !prop.array && !prop.type && prop.name.indexOf('At') == -1)
+                        //console.dir(prop)
+                        if(what == 'timestamp' && prop.name.indexOf('At') > -1)
+                        {
+	                        rv = true
+                        }
+                        if(what=='code' && prop.code == true && !prop.array && !prop.type)
+                        {
+                        	rv = true
+                        }
+                        if (what == 'scalar' && !prop.array && !prop.type && prop.name.indexOf('At') == -1 && !prop.code)
                         {
                             rv = true
                         }
-                        if(what == 'array' && prop.array == true)
+                        if (what == 'array' && prop.array == true && !prop.code)
                         {
                             rv = true
                         }
-                        if(what == 'ref' && prop.type && !(prop.array == true))
+                        if (what == 'ref' && prop.type && !(prop.array == true) && !prop.code)
                         {
                             rv = true
                         }
-                        if(what == 'time' && prop.name.indexOf('At') > -1)
-                        {
-                            rv = true
-                        }
-                    }
-                })
-                //console.log('isType called for '+item.key+' and '+what+' returning '+rv)
+                      }
+                  } )
+                  console.log('isType called for '+item.key+' and '+what+' returning '+rv)
+                }
                 return rv
             },
 
@@ -224,6 +254,7 @@
                 {
                     onDelete: this.onDeleteListElement.bind(this)
                 }
+
             },
 
             addModel: function(e)
@@ -345,7 +376,20 @@
             {
                 console.log('spin-model onModelChanged called')
                 console.dir(newmodel)
+	            console.log('---------------------------spin-model: i18n is')
+	            console.dir(this.i18n)
+                if(newmodel && !this.modelproperties && this.client)
+                {
+	                this.client.emitMessage({target: 'getModelFor', modelname: newmodel.type}).then(function(mprops)
+	                {
+	                	console.log('======================= spin-mode.onModelChanged getModelFor returns ')
+                        console.dir(mprops)
 
+	                	this.set('modelproperties', mprops)
+                        this.set('model', this.model)
+                        this.notifyPath('model', this.model)
+                    }.bind(this))
+                }
             },
 
             onSelect: function(e)

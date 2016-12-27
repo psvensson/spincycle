@@ -15,6 +15,12 @@ server.listen port, ->
 #app.use express.static("lib")
 app.use(cors())
 app.options('*', cors())
+
+app.use (req, res, next) ->
+  res.header 'Access-Control-Allow-Origin', '*'
+  res.header 'Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept'
+  next()
+
 ddoptions = {
   api_key: "8a8c68a6193ac76c501f49b08e3a105f",
   app_key: "1b9c45f6638bd01d8ef4c474ec87e15487f644a2",
@@ -24,7 +30,7 @@ ddoptions = {
 
 
 #--------------------------------------------------> Set up Message Router
-authMgr         = new AuthenticationManager()
+authMgr         = new AuthenticationManager(app)
 messageRouter   = new SpinCycle(authMgr, null, null, app, 'rethinkdb', ddoptions)
 #--------------------------------------------------> Express Routing
 new SpinCycle.HttpMethod(messageRouter, app, '/api/')

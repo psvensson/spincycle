@@ -64,7 +64,7 @@ class spinpolymer
     @setup()
 
   failed: (msg)->
-    console.log 'spinclient message failed!! ' + msg
+    console.log 'spinclient message failed!! ' + JSON.toString(msg)
     if @onFailure then @onFailure msg.info
 
   setSessionId: (id) ->
@@ -88,8 +88,8 @@ class spinpolymer
     @socket.emit('message', JSON.stringify(message))
 
   setup: () =>
-    console.log '..connecting to '+@dbUrl
-    @socket = io(@dbUrl,{path: @dbUrl+'/socket.io'})
+    console.log '.....connecting to "' + @dbUrl + "'"
+    @socket = io(@dbUrl)
     @socket.on 'connect', ()=>
       @emit({target:'listcommands'})
 

@@ -2,16 +2,15 @@
 <script src="../bower_components/uuid4/lib/browser/index.js"></script>
 <script src="../bower_components/lrucache/index.js"></script>
 <script src="/socket.io/socket.io.js"></script>
+<!-- <script src="http://localhost:6006/socket.io/socket.io.js"></script> -->
 <script src="spinclient.js"></script>
 
-<link rel="import" href="../bower_components/polymer-cookie/polymer-cookie.html">
-
-<dom-module id="spin-client">
+<dom-module id="ge-login">
     <template>
         <style>
 
         </style>
-        <polymer-cookie id="sidcookie" name="sid" ></polymer-cookie>
+
     </template>
 
     <script>
@@ -21,7 +20,8 @@
                 {
                     client:{type:'Object', notify: true},
                     user: {type:'Object', notify: true, observer: 'onUserChanged'},
-                    failure:{type:'String', notify:true}
+                    failure:{type:'String', notify:true},
+                    serveruri:{type:String}
                 },
 
             listeners:
@@ -32,69 +32,73 @@
 
             ready: function()
                    {
-                       (function(){
-                           var cookies;
 
-                           function readCookie(name,c,C,i){
-                               if(cookies){ return cookies[name]; }
-
-                               c = document.cookie.split('; ');
-                               cookies = {};
-
-                               for(i=c.length-1; i>=0; i--){
-                                   C = c[i].split('=');
-                                   if(C[1])
-                                   {
-                                       cookies[C[0]] = C[1];
-                                   }
-                               }
-                               console.log('---- cookies----')
-                               console.dir(cookies)
-
-                               return cookies[name];
-                           }
-
-                           window.readCookie = readCookie; // or expose it however you want
-                       })();
                    },
 
             onUserChanged: function ( e )
                            {
-                               //console.log( '********************* spin-client onUserChanged called.' )
-                               if(e && e.id)
-                               {
-                                   this.set('user', e)
-                                   //console.dir(this.user)
-                                   this.client.emitMessage( {
-                                       target: '_updateGEUser',
-                                       obj:    this.user
-                                   } ).then( function ( ures )
-                                   {
-                                       console.log( 'user update result: ' + ures )
-                                   }.bind( this ) )
-                               }
+	                           //console.log( '********************* spin-client onUserChanged called.' )
+	                           if (e && e.id && !this.setting)
+	                           {
+		                           this.setting = true
+		                           if (e.sid)
+		                           {
+			                           this.client.setSessionId( e.sid )
+		                           }
+		                           this.set( 'user', e )
+		                           //console.dir(this.user)
+		                           this.client.emitMessage( {
+			                           target: '_updateUser',
+			                           obj:    this.user
+		                           } ).then( function ( ures )
+		                           {
+			                           console.log( 'user update result: ' + ures )
+		                           }.bind( this ) )
+		                           if (this.subscriptionid)
+		                           {
+			                           this.client.deRegisterObjectsSubscriber( this.subscriptionid, this.user )
+		                           }
+		                           this.client.registerObjectSubscriber( {
+			                           id: this.user.id, type: this.user.type, cb: function ( nm )
+			                           {
+				                           console.log( '*** spin-client got user update ***' )
+				                           console.dir( nm )
+
+
+			                           }.bind( this )
+		                           } ).then( function ( sid )
+		                           {
+			                           console.log( 'myview model subscribed' )
+			                           this.subscriptionid = sid
+		                           }.bind( this ) )
+                                 this.setting = false
+	                           }
+
                            },
 
             attached: function()
                       {
-                          window.spinclient = new window.SpinClient('')
+                          window.spinclient = new window.SpinClient(this.serveruri || '')
                           console.log('spin-client attached.')
-                          this.set('client', window.spinclient)
-                          this.client.setUser = this.onUserChanged.bind( this )
-                          this.client.onFailure = this.onFailure.bind(this)
-                          cookie = this.$.sidcookie
-                          var sid = cookie.readCookie()
-                          console.log('all cookies are: '+document.cookie)
-                          console.log('existing sid cookie = '+sid)
-                          var wsid = window.readCookie('sid')
-                          console.log('window.readcookie says... '+wsid)
-                          this.client.setSessionId(sid || wsid)
+
+	                      window.spinclient.setUser = this.onUserChanged.bind( this )
+	                      window.spinclient.onFailure = this.onFailure.bind(this)
                           this.addEventListener('user-changed', this.onUserChanged.bind(this))
+	                      window.spinclient.failureListeners = []
+                          window.spinclient.addFailureListener = this.addFailureListener.bind(this)
+	                      this.set('client', window.spinclient)
                       },
+
+            addFailureListener: function(fl)
+                                {
+                                    this.client.failureListeners.push(fl)
+                                },
 
             onFailure:function(ftext)
                       {
+                        console.log('** spin-client.html onFailure called: '+ftext)
                           this.set('failure', ftext)
+
                           this.client.failureListeners.forEach(function(cb)
                           {
                               cb(ftext)

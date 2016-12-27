@@ -32,18 +32,7 @@
                 _rewriteArray() {
                     this.splice("array", 0, this.array.length);
                     for(let i in this.object) {
-                        console.log('objarray converting property '+i+': '+this.object[i])
-                        var val = this.object[i]
-                        if(sobj)
-                        {
-                            var sobj = this.object[i].toString()
-                            if(sobj.indexOf('{') > -1 && sobj.indexOf('}') > -1)
-                            {
-                                val = this.object[i].toString()
-                                console.log('  parsing val to '+val)
-                            }
-                        }
-                        this.push("array", {key:i, value:val});
+                        this.push("array", {key:i, value:this.object[i]});
                     }
                 }
 
@@ -52,8 +41,7 @@
                     const key = path[1];
                     const objectPath = "object." + key + (path[2] || "");
                     const id = this._getId(key);
-                    var str = typeof path[2] == 'object' ? JSON.stringify(path[2]) : path[2]
-                    const arrayPath = "array." + id + ".value" + (str || "");
+                    const arrayPath = "array." + id + ".value" + (path[2] || "");
                     this.set(arrayPath, this.get(objectPath));
                 }
 

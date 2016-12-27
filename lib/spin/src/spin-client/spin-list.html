@@ -80,9 +80,10 @@
 
             onSpinIdsChange:function(newids, oldids)
                             {
+	                            console.log('================================================== onSpinIdsChange called newids. model is '+this.model)
                                 if(this.model)
                                 {
-                                    console.log('onSpinIdsChange called newids. model is '+this.model)
+
                                     console.dir(newids)
                                     if(newids && (typeof newids != 'object' || !newids.length))
                                     {
