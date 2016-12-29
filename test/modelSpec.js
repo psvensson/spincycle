@@ -104,6 +104,10 @@
           name: 'name',
           value: 'name',
           "default": 'foo'
+        }, {
+          name: 'someProp',
+          value: 'someProp',
+          "default": 'xyzzy'
         }
       ];
 
@@ -890,6 +894,42 @@
                 property: 'name',
                 value: 'My',
                 wildcard: true
+              };
+              return DB.findQuery('DFoo', query).then((function(_this) {
+                return function(records) {
+                  expect(records.length).to.equal(2);
+                  return done();
+                };
+              })(this));
+            });
+          });
+        });
+      });
+    });
+    it('should be able to get two hits on a specific property search', function(done) {
+      var record10, record9;
+      record9 = {
+        id: 'bbb4567',
+        type: 'DFoo',
+        someProp: 'xx',
+        name: 'fyffe sKolars'
+      };
+      record10 = {
+        id: 'bbb45677',
+        type: 'DFoo',
+        someProp: 'xx',
+        name: 'affo Kolars'
+      };
+      ResolveModule.modulecache['DFoo'] = DFoo;
+      return new DFoo(record9).then(function(dfoo1) {
+        return dfoo1.serialize().then(function() {
+          return new DFoo(record10).then(function(dfoo2) {
+            return dfoo2.serialize().then(function() {
+              var query;
+              query = {
+                sort: 'name',
+                property: 'someProp',
+                value: 'xx'
               };
               return DB.findQuery('DFoo', query).then((function(_this) {
                 return function(records) {
