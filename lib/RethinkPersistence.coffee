@@ -198,21 +198,15 @@ class RethinkPersistence
       console.log 'rv = '+rv
       console.log 'not rv and query.property ---> '+(not rv and query.property isnt undefined and query.property isnt null)
       if not rv and query.property isnt undefined and query.property isnt null
-        console.log '1'
         value = query.value.toString()
         value = value.replace(/[^\w\s@.]/gi, '')
         if not query.wildcard then value = '^'+value+'$'
-        console.log '2'
         rr = rr.filter( (element)=>
-            if debug then console.log 'Rethink findQuery running query...'
             element(query.property).match(value)
         )
-        console.log '3'
-        if query.limit
-          rr = rr.skip(query.skip).limit(query.limit)
-        console.log '4'
+        if query.limit then rr = rr.skip(query.skip).limit(query.limit)
+        if debug then console.log 'Rethink findQuery running query...'
         rr.run @connection, (err, cursor) ->
-          console.log '5'
           if err
             console.log 'findQuery error: '+err
             console.dir err
