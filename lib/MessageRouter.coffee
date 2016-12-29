@@ -7,6 +7,7 @@ DB              = require('./DB')
 EventManager    = require('./EventManager')
 SuperModel      = require('./SuperModel')
 SpinModule      = require('./SpinModule')
+SpinApp         = require('./SpinApp')
 SpinFunction    = require('./SpinFunction')
 ClientEndpoints = require('./ClientEndpoints')
 OStore          = require('./OStore')
@@ -63,6 +64,7 @@ class MessageRouter
     @resolver = new ResolveModule()
     ResolveModule.modulecache['SpinModule'] = SpinModule
     ResolveModule.modulecache['SpinFunction'] = SpinFunction
+    ResolveModule.modulecache['SpinApp'] = SpinApp
     @targets  = []
     @debugtargets  = []
     @args     = []
@@ -117,6 +119,7 @@ class MessageRouter
       console.log ' DB init done..'
       @objectManager.expose 'SpinModule'
       @objectManager.expose 'SpinFunction'
+      @objectManager.expose 'SpinApp'
       ResolveModule.modulecache['SpinFunction'] = SpinFunction
       ResolveModule.modulecache['SpinModule'] = SpinModule
 

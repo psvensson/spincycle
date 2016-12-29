@@ -74,11 +74,8 @@
 
             onSearchChange:function(e)
             {
-                console.dir('spin-allmodels onSearchChange called')
-                console.dir(e)
                 if(this.searchproperty && this.searchvalue)
                 {
-                    console.log('do search for '+this.searchproperty+' and '+this.searchvalue)
                     if(this.client)
                     {
                         this.fetchPage()

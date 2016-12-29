@@ -65,7 +65,7 @@ class ResolveModule
         o._rev = record._rev
         o.constructor(record[0]).then (finishedobj) -> q.resolve(finishedobj)
       else
-        console.log 'ResolveModuel could not find module '+record[0].type+' in cache!'
+        console.log 'ResolveModule could not find module '+record[0].type+' in cache!'
         console.dir ResolveModule.modulecache
         @resolve record[0].type, (filename) ->
           if debug then console.log 'ResolveModule resolved module '+record[0].type+" as "+filename

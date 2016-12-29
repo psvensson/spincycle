@@ -13,7 +13,7 @@ class SpinFunction extends SuperModel
       {name: 'testdata',    public: true,   value: 'testdata',    default: '{}', code:true }
       {name: 'testfunction', public: true,   value: 'testfunction',    default: 'var testdata = this.testdata;this.codefunc(testdata);', code:true }
       {name: 'testassertion', public: true,   value: 'testassertion',    default: 'return arg.value == 1;', code:true }
-      {name: 'version',     public: true,   value: 'version', default: '0.1' }
+      {name: 'version',     public: true,   value: 'version', default: '0.0' }
     ]
 
   constructor: (@record) ->

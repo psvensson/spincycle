@@ -14,6 +14,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="spin-model.html">
 <link rel="import" href="spin-client.html">
 <link rel="import" href="spin-explorer.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 
 <dom-module id="spin-admin">
 
@@ -54,12 +55,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 font-weight: bold;
             }
         </style>
-        <spin-client client="{{client}}" user="{{user}}" failure="{{failure}}"></spin-client>
+
+
         <div class="card">
-            loggedin = {{loggedin}} fail={{fail}}
-            <template is="dom-if" if="{{!fail}}">
-                <div class="fail" on-tap="clearFail">{{failure}}</div>
-            </template>
             <p>
             <div style="display:flex; flex-direction: row">
                 <template is="dom-if" if="{{!reject}}">
@@ -94,7 +92,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             {
                 client:{type:'Object', notify: true, observer: 'onClientChanged'},
                 user:{type:'Object', notify: true},
-                reject:{type: Boolean, notify:true},
+
                 loggedin:{type: Boolean, notify:true},
                 selecteditem:{type:'Object',observer:'onSelect'}
             },
@@ -111,11 +109,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             is: 'spin-admin',
 
-            onFailure:function(f)
-                      {
-                        console.log('on failure changed: '+f)
-                          this.fail = true
-                      },
+
 
             clearFail:function(f)
                       {
@@ -133,6 +127,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                              {
                                 console.log('spin-admin onClientChanged')
                                 console.dir(this.client)
+
                              },
 
             onUserChanged: function(newu, old)

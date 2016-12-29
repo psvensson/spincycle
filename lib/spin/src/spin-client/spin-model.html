@@ -29,16 +29,17 @@
                 box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
             }
         </style>
-        <div>
-            <div dom-if="{{modelproperties.length>0}}">
-            <h4>{{model.name}}</h4> <paper-button raised class="fancy" on-tap="saveModel">Save</paper-button>
+
+        <template is="dom-if" if="{{doshow}}">
+            <h4>{{model.name}}</h4>
+            <paper-button raised class="fancy" on-tap="saveModel">Save</paper-button>
             <paper-listbox>
                 <!-- <paper-button on-tap="saveModel">Save</paper-button> -->
                 <my-objarray object="{{model}}" array="{{array}}"></my-objarray>
                 <template id="modeltemplate" is="dom-repeat" items="{{array}}">
                     <div style="display:flex; flex-direction:row">
                         <paper-item >
-                            <!-- {{item.key}}__ -->
+                             <!-- {{item.key}}__ -->
                             <template is="dom-if" if="{{isType(item,'array')}}">
                                 <spin-list propname="{{item.key}}" delete="true" incallbacks="[[outCallbacks]]" client="{{client}}" user="{{user}}" model="{{getTypeFor(item)}}" spinids="{{item.value}}" itemselected="{{selectedlistitem}}"></spin-list>
                                 <paper-button raised on-tap="addModel">[[i18n.add]] {{getTypeFor(item)}}</paper-button>
@@ -72,8 +73,8 @@
                     </div>
                 </template>
             </paper-listbox>
-            </div>
-        </div>
+        </template>
+
     </template>
 
     <script>
@@ -101,6 +102,12 @@
             behaviors: [
                 Polymer.CarbonI18nBehavior
             ],
+
+          showing: function()
+            {
+        	    console.log('this.doshow = '+this.doshow)
+                return this.doshow
+            },
 
           onEditorContent:function(i)
                           {
@@ -135,6 +142,7 @@
                       {
                           //console.log("test._onItems", change.path);
                           //console.dir(change)
+
                       },
 
             _onArray: function(change)
@@ -145,8 +153,8 @@
 
             onModelProperties:function(props)
                               {
-                                    console.log('spin-model ------ onModelProperties')
-                                    console.dir(props)
+                                    //console.log('spin-model ------ onModelProperties')
+                                    //console.dir(props)
                               },
 
             onListItemSelect: function(item)
@@ -230,7 +238,7 @@
                         }
                       }
                   } )
-                  console.log('isType called for '+item.key+' and '+what+' returning '+rv)
+                  //console.log('isType called for '+item.key+' and '+what+' returning '+rv)
                 }
                 return rv
             },
@@ -244,6 +252,7 @@
 
             ready: function()
             {
+	            this.doshow = false
                 this.subscriptions = []
                 this.dialogCallbacks =
                 {
@@ -374,10 +383,14 @@
 
             onModelChanged: function(newmodel)
             {
-                console.log('spin-model onModelChanged called')
-                console.dir(newmodel)
-	            console.log('---------------------------spin-model: i18n is')
-	            console.dir(this.i18n)
+                //console.log('spin-model onModelChanged called')
+                //console.dir(newmodel)
+	            //console.log('---------------------------spin-model: i18n is')
+	            //console.dir(this.i18n)
+                if(newmodel && newmodel.id)
+                {
+	                this.doshow = true
+                }
                 if(newmodel && !this.modelproperties && this.client)
                 {
 	                this.client.emitMessage({target: 'getModelFor', modelname: newmodel.type}).then(function(mprops)

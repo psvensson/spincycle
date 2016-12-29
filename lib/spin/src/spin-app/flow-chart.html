@@ -1,0 +1,105 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../spin-client/spin-client.html">
+<link rel="import" href="../spin-client/spin-admin.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animated-pages.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animatable.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animations.html">
+
+<link rel="import" href="../spin-client/spin-elementlist.html">
+
+<dom-module id="flow-chart">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+        <div style="display:flex; flex-direction: row; padding-top:15px">
+            <spin-elementlist spintype="SpinApp" captions="{{captions}}" client="{{client}}" list="{{list}}" style="padding-left:20px;padding-top:10px">
+                <div >
+                    <template is="dom-repeat" items="{{list}}">
+                        <paper-item  raised on-tap="onSelect">{{item.name}}</paper-item>
+                    </template>
+                </div>
+            </spin-elementlist>
+            <spin-model client="{{client}}" model="{{selecteditem}}" modelproperties="{{modelprops}}" style="padding-left:10px; margin-left:4px; border-left: 1px solid grey"></spin-model>
+            <template is="dom-if" if="{{selecteditem.id}}">
+                <div style="display:flex; flex-direction: column;padding-left:20px; margin-left:4px; border-left: 1px solid grey">
+                    <div>
+                        <paper-button>New Input</paper-button>
+                        <paper-button>New Output</paper-button>
+                        <paper-button>New Connection</paper-button>
+                        <paper-button>New Function</paper-button>
+                        <paper-button>New State Property</paper-button>
+                        <paper-button disabled="true">New Sub-module</paper-button>
+                    </div>
+                    <canvas id="canvas" style="height:600px;width:800px;padding-top:10px"></canvas>
+                </div>
+            </template>
+        </div>
+    </template>
+
+    <script>
+			Polymer({
+
+				is: 'flow-chart',
+
+				properties:
+					{
+						selected:{type:String, value: 'view1'},
+                        client:{type:'Object', observer:'onClient'},
+                        captions:{type:Object},
+                        selecteditem:{type:Object, observer:'onSelectedItem'}
+					},
+
+              onClient: function()
+                     {
+	                     this.client.emitMessage({target: 'getModelFor', modelname: 'SpinApp'}).then(function(mprops)
+		                     {
+		                        	this.modelprops = mprops
+                             }.bind(this))
+                     },
+
+              onSelect:function(e)
+                        {
+                        	console.log('flow-chart selected app')
+                            var app = e.model.item
+                            console.dir(app)
+                            this.set('selecteditem', app)
+                        },
+
+              attached: function()
+                        {
+
+                        },
+
+              onSelectedItem:function()
+                             {
+                             	console.log('onSelectedItem:'+this.selecteditem)
+                                console.dir(this.selecteditem)
+                               setTimeout(function()
+                               {
+	                               var canvaslist = document.getElementsByTagName('canvas')
+	                               console.log('canvaslist is')
+	                               console.dir(canvaslist)
+	                               var canvas = canvaslist[0]
+	                               console.log('canvas is '+canvas)
+	                               console.dir(canvas)
+	                               if(this.selecteditem.id && canvas)
+	                               {
+		                               console.log('--- drawing canvas ---')
+
+		                               this.ctx = canvas.getContext('2d');
+		                               this.ctx.fillStyle = "orange";
+		                               this.ctx.fillRect(0,0,800,600)
+	                               }
+                               }.bind(this),100)
+
+
+                             }
+
+			});
+    </script>
+</dom-module>

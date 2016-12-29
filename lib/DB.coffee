@@ -285,13 +285,13 @@ class DB
     if (typeof id == 'object')
       console.log 'DB.get was served an object instead of an id!!!'
       console.dir id
-      q.resolve(null)
+      q.resolve([])
     else
       #console.log 'DB.get id is '+id
       rv = @lru.get id
       if rv
         if debug then console.log 'DB found '+id+'  in lru: '+rv
-        if debug then console.log rv.name
+        if debug then console.dir rv
         q.resolve(toarr(rv))
       else
         #console.log ' attempting to use datastore for type '+type+' and id '+id+' typeof = '+(typeof id)

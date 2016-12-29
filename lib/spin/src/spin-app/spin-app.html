@@ -1,6 +1,14 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../spin-client/spin-client.html">
 <link rel="import" href="../spin-client/spin-admin.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animated-pages.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animatable.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animations.html">
+
+<link rel="import" href="./flow-chart.html">
+<link rel="import" href="../spin-client/spin-client.html">
 
 <dom-module id="spin-app">
   <template>
@@ -9,8 +17,30 @@
         display: block;
       }
     </style>
-    <h2>Hello [[prop1]]</h2>
-    <spin-admin></spin-admin>
+
+    <spin-client client="{{client}}" user="{{user}}" failure="{{failure}}"></spin-client>
+    <paper-toast id="ftoaster" verticalAlign="top" duration="12000"></paper-toast>
+
+    <template is="dom-if" if="{{!fail}}">
+      <div class="fail" on-tap="clearFail">{{failure}}</div>
+    </template>
+    <h2>SpinCycle Administration Facitilites</h2>
+    <paper-tabs selected="{{selected}}" attr-for-selected='key'>
+      <paper-tab key="view1">Object Explorer</paper-tab>
+      <paper-tab key="view2">App Management</paper-tab>
+    </paper-tabs>
+    <neon-animated-pages selected='{{selected}}'
+                         attr-for-selected='key'
+                         entry-animation='slide-from-left-animation'
+                         exit-animation='slide-right-animation'>
+      <neon-animatable key='view1'>
+        <spin-admin client="{{client}}" captions="{{captions}}"></spin-admin>
+      </neon-animatable>
+      <neon-animatable key='view2'>
+        <flow-chart client="{{client}}" captions="{{captions}}"></flow-chart>
+      </neon-animatable>
+    </neon-animated-pages>
+
   </template>
 
   <script>
@@ -18,12 +48,31 @@
 
       is: 'spin-app',
 
-      properties: {
-        prop1: {
-          type: String,
-          value: 'spin-app',
-        },
+      properties:
+      {
+	      client:{type:'Object', observer:'onClient'},
+          selected:{type:String, value: 'view1'},
+	      reject:{type: Boolean, notify:true},
+          captions: {type: Object, value:
+            {
+              create_button: 'Create New'
+            }
+	      }
       },
+	    onFailure: function(f)
+	               {
+		               this.set('failure', f)
+		               this.$$('#ftoaster').show({text: f, duration: 3000})
+	               },
+
+        onClient: function(newc)
+                  {
+	                  if(newc)
+	                  {
+		                  this.client.addFailureListener(this.onFailure.bind(this))
+	                  }
+                  }
+
 
     });
   </script>

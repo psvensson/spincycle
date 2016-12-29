@@ -20,11 +20,6 @@ class SuperModel
   SuperModel.onCreate = (cb)->
     SuperModel.oncreatelisteners.push cb
 
-  _getRecord:() =>
-   rv = @getRecord() 
-   rv._rev = @._rev
-   return rv;
-
   constructor:(@record={})->
     #console.log 'SuperModel constructor for '+@record?.id
     #console.dir @model
@@ -56,7 +51,6 @@ class SuperModel
 
       if not @record.id then SuperModel.oncreatelisteners.forEach (listener) => listener(@)
 
-
       if @postCreate
         @postCreate(q)
       else
@@ -83,6 +77,8 @@ class SuperModel
             rv[k] = me[k]._getRecord(me[k], me[k].constructor.model, me[k].record)
           else
             rv[k] = me[k].id
+        else
+          rv[k] = null
       else if (v.value and v.value isnt 0) and not v.type
         #if debug then console.log 'direct value '+v.value+' me[v.value] = '+(me[v.value])+' record[k] = '+(record[k])
         rv[k] = me[v.value]
@@ -126,7 +122,8 @@ class SuperModel
       ra.forEach (el) =>
         if el.name == k and k != 'record' and el.public
           res = @prettyPrint(k, v)
-          rv[k] = res or el.default
+          rv[k] = res
+          if not rv[k] and el.default then rv[k] = el.default
     rv.id = @id
     rv.type = @.constructor.type
     return rv
@@ -142,6 +139,12 @@ class SuperModel
       record = @getRecord()
       delete record.record if record.record
       if @_rev then record._rev = @_rev
+      if debug then console.log 'SuperModel.serialize called'
+      if debug then console.dir record
+      if debug then console.log 'actual object is '
+      if debug then console.dir @
+      if debug then console.log 'toClient is '
+      if debug then console.dir @toClient()
       DB.set @.constructor.type, record, (res) =>
         #if debug then console.log ' * serialized and persisted '+@type+" id "+@id
         @_serializing = false
