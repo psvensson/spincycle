@@ -571,19 +571,19 @@ describe 'Spincycle Model Tests', ->
     record9=
       id: 'bbb4567'
       type: 'DFoo'
-      someProp: 'xx'
+      createdBy: 'a945872c-cd42-48e7-9d73-703df1e82f1c'
       name: 'fyffe sKolars'
     record10=
       id: 'bbb45677'
       type: 'DFoo'
-      someProp: 'xx'
+      createdBy: 'a945872c-cd42-48e7-9d73-703df1e82f1c'
       name: 'affo Kolars'
     ResolveModule.modulecache['DFoo'] = DFoo
     new DFoo(record9).then (dfoo1) ->
       dfoo1.serialize().then ()->
         new DFoo(record10).then (dfoo2) ->
           dfoo2.serialize().then ()->
-            query = {sort:'name', property: 'someProp', value: 'xx'}
+            query = {property: 'createdBy', value: 'a945872c-cd42-48e7-9d73-703df1e82f1c'}
             DB.findQuery('DFoo', query).then (records) =>
               expect(records.length).to.equal(2)
               done()

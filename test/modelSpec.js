@@ -911,13 +911,13 @@
       record9 = {
         id: 'bbb4567',
         type: 'DFoo',
-        someProp: 'xx',
+        createdBy: 'a945872c-cd42-48e7-9d73-703df1e82f1c',
         name: 'fyffe sKolars'
       };
       record10 = {
         id: 'bbb45677',
         type: 'DFoo',
-        someProp: 'xx',
+        createdBy: 'a945872c-cd42-48e7-9d73-703df1e82f1c',
         name: 'affo Kolars'
       };
       ResolveModule.modulecache['DFoo'] = DFoo;
@@ -927,9 +927,8 @@
             return dfoo2.serialize().then(function() {
               var query;
               query = {
-                sort: 'name',
-                property: 'someProp',
-                value: 'xx'
+                property: 'createdBy',
+                value: 'a945872c-cd42-48e7-9d73-703df1e82f1c'
               };
               return DB.findQuery('DFoo', query).then((function(_this) {
                 return function(records) {
