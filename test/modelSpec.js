@@ -1171,14 +1171,18 @@
         });
       });
     });
-    it('should be able to get population change callbacks', function(done) {
+    it('should be able to get population change callbacks on create', function(done) {
       var msg;
       ClientEndpoints.registerEndpoint('updateclient', function(reply) {
-        expect(reply.payload).to.exist;
+        console.log('--__--__--__  update client got population change __--__--__--');
+        console.dir(reply);
+        expect(reply.payload.added).to.exist;
+        ClientEndpoints.removeEndpoint('updateclient');
         return done();
       });
       msg = {
         type: 'Bar',
+        id: '11992299',
         client: 'updateclient',
         user: {
           isAdmin: true
@@ -1188,6 +1192,44 @@
         }
       };
       return messageRouter.objectManager.onRegisterForPopulationChanges(msg);
+    });
+    it('should be able to get population change callbacks on delete', function(done) {
+      ClientEndpoints.registerEndpoint('updateclient2', function(reply) {
+        console.log('--__--__--__  update client got population change __--__--__--');
+        console.dir(reply);
+        expect(reply.payload.removed).to.exist;
+        ClientEndpoints.removeEndpoint('updateclient2');
+        return done();
+      });
+      return new Bar({
+        id: '11992299',
+        type: 'Bar'
+      }).then(function(bar) {
+        var msg, umsg;
+        umsg = {
+          obj: {
+            type: 'Bar',
+            id: '11992299'
+          },
+          type: 'Bar',
+          client: 'updateclient2',
+          user: {
+            isAdmin: true
+          },
+          replyFunc: function(ureply) {}
+        };
+        msg = {
+          type: 'Bar',
+          client: 'updateclient2',
+          user: {
+            isAdmin: true
+          },
+          replyFunc: function(reply) {
+            return messageRouter.objectManager._deleteObject(umsg);
+          }
+        };
+        return messageRouter.objectManager.onRegisterForPopulationChanges(msg);
+      });
     });
     it('should be able call listcommands through HttpMethod', function(done) {
       return request.get('http://localhost:8008/api/?target=listcommands', function(req, res, _body) {

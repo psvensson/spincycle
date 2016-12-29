@@ -86,9 +86,9 @@ class DB
     else
       db.all dbname,{skip:0,limit:10},(res)=>
         if res.length > 0
-          console.log 'extendSchemaIfNeeded found '+res.length+' objects after call to all()'
-          console.log 'first object is '+res[0]
-          console.dir res[0]
+          if debug then console.log 'extendSchemaIfNeeded found '+res.length+' objects after call to all()'
+          if debug then console.log 'first object is '+res[0]
+          if debug then console.dir res[0]
           # collect missing properties from first object
           o = res[res.length-1]
           missing = []
@@ -96,7 +96,7 @@ class DB
           for k,v of o
             lookup[k] = k
           proto.model.forEach (property)=>
-            console.log 'checking property '+property.name+' and if it exist in lookup table -> '+lookup[property.name]
+            if debug then console.log 'checking property '+property.name+' and if it exist in lookup table -> '+lookup[property.name]
             #console.dir property
             if not lookup[property.name] then missing.push property
           console.log 'found '+missing.length+' missing properties on first object of '+dbname+' compared to current model : '

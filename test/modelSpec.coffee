@@ -745,15 +745,17 @@ describe 'Spincycle Model Tests', ->
 
             messageRouter.objectManager._updateObject(umsg)
 
-  it 'should be able to get population change callbacks', (done)->
+  it 'should be able to get population change callbacks on create', (done)->
     ClientEndpoints.registerEndpoint 'updateclient',(reply)->
-      #console.log '--__--__--__  update client got population change __--__--__--'
-      #console.dir reply
-      expect(reply.payload).to.exist
+      console.log '--__--__--__  update client got population change __--__--__--'
+      console.dir reply
+      expect(reply.payload.added).to.exist
+      ClientEndpoints.removeEndpoint 'updateclient'
       done()
 
     msg =
       type: 'Bar'
+      id:'11992299'
       client: 'updateclient'
       user:
         isAdmin: true
@@ -762,6 +764,33 @@ describe 'Spincycle Model Tests', ->
           #console.log 'bar created. waiting for population change'
 
     messageRouter.objectManager.onRegisterForPopulationChanges(msg)
+
+  it 'should be able to get population change callbacks on delete', (done)->
+    ClientEndpoints.registerEndpoint 'updateclient2',(reply)->
+      console.log '--__--__--__  update client got population change __--__--__--'
+      console.dir reply
+      expect(reply.payload.removed).to.exist
+      ClientEndpoints.removeEndpoint 'updateclient2'
+      done()
+
+    new Bar({id:'11992299', type: 'Bar'}).then (bar) ->
+      umsg =
+        obj: {type:'Bar', id:'11992299'}
+        type: 'Bar'
+        client: 'updateclient2'
+        user:
+          isAdmin: true
+        replyFunc: (ureply)->
+
+      msg =
+        type: 'Bar'
+        client: 'updateclient2'
+        user:
+          isAdmin: true
+        replyFunc: (reply)->
+          messageRouter.objectManager._deleteObject(umsg)
+
+      messageRouter.objectManager.onRegisterForPopulationChanges(msg)
 
   it 'should be able call listcommands through HttpMethod', (done)->
     request.get 'http://localhost:8008/api/?target=listcommands', (req,res,_body)->

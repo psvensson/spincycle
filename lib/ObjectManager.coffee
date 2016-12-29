@@ -76,16 +76,17 @@ class ObjectManager
 
   #---------------------------------------------------------------------------------------------------------------------
   _createObject: (msg) =>
+    console.log 'objmgr.createObject called'
     if msg.obj and msg.obj.type
       if @messageRouter.authMgr.canUserCreateThisObject(msg.obj.type, msg.user, msg.sessionId)
-        if debug then console.log 'objmgr.createObject called'
+
         if debug then console.dir msg
         msg.obj.createdAt = Date.now()
         msg.obj.modifiedAt = Date.now()
         msg.obj.createdBy = msg.user.id
         msg.obj.userRef = msg.user.id
-        if debug then console.log 'objmgr.createObject called. record is now'
-        if debug then console.dir msg.obj
+        console.log 'objmgr.createObject called. record is now'
+        console.dir msg.obj
         SuperModel.resolver.createObjectFrom(msg.obj).then (o) =>
           o.serialize().then () =>
             @messageRouter.gaugeMetric('create',1,{type:  msg.obj.type,'username': msg.user.name, 'useremail': msg.user.email, 'provider': msg.user.provider, 'organization': msg.user.organization})
