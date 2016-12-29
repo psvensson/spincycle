@@ -200,7 +200,7 @@ class RethinkPersistence
       if not rv and query.property isnt undefined and query.property isnt null
         value = query.value.toString()
         value = value.replace(/[^\w\s@.]/gi, '')
-        if not query.wildcard then value = '^'+value+'$'
+        if query.wildcard then value = '^'+value+'$'
         rr = rr.filter( (element)=>
             element(query.property).match(value)
         )
