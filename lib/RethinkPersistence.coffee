@@ -201,6 +201,7 @@ class RethinkPersistence
         value = query.value.toString()
         #value = value.replace(/[^\w\s@.]/gi, '')
         value = value.replace(/[`~!@#$%^&*()_|+\=?;:'",.<>\{\}\[\]\\\/]/gi, '')
+        if debug then console.log 'final search value is '+value
         if query.wildcard then value = '^'+value+'$'
         rr = rr.filter( (element)=>
             element(query.property).match(value)
