@@ -8,6 +8,9 @@
 <link rel="import" href="../bower_components/neon-animation/neon-animations.html">
 
 <link rel="import" href="../spin-client/spin-elementlist.html">
+<link rel="import" href="./flow-connector.html">
+<link rel="import" href="./flow-input.html">
+<link rel="import" href="./flow-output.html">
 
 <dom-module id="flow-chart">
     <template>
@@ -35,6 +38,11 @@
                         <paper-button>New State Property</paper-button>
                         <paper-button disabled="true">New Sub-module</paper-button>
                     </div>
+                    <!-- module connections -->
+                    <template is="dom-repeat" items="{{selectedmodule.moduleConnections}}">
+                        <flow-connector connection="{{item}}" ctx="{{ctx}}"></flow-connector>
+                    </template>
+                    <!-- canvas -->
                     <canvas id="canvas" style="height:600px;width:800px;padding-top:10px"></canvas>
                 </div>
             </template>

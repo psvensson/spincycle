@@ -1,0 +1,48 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../spin-client/spin-client.html">
+<link rel="import" href="../spin-client/spin-admin.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animated-pages.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animatable.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animations.html">
+
+<dom-module id="flow-input">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+
+    </template>
+
+    <script>
+			// {name: 'qqqq', destinationModule: 'yyyy', destinationFunction: 'zzzz'}
+			Polymer( {
+
+				is: 'flow-input',
+
+				properties: {
+					ctx:                    {type: Object, observer: 'onStuff'},
+					connector:              {type: Object, observer: 'onStuff'},
+                    index:                  {type: Number},
+                    basex:                  {type: Number, value: 100},
+					basey:                  {type: Number, value: 100},
+                    name:                   {type: String, notify: true},
+					destinationModule:      {type: String, notify: true},
+                    destinationFunction:    {type: String, notify: true}
+				},
+
+				onStuff: function ()
+				         {
+					         if (this.ctx && this.connector)
+					         {
+						         console.log( 'flow-input onStuff (unimplemented)' )
+					         }
+				         }
+
+
+			} );
+    </script>
+</dom-module>

@@ -1,0 +1,47 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../spin-client/spin-client.html">
+<link rel="import" href="../spin-client/spin-admin.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animated-pages.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animatable.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animations.html">
+
+<dom-module id="flow-output">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+
+    </template>
+
+    <script>
+            // just an array of strings (named output hooks)
+			Polymer({
+
+				is: 'flow-output',
+
+				properties:
+					{
+						ctx:        {type: Object, observer:'onStuff'},
+						connector:  {type: Object, observer:'onStuff'},
+                        index:      {type: Number, notify: true},
+						basex:      {type: Number, value: 500},
+                        basey:      {type: Number, value: 100},
+                        name:       {type: String, notify: true}
+					},
+
+				onStuff:function()
+				        {
+					        if(this.ctx && this.connector)
+					        {
+						        console.log('flow-output onStuff (unimplemented)')
+					        }
+				        }
+
+
+			});
+    </script>
+</dom-module>
