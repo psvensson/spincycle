@@ -24,28 +24,38 @@
 				is: 'flow-input',
 
 				properties: {
-					ctx:                    {type: Object, observer: 'onStuff'},
-                    connection:             {type: Object, observer: 'onStuff'},
-                    basex:                  {type: Number, value: 10},
-					basey:                  {type: Number, value: 10},
-                    /*
-                    name:                   {type: String, notify: true, observer: 'onStuff'},
-					destinationModule:      {type: String, notify: true, observer: 'onStuff'},
-                    destinationFunction:    {type: String, notify: true},
-                    */
-					height:                 {type: Number, value:40},
-					width:                  {type: Number, value:140},
-                    strokeStyle:            {type: String, value: 'red'}
+					ctx:         {type: Object, observer: 'onStuff'},
+					connection:  {type: Object, observer: 'onStuff'},
+					basex:       {type: Number, value: 10},
+					basey:       {type: Number, value: 10},
+					gap:         {type: Number, value: 5},
+									textoffset:         {type: Number, value: 15},
+            /*
+             name:                   {type: String, notify: true, observer: 'onStuff'},
+             destinationModule:      {type: String, notify: true, observer: 'onStuff'},
+             destinationFunction:    {type: String, notify: true},
+             */
+					height:      {type: Number, value: 40},
+					width:       {type: Number, value: 140},
+					strokeStyle: {type: String, value: 'red'},
+									textoffsetx:{type:Number, value: 5},
+									textoffsety:{type:Number, value: 25},
 				},
 
 				onStuff: function ()
 				         {
 					         if (this.ctx && this.connection)
 					         {
-					         	console.log('drawing input ',this.basex, this.basey + this.connection.index * this.height, this.width, this.height, this.strokeStyle)
-                                 this.ctx.strokeStyle = this.strokeStyle
-                                 this.ctx.fillStyle = this.strokeStyle
-                                 this.ctx.fillRect(parseInt(this.basex), parseInt(this.basey + this.connection.index * this.height), parseInt(this.width), parseInt(this.height))
+						         console.log( 'drawing input ' )
+						         this.ctx.lineWidth = 1
+						         this.ctx.strokeStyle = this.strokeStyle
+						         this.ctx.fillStyle = this.strokeStyle
+						         var x = this.basex
+						         var y = this.basey + (this.connection.index * this.height) + this.gap
+						         this.ctx.strokeRect( x, y, this.width, this.height )
+						         this.ctx.fillStyle = 'black'
+                                 this.ctx.font = "16px Courier";
+						         this.ctx.fillText( this.connection.name, x+ this.textoffsetx , y+ this.textoffsety )
 					         }
 				         }
 

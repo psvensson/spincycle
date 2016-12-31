@@ -59,7 +59,7 @@
                         <flow-connector connection="{{item}}" ctx="{{ctx}}"></flow-connector>
                     </template>
                     <!-- canvas -->
-                    <canvas id="canvas" style="height:600px;width:800px;padding-top:10px"></canvas>
+                    <canvas id="canvas" style="height:600px;width:800px;padding-top:10px" height="600" width="800"></canvas>
                 </div>
             </template>
         </div>
@@ -83,7 +83,7 @@
 					          {
 					          	console.log('newInput')
 						          this.push( 'selectedmodule.inputs', {
-                                      index: this.selectedmodule.inputs.length+1,
+                                      index: this.selectedmodule.inputs.length,
 							          name:                'New Input',
 							          destinationModule:   this.selectedmodule.id,
 							          destinationFunction: ''
