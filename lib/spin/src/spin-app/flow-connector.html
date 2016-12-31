@@ -31,14 +31,18 @@
                                startModule:     {type: String, notify: true},
                                endModule:       {type: String, notify: true},
                                startOutputName: {type: String, notify: true},
-                               endInputName:    {type: String, notify: true}
+                               endInputName:    {type: String, notify: true},
+                               height:     {type: Number, value:40},
+							   width:      {type: Number, value:140},
+							   strokeStyle:{type: String, value: 'blue'}
 					         },
 
 				onStuff:function()
                         {
                         	if(this.ctx && this.connector)
                             {
-                            	console.log('flow-connector onStuff (unimplemented)')
+	                            this.ctx.strokeStyle = this.strokeStyle
+	                            this.ctx.strokeRect(this.basex, this.basey * this.index * this.height, this.width, this.height)
                             }
                         }
 

@@ -25,20 +25,27 @@
 
 				properties: {
 					ctx:                    {type: Object, observer: 'onStuff'},
-					connector:              {type: Object, observer: 'onStuff'},
-                    index:                  {type: Number},
-                    basex:                  {type: Number, value: 100},
-					basey:                  {type: Number, value: 100},
-                    name:                   {type: String, notify: true},
-					destinationModule:      {type: String, notify: true},
-                    destinationFunction:    {type: String, notify: true}
+                    connection:             {type: Object, observer: 'onStuff'},
+                    basex:                  {type: Number, value: 10},
+					basey:                  {type: Number, value: 10},
+                    /*
+                    name:                   {type: String, notify: true, observer: 'onStuff'},
+					destinationModule:      {type: String, notify: true, observer: 'onStuff'},
+                    destinationFunction:    {type: String, notify: true},
+                    */
+					height:                 {type: Number, value:40},
+					width:                  {type: Number, value:140},
+                    strokeStyle:            {type: String, value: 'red'}
 				},
 
 				onStuff: function ()
 				         {
-					         if (this.ctx && this.connector)
+					         if (this.ctx && this.connection)
 					         {
-						         console.log( 'flow-input onStuff (unimplemented)' )
+					         	console.log('drawing input ',this.basex, this.basey + this.connection.index * this.height, this.width, this.height, this.strokeStyle)
+                                 this.ctx.strokeStyle = this.strokeStyle
+                                 this.ctx.fillStyle = this.strokeStyle
+                                 this.ctx.fillRect(parseInt(this.basex), parseInt(this.basey + this.connection.index * this.height), parseInt(this.width), parseInt(this.height))
 					         }
 				         }
 

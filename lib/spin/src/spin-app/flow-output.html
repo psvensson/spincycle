@@ -30,14 +30,18 @@
                         index:      {type: Number, notify: true},
 						basex:      {type: Number, value: 500},
                         basey:      {type: Number, value: 100},
-                        name:       {type: String, notify: true}
+                        name:       {type: String, notify: true},
+                        height:     {type: Number, value:40},
+                        width:      {type: Number, value:140},
+                        strokeStyle:{type: String, value: 'red'}
 					},
 
 				onStuff:function()
 				        {
 					        if(this.ctx && this.connector)
 					        {
-						        console.log('flow-output onStuff (unimplemented)')
+						        this.ctx.strokeStyle = this.strokeStyle
+                                this.ctx.strokeRect(this.basex, this.basey * this.index * this.height, this.width, this.height)
 					        }
 				        }
 

@@ -12,9 +12,9 @@
         <style>
         </style>
         <div>
-            <div dom-if="edit" style="display:flex; flex-direction:row">
+            <template is="dom-if" if="{{edit}}" style="display:flex; flex-direction:row">
                 <paper-button raised on-tap="doSave">{{captions['save_button']}}</paper-button>
-            </div>
+            </template>
             <content></content>
         </div>
     </template>
@@ -24,11 +24,11 @@
 				is: 'spin-element',
 				properties:
 				    {
-					    client:{type:'Object'},
+					    client:{type:'Object', observer:'onStuff'},
 					    spintype:{type:String, observer:'onStuff'},
                         spinid:{type:String, observer:'onStuff'},
                         model:{type:Object, notify:true},
-                        edit:{type: Boolean},
+                        edit:{type: Boolean, value: false},
                         captions:{type:Object}
 				    },
 
@@ -39,6 +39,7 @@
 
                 getModelProperties: function()
                                     {
+                                    	console.log('--- spinelement getting '+this.spintype+' '+this.spinid)
 	                                    this.client.emitMessage({target: 'getModelFor', modelname: this.spintype}).then(function(mprops)
 	                                    {
 		                                    console.log('======================= spin-element.onModelChanged getModelFor returns ')
@@ -60,7 +61,8 @@
 
                 onStuff:function()
                         {
-                            if(this.spintype && this.spinid)
+                        	console.log('-- -- spinelement onStuff')
+                            if(this.spintype && this.spinid && this.client)
                             {
                                 this.getModelProperties()
                             }

@@ -7,6 +7,7 @@
 <link rel="import" href="../bower_components/neon-animation/neon-animatable.html">
 <link rel="import" href="../bower_components/neon-animation/neon-animations.html">
 
+<link rel="import" href="../spin-client/spin-element.html">
 <link rel="import" href="../spin-client/spin-elementlist.html">
 <link rel="import" href="./flow-connector.html">
 <link rel="import" href="./flow-input.html">
@@ -20,24 +21,39 @@
             }
         </style>
         <div style="display:flex; flex-direction: row; padding-top:15px">
-            <spin-elementlist spintype="SpinApp" captions="{{captions}}" client="{{client}}" list="{{list}}" style="padding-left:20px;padding-top:10px">
-                <div >
+            <spin-elementlist spintype="SpinApp" captions="{{captions}}" client="{{client}}" list="{{list}}"
+                              style="padding-left:20px;padding-top:10px">
+                <div>
                     <template is="dom-repeat" items="{{list}}">
-                        <paper-item  raised on-tap="onSelect">{{item.name}}</paper-item>
+                        <paper-item raised on-tap="onSelect">{{item.name}}</paper-item>
                     </template>
                 </div>
             </spin-elementlist>
-            <spin-model client="{{client}}" model="{{selecteditem}}" modelproperties="{{modelprops}}" style="padding-left:10px; margin-left:4px; border-left: 1px solid grey"></spin-model>
+            <spin-model client="{{client}}" model="{{selecteditem}}" modelproperties="{{modelprops}}"
+                        style="padding-left:10px; margin-left:4px; border-left: 1px solid grey"></spin-model>
             <template is="dom-if" if="{{selecteditem.id}}">
                 <div style="display:flex; flex-direction: column;padding-left:20px; margin-left:4px; border-left: 1px solid grey">
+                    <spin-element client="{{client}}" spintype="SpinModule" spinid="{{selecteditem.targetModule}}"
+                                  model="{{selectedmodule}}">
+                        <h3>Selected Module: {{selectedmodule.name}}</h3>
+                    </spin-element>
+
                     <div>
-                        <paper-button>New Input</paper-button>
+                        <paper-button on-tap="newInput">New Input</paper-button>
                         <paper-button>New Output</paper-button>
                         <paper-button>New Connection</paper-button>
                         <paper-button>New Function</paper-button>
                         <paper-button>New State Property</paper-button>
                         <paper-button disabled="true">New Sub-module</paper-button>
                     </div>
+                    <!-- inputs -->
+                    <template is="dom-repeat" items="{{selectedmodule.inputs}}">
+                        <flow-input connection="{{item}}" ctx="{{ctx}}"></flow-input>
+                    </template>
+                    <!-- outputs -->
+                    <template is="dom-repeat" items="{{selectedmodule.outputs}}">
+                        <flow-output connection="{{item}}" ctx="{{ctx}}"></flow-output>
+                    </template>
                     <!-- module connections -->
                     <template is="dom-repeat" items="{{selectedmodule.moduleConnections}}">
                         <flow-connector connection="{{item}}" ctx="{{ctx}}"></flow-connector>
@@ -50,64 +66,83 @@
     </template>
 
     <script>
-			Polymer({
+			Polymer( {
 
 				is: 'flow-chart',
 
-				properties:
-					{
-						selected:{type:String, value: 'view1'},
-                        client:{type:'Object', observer:'onClient'},
-                        captions:{type:Object},
-                        selecteditem:{type:Object, observer:'onSelectedItem'}
+				properties: {
+					selected:       {type: String, value: 'view1'},
+					client:         {type: 'Object', observer: 'onClient'},
+					captions:       {type: Object},
+					selecteditem:   {type: Object, observer: 'onSelectedItem'},
+					selectedmodule: {
+						type: Object, observer: 'onSelectedModule'}
 					},
 
-              onClient: function()
-                     {
-	                     this.client.emitMessage({target: 'getModelFor', modelname: 'SpinApp'}).then(function(mprops)
-		                     {
-		                        	this.modelprops = mprops
-                             }.bind(this))
-                     },
+					newInput: function ()
+					          {
+					          	console.log('newInput')
+						          this.push( 'selectedmodule.inputs', {
+                                      index: this.selectedmodule.inputs.length+1,
+							          name:                'New Input',
+							          destinationModule:   this.selectedmodule.id,
+							          destinationFunction: ''
+						          } )
+                                console.dir(this.selectedmodule)
+					          },
 
-              onSelect:function(e)
-                        {
-                        	console.log('flow-chart selected app')
-                            var app = e.model.item
-                            console.dir(app)
-                            this.set('selecteditem', app)
-                        },
+					onClient: function ()
+					          {
+						          this.client.emitMessage( {target: 'getModelFor', modelname: 'SpinApp'} ).then( function ( mprops )
+						          {
+							          this.modelprops = mprops
+						          }.bind( this ) )
+					          },
 
-              attached: function()
-                        {
+					onSelect: function ( e )
+					          {
+						          console.log( 'flow-chart selected app' )
+						          var app = e.model.item
+						          console.dir( app )
+						          this.set( 'selecteditem', app )
+					          },
 
-                        },
+					attached: function ()
+					          {
 
-              onSelectedItem:function()
-                             {
-                             	console.log('onSelectedItem:'+this.selecteditem)
-                                console.dir(this.selecteditem)
-                               setTimeout(function()
-                               {
-	                               var canvaslist = document.getElementsByTagName('canvas')
-	                               console.log('canvaslist is')
-	                               console.dir(canvaslist)
-	                               var canvas = canvaslist[0]
-	                               console.log('canvas is '+canvas)
-	                               console.dir(canvas)
-	                               if(this.selecteditem.id && canvas)
-	                               {
-		                               console.log('--- drawing canvas ---')
+					          },
 
-		                               this.ctx = canvas.getContext('2d');
-		                               this.ctx.fillStyle = "orange";
-		                               this.ctx.fillRect(0,0,800,600)
-	                               }
-                               }.bind(this),100)
+					onSelectedModule: function ()
+					                  {
+						                  console.log( 'onSelectedModule:' + this.selectedmodule )
+						                  console.dir( this.selectedmodule )
+					                  },
+
+					onSelectedItem: function ()
+					                {
+						                console.log( 'onSelectedItem:' + this.selecteditem )
+						                console.dir( this.selecteditem )
+						                setTimeout( function ()
+						                {
+							                var canvaslist = document.getElementsByTagName( 'canvas' )
+							                console.log( 'canvaslist is' )
+							                console.dir( canvaslist )
+							                var canvas = canvaslist[ 0 ]
+							                console.log( 'canvas is ' + canvas )
+							                console.dir( canvas )
+							                if (this.selecteditem.id && canvas)
+							                {
+								                console.log( '--- drawing canvas ---' )
+
+								                this.ctx = canvas.getContext( '2d' );
+								                this.ctx.fillStyle = "orange";
+								                this.ctx.fillRect( 0, 0, 800, 600 )
+							                }
+						                }.bind( this ), 100 )
 
 
-                             }
+					                }
 
-			});
+				} );
     </script>
 </dom-module>
