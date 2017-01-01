@@ -7,6 +7,8 @@
 <link rel="import" href="../bower_components/neon-animation/neon-animatable.html">
 <link rel="import" href="../bower_components/neon-animation/neon-animations.html">
 
+<link rel="import" href="canvas-utils.html">
+
 <dom-module id="flow-input">
     <template>
         <style>
@@ -24,38 +26,64 @@
 				is: 'flow-input',
 
 				properties: {
-					ctx:         {type: Object, observer: 'onStuff'},
-					connection:  {type: Object, observer: 'onStuff'},
-					basex:       {type: Number, value: 10},
-					basey:       {type: Number, value: 10},
-					gap:         {type: Number, value: 5},
-									textoffset:         {type: Number, value: 15},
-            /*
-             name:                   {type: String, notify: true, observer: 'onStuff'},
-             destinationModule:      {type: String, notify: true, observer: 'onStuff'},
-             destinationFunction:    {type: String, notify: true},
-             */
-					height:      {type: Number, value: 40},
-					width:       {type: Number, value: 140},
-					strokeStyle: {type: String, value: 'red'},
-									textoffsetx:{type:Number, value: 5},
-									textoffsety:{type:Number, value: 25},
+					ctx:             {type: Object, observer: 'onStuff'},
+					canvas:          {type: Object, observer: 'onStuff'},
+					input:           {type: Object, observer: 'onStuff'},
+					basex:           {type: Number, value: 10},
+					basey:           {type: Number, value: 10},
+					gap:             {type: Number, value: 15},
+					textoffset:      {type: Number, value: 5},
+					height:          {type: Number, value: 40},
+					width:           {type: Number, value: 140},
+					strokeStyle:     {type: String, value: '#488'},
+					highlightcolor:  {type: String, value: '#7bb'},
+					backgroundcolor: {type: String, value: '#add'},
+					textoffsetx:     {type: Number, value: 5},
+					textoffsety:     {type: Number, value: 25},
 				},
+
+				behaviors: [ canvasUtils ],
 
 				onStuff: function ()
 				         {
-					         if (this.ctx && this.connection)
+					         if (this.ctx && this.input)
 					         {
 						         console.log( 'drawing input ' )
 						         this.ctx.lineWidth = 1
 						         this.ctx.strokeStyle = this.strokeStyle
 						         this.ctx.fillStyle = this.strokeStyle
 						         var x = this.basex
-						         var y = this.basey + (this.connection.index * this.height) + this.gap
+						         var y = this.basey + (this.input.index * (this.gap + this.height))
 						         this.ctx.strokeRect( x, y, this.width, this.height )
+						         this.ctx.fillStyle = this.backgroundcolor
+						         this.ctx.fillRect( x + 2, y + 2, this.width - 2, this.height - 2 )
+						         this.area = {x: x + 2, y: y + 2, width: this.width - 2, height: this.height - 2}
+						         this.addEventListener( this.canvas, 'click', this.area, function ( e )
+						         {
+							         console.log( 'click' )
+							         console.dir( this.area )
+						         }.bind( this ) )
+						         this.addEventListener( this.canvas, 'mouseenter', this.area, function ( e )
+						         {
+							         console.log( '--enter' )
+							         this.ctx.fillStyle = this.highlightcolor
+							         this.ctx.fillRect( x + 2, y + 2, this.width - 2, this.height - 2 )
+							         this.ctx.fillStyle = 'black'
+							         this.ctx.font = "16px Sans-Serif";
+							         this.ctx.fillText( this.input.name, x + this.textoffsetx, y + this.textoffsety )
+						         }.bind( this ) )
+						         this.addEventListener( this.canvas, 'mouseout', this.area, function ( e )
+						         {
+							         console.log( '--out' )
+							         this.ctx.fillStyle = this.backgroundcolor
+							         this.ctx.fillRect( x + 2, y + 2, this.width - 2, this.height - 2 )
+							         this.ctx.fillStyle = 'black'
+							         this.ctx.font = "16px Sans-Serif";
+							         this.ctx.fillText( this.input.name, x + this.textoffsetx, y + this.textoffsety )
+						         }.bind( this ) )
 						         this.ctx.fillStyle = 'black'
-                                 this.ctx.font = "16px Courier";
-						         this.ctx.fillText( this.connection.name, x+ this.textoffsetx , y+ this.textoffsety )
+						         this.ctx.font = "16px Sans-Serif";
+						         this.ctx.fillText( this.input.name, x + this.textoffsetx, y + this.textoffsety )
 					         }
 				         }
 

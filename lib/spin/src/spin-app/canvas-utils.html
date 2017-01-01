@@ -1,0 +1,120 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<script src="https://npmcdn.com/contentful@latest/browser-dist/contentful.min.js"></script>
+
+<dom-module id="canvas-utils">
+
+    <template>
+    </template>
+
+    <script>
+
+
+			canvasUtils =
+				{
+					getClickPosition: function ( e )
+					                  {
+						                  function getPosition( element )
+						                  {
+							                  var xPosition = 0;
+							                  var yPosition = 0;
+
+							                  while (element)
+							                  {
+								                  xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
+								                  yPosition += (element.offsetTop - element.scrollTop + element.clientTop);
+								                  element = element.offsetParent;
+							                  }
+							                  return {x: xPosition, y: yPosition};
+						                  }
+
+						                  var parentPosition = getPosition( e.currentTarget );
+						                  var xPosition = e.clientX - parentPosition.x;
+						                  var yPosition = e.clientY - parentPosition.y;
+
+						                  return {x: xPosition, y: yPosition};
+					                  },
+
+					addEventListener: function ( canvas, event, thing, cb )
+					                  {
+						                  console.log( 'canvasutils adding thing..' )
+						                  console.dir( thing )
+						                  if (canvas && canvas.id)
+						                  {
+							                  if (!window._cevents)
+							                  {
+								                  window._cevents = {}
+							                  }
+							                  var canvasevents = window._cevents[ canvas.id ]
+							                  if (!canvasevents)
+							                  {
+								                  canvasevents = {}
+								                  window._cevents[ canvas.id ] = canvasevents
+								                  canvas.addEventListener( 'mousemove', function ( e )
+								                  {
+									                  this.handleEnterAndExitThings( e, canvasevents )
+								                  }.bind( this ) )
+
+							                  }
+							                  var eventlist = canvasevents[ event ]
+							                  if (!eventlist)
+							                  {
+								                  eventlist = []
+								                  canvasevents[ event ] = eventlist
+								                  canvas.addEventListener( event, function ( e )
+								                  {
+									                  var pos = this.getClickPosition( e )
+									                  for (var i = 0; i < eventlist.length; i++)
+									                  {
+										                  var t = eventlist[ i ]
+										                  if (this.isWithin( pos, t ))
+										                  {
+											                  cb( e )
+											                  break;
+										                  }
+									                  }
+								                  }.bind( this ) )
+							                  }
+							                  thing._cbs = thing._cbs || {}
+                                              thing._cbs[event] = cb
+							                  thing._within = false
+							                  eventlist.push( thing )
+						                  }
+					                  },
+
+					isWithin: function ( pos, t )
+					          {
+						          var tw = (t.x + t.width)
+						          var th = (t.y + t.height)
+						          return (t.x < pos.x && t.y < pos.y && tw > pos.x && th > pos.y)
+					          },
+
+					handleEnterAndExitThings: function ( e, canvasevents )
+					                          {
+						                          var pos = this.getClickPosition( e )
+						                          var enters = canvasevents[ 'mouseenter' ]
+						                          var outs = canvasevents[ 'mouseout' ]
+						                          for (var i = 0; i < enters.length; i++)
+						                          {
+							                          var ething = enters[ i ]
+							                          if (this.isWithin( pos, ething ) && !ething._within)
+							                          {
+								                          ething._within = true
+                                                        console.dir(ething)
+								                          ething._cbs['mouseenter']( e )
+							                          }
+						                          }
+						                          for (var j = 0; j < outs.length; j++)
+						                          {
+							                          var othing = outs[ j ]
+							                          if (!this.isWithin( pos, othing ) && othing._within)
+							                          {
+								                          othing._within = false
+								                          othing._cbs['mouseout']( e )
+							                          }
+						                          }
+					                          }
+				}
+
+    </script>
+
+</dom-module>

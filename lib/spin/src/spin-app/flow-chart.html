@@ -48,7 +48,7 @@
                     </div>
                     <!-- inputs -->
                     <template is="dom-repeat" items="{{selectedmodule.inputs}}">
-                        <flow-input connection="{{item}}" ctx="{{ctx}}"></flow-input>
+                        <flow-input input="{{item}}" ctx="{{ctx}}" canvas="{{canvas}}"></flow-input>
                     </template>
                     <!-- outputs -->
                     <template is="dom-repeat" items="{{selectedmodule.outputs}}">
@@ -133,7 +133,7 @@
 							                if (this.selecteditem.id && canvas)
 							                {
 								                console.log( '--- drawing canvas ---' )
-
+                                                this.canvas = canvas
 								                this.ctx = canvas.getContext( '2d' );
 								                this.ctx.fillStyle = "orange";
 								                this.ctx.fillRect( 0, 0, 800, 600 )
