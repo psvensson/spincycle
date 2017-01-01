@@ -54,6 +54,8 @@
 						         this.ctx.fillStyle = this.strokeStyle
 						         var x = this.basex
 						         var y = this.basey + (this.input.index * (this.gap + this.height))
+						         this.x = x
+						         this.y = y
 						         this.ctx.strokeRect( x, y, this.width, this.height )
 						         this.ctx.fillStyle = this.backgroundcolor
 						         this.ctx.fillRect( x + 2, y + 2, this.width - 2, this.height - 2 )
@@ -66,27 +68,25 @@
 						         this.addEventListener( this.canvas, 'mouseenter', this.area, function ( e )
 						         {
 							         console.log( '--enter' )
-							         this.ctx.fillStyle = this.highlightcolor
-							         this.ctx.fillRect( x + 2, y + 2, this.width - 2, this.height - 2 )
-							         this.ctx.fillStyle = 'black'
-							         this.ctx.font = "16px Sans-Serif";
-							         this.ctx.fillText( this.input.name, x + this.textoffsetx, y + this.textoffsety )
+							         this.drawBackground( this.highlightcolor )
 						         }.bind( this ) )
 						         this.addEventListener( this.canvas, 'mouseout', this.area, function ( e )
 						         {
 							         console.log( '--out' )
-							         this.ctx.fillStyle = this.backgroundcolor
-							         this.ctx.fillRect( x + 2, y + 2, this.width - 2, this.height - 2 )
-							         this.ctx.fillStyle = 'black'
-							         this.ctx.font = "16px Sans-Serif";
-							         this.ctx.fillText( this.input.name, x + this.textoffsetx, y + this.textoffsety )
+							         this.drawBackground( this.backgroundcolor )
 						         }.bind( this ) )
-						         this.ctx.fillStyle = 'black'
-						         this.ctx.font = "16px Sans-Serif";
-						         this.ctx.fillText( this.input.name, x + this.textoffsetx, y + this.textoffsety )
+						         this.drawBackground( this.backgroundcolor )
 					         }
-				         }
+				         },
 
+				drawBackground: function ( bgcolor )
+				                {
+					                this.ctx.fillStyle = bgcolor
+					                this.ctx.fillRect( this.x + 2, this.y + 2, this.width - 2, this.height - 2 )
+					                this.ctx.fillStyle = 'black'
+					                this.ctx.font = "16px Sans-Serif";
+					                this.ctx.fillText( this.input.name, this.x + this.textoffsetx, this.y + this.textoffsety )
+				                }
 
 			} );
     </script>
