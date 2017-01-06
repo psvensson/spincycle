@@ -63,6 +63,21 @@ class spinpolymer
 
     @setup()
 
+  get: (type, id)->
+    d = $q.defer()
+    o = @objects.get(id)
+    if not o
+      @emitMessage( {target: '_get'+type, type: type, obj: {id: id, type: type}} ).then (oo)=>
+        @objects.set(oo.id, oo)
+        d.resolve(oo)
+    else
+      d.resolve(o)
+    return d.promise
+
+  save: (o) ->
+    @objects.set(o.id, o)
+    @emitMessage( { target: '_update'+o.type, obj: o } ).then (sres)->console.log('saved obj result: '+sres)
+
   failed: (msg)->
     console.log 'spinclient message failed!! ' + JSON.toString(msg)
     if @onFailure then @onFailure msg.info
@@ -302,8 +317,6 @@ class spinpolymer
     @outstandingMessages.push detail
     #if debug then console.log 'saving outstanding reply to messageId ' + detail.messageId + ' and @sessionId ' + detail.sessionId
     @emit detail
-    
-
     return d.promise
 
 # ------------------------------------------------------------------------------------------------------------------

@@ -44,6 +44,11 @@
 
 				behaviors: [ canvasUtils ],
 
+                attached: function()
+                          {
+                              console.log('input attached: ',this.ctx, this.canvas, this.input)
+                          },
+
 				onStuff: function ()
 				         {
 					         if (this.ctx && this.input)
@@ -62,7 +67,7 @@
 						         this.area = {x: x + 2, y: y + 2, width: this.width - 2, height: this.height - 2}
 						         this.addEventListener( this.canvas, 'click', this.area, function ( e )
 						         {
-							         console.log( 'click' )
+							         console.log( 'input click' )
 							         console.dir( this.area )
 						         }.bind( this ) )
 						         this.addEventListener( this.canvas, 'mouseenter', this.area, function ( e )

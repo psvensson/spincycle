@@ -1,0 +1,102 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../spin-client/spin-client.html">
+<link rel="import" href="../spin-client/spin-admin.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animated-pages.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animatable.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animations.html">
+
+<link rel="import" href="canvas-utils.html">
+
+<dom-module id="flow-function">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+
+    </template>
+
+    <script>
+        // just an array of strings (named output hooks)
+        Polymer({
+
+            is: 'flow-function',
+
+            properties:
+            {
+                ctx:        {type: Object},
+                client:        {type: Object},
+                canvas:     {type: Object},
+                functionid:   {type: String},
+                index:           {type: Number},
+                basex:           {type: Number, value: 300},
+                basey:           {type: Number, value: 10},
+                gap:             {type: Number, value: 15},
+                textoffset:      {type: Number, value: 5},
+                height:          {type: Number, value: 40},
+                width:           {type: Number, value: 140},
+                strokeStyle:     {type: String, value: '#488'},
+                highlightcolor:  {type: String, value: '#bb7'},
+                backgroundcolor: {type: String, value: '#dda'},
+                textoffsetx:     {type: Number, value: 5},
+                textoffsety:     {type: Number, value: 25},
+            },
+
+            behaviors: [ canvasUtils ],
+
+            attached:function()
+                    {
+                        console.log( '====================== drawing function. client is '+this.client )
+                        var p = this.client.get('SpinFunction', this.functionid)
+                        console.log('client promise is '+p)
+                        console.dir(p)
+                        p.then(function(func)
+                                {
+                                    this.function = func
+                                    console.log('got function')
+                                    console.dir(func)
+
+                                    this.ctx.lineWidth = 1
+                                    this.ctx.strokeStyle = this.strokeStyle
+                                    this.ctx.fillStyle = this.strokeStyle
+                                    var x = this.basex
+                                    var y = this.basey + (this.index * (this.gap + this.height))
+                                    this.x = x
+                                    this.y = y
+                                    this.ctx.strokeRect( x, y, this.width, this.height )
+                                    this.ctx.fillStyle = this.backgroundcolor
+                                    this.ctx.fillRect( x + 2, y + 2, this.width - 2, this.height - 2 )
+                                    this.area = {x: x + 2, y: y + 2, width: this.width - 2, height: this.height - 2}
+                                    this.addEventListener( this.canvas, 'click', this.area, function ( e )
+                                    {
+                                        console.log( 'function click' )
+                                        console.dir( this.area )
+                                    }.bind( this ) )
+                                    this.addEventListener( this.canvas, 'mouseenter', this.area, function ( e )
+                                    {
+                                        console.log( 'function--enter' )
+                                        this.drawBackground( this.highlightcolor )
+                                    }.bind( this ) )
+                                    this.addEventListener( this.canvas, 'mouseout', this.area, function ( e )
+                                    {
+                                        console.log( 'function--out' )
+                                        this.drawBackground( this.backgroundcolor )
+                                    }.bind( this ) )
+                                    this.drawBackground( this.backgroundcolor )
+                                }.bind(this))
+                    },
+
+            drawBackground: function ( bgcolor )
+                            {
+                                this.ctx.fillStyle = bgcolor
+                                this.ctx.fillRect( this.x + 2, this.y + 2, this.width - 2, this.height - 2 )
+                                this.ctx.fillStyle = 'black'
+                                this.ctx.font = "16px Sans-Serif";
+                                this.ctx.fillText( this.function.name, this.x + this.textoffsetx, this.y + this.textoffsety )
+                            }
+        });
+    </script>
+</dom-module>

@@ -22,7 +22,7 @@ class WsMethod
 
       # when the client emits 'message', this listens and executes
       socket.on "message", (datastring) ->
-        console.log 'got new message "'+datastring+'" ['+(typeof datastring)+']'
+        #console.log 'got new message "'+datastring+'" ['+(typeof datastring)+']'
         if typeof datastring == "string"
           data = JSON.parse(datastring)
         else
@@ -37,6 +37,7 @@ class WsMethod
           #if debug then console.dir replydata
           socket.emit('message', replydata)
 
+        console.log 'got new message for '+data.target
         fn = WsMethod.wsroutes[data.target]
         if fn then fn(data) else console.log '*********** Could not find registered target for '+data.target
 

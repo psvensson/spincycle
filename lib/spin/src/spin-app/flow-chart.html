@@ -12,6 +12,7 @@
 <link rel="import" href="./flow-connector.html">
 <link rel="import" href="./flow-input.html">
 <link rel="import" href="./flow-output.html">
+<link rel="import" href="./flow-function.html">
 
 <dom-module id="flow-chart">
     <template>
@@ -39,16 +40,20 @@
                     </spin-element>
 
                     <div>
-                        <paper-button on-tap="newInput">New Input</paper-button>
-                        <paper-button>New Output</paper-button>
-                        <paper-button>New Connection</paper-button>
-                        <paper-button>New Function</paper-button>
-                        <paper-button>New State Property</paper-button>
-                        <paper-button disabled="true">New Sub-module</paper-button>
+                        <paper-button raised on-tap="newInput">New Input</paper-button>
+                        <paper-button raised >New Output</paper-button>
+                        <paper-button raised >New Connection</paper-button>
+                        <paper-button raised on-tap="newFunction">New Function</paper-button>
+                        <paper-button raised >New State Property</paper-button>
+                        <paper-button raised  disabled="true">New Sub-module</paper-button>
                     </div>
                     <!-- inputs -->
                     <template is="dom-repeat" items="{{selectedmodule.inputs}}">
                         <flow-input input="{{item}}" ctx="{{ctx}}" canvas="{{canvas}}"></flow-input>
+                    </template>
+                    <!-- functions -->
+                    <template is="dom-repeat" items="{{selectedmodule.functions}}">
+                        <flow-function index="{{index}}" client="{{client}}" functionid="{{item}}" ctx="{{ctx}}" canvas="{{canvas}}"></flow-function>
                     </template>
                     <!-- outputs -->
                     <template is="dom-repeat" items="{{selectedmodule.outputs}}">
@@ -76,9 +81,41 @@
 					captions:       {type: Object},
 					selecteditem:   {type: Object, observer: 'onSelectedItem'},
 					selectedmodule: {
-						type: Object, observer: 'onSelectedModule'}
+						type: Object, observer: 'onSelectedModule'},
+                    resolvedFunctions:{type:Array, value: []}
 					},
 
+
+                /*
+                    _moduleChanged: function(newm)
+                                       {
+                                         console.log('_moduleChanged')
+                                           console.dir(newm)
+                                           this.resolveFunctions()
+                                       },
+
+                    resolveFunctions: function()
+                                     {
+                                         var count = this.resolvedFunctions.length
+                                         var narr = []
+                                        this.splice('this.resolvedFunctions',0, count)
+                                        this.selectedmodule.functions.forEach(function(fid)
+                                        {
+                                            this.client.get('SpinFunction', fid).then(function(func)
+                                            {
+                                                narr.push(func)
+                                                if(-count === 0)
+                                                {
+                                                    narr.sort()
+                                                    narr.forEach(function(nf)
+                                                    {
+                                                        this.push('this.resolvedFunctions', nf)
+                                                    })
+                                                }
+                                            }.bind(this))
+                                        }.bind(this))
+                                     },
+                */
 					newInput: function ()
 					          {
 					          	console.log('newInput')
@@ -90,6 +127,19 @@
 						          } )
                                 console.dir(this.selectedmodule)
 					          },
+
+                    newFunction: function ()
+                              {
+                                  console.log('newFunction')
+                                  this.client.emitMessage({target: '_createSpinFunction', obj:{type: 'SpinFunction'}}).then(function (newf)
+                                  {
+                                      console.log('new SpinFunction created')
+                                      this.push('selectedmodule.functions', newf.id)
+                                      this.client.save(this.selectedmodule)
+                                      console.log('selected module is now')
+                                      console.dir(this.selectedmodule)
+                                  }.bind(this))
+                              },
 
 					onClient: function ()
 					          {
@@ -106,6 +156,11 @@
 						          console.dir( app )
 						          this.set( 'selecteditem', app )
 					          },
+
+                    ready: function()
+                           {
+
+                           },
 
 					attached: function ()
 					          {

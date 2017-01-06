@@ -1,0 +1,111 @@
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+
+<dom-module id="spin-elementlist">
+
+    <template>
+        <style>
+        </style>
+        <div>
+            <paper-button raised on-tap="doCreate" >{{captions.create_button}}</paper-button>
+            <content></content>
+        </div>
+    </template>
+
+    <script>
+			Polymer({
+				is: 'spin-elementlist',
+				properties:
+				    {
+					    client:{type:'Object', observer:'onStuff'},
+					    spintype:{type:String, observer:'onStuff'},
+					    list:{type:Array, notify:true},
+					    edit:{type: Boolean},
+					    captions:{type:Object, observer: 'onStuff'}
+				    },
+
+				ready: function()
+				       {
+
+				       },
+
+				attached: function()
+				          {
+
+				          },
+
+                doCreate:function()
+                         {
+                         	console.log('doCreate spin-elementlist for '+this.spintype)
+	                         this.client.emitMessage({target: '_create' + this.spintype, obj:{type: this.spintype}}).then(function (newModel)
+	                         {
+
+	                         }.bind(this))
+                         },
+
+				onStuff:function()
+				        {
+				        	console.log('** onstuff spintype='+this.spintype+' client='+this.client+' captions='+this.captions)
+					        if(this.spintype && this.client && this.captions)
+					        {
+						        this.getModelList()
+					        }
+				        },
+
+                getModelList:function()
+                             {
+                             	console.log('---spin-elementlist get all elements')
+	                             var q = {property: 'name', wildcard:true, value: '', limit:100, skip: 0}
+	                             this.client.emitMessage({ target:'_list'+this.spintype+'s', query: q}).then(function(newlist)
+	                             {
+		                             console.log('spin-elementlist  fetchpage got '+newlist.length+' items back')
+		                             //console.dir(newlist)
+		                             newlist.sort(function(a,b)
+		                             {
+			                             return a.name == b.name ? 0 : a.name < b.name ? -1 : 1
+		                             })
+		                             if(!this.list)
+		                             {
+			                             this.list = newlist
+		                             }
+		                             else
+		                             {
+			                             this.splice('list', 0, this.shownItems.length)
+			                             newlist.forEach(function(el){this.push('list', el)}.bind(this))
+			                             this.drawQuickSelectBar()
+		                             }
+		                             this.registerPopulationListener()
+	                             }.bind(this))
+                             },
+
+                registerPopulationListener: function()
+                                            {
+	                                            if(this.listenerid)
+	                                            {
+		                                            this.client.deRegisterPopulationChangesSubscriber({ type: this.spintype, listenerid: this.listenerid})
+	                                            }
+	                                            this.client.registerPopulationChangeSubscriber({ type: this.spintype, cb: function(popchange)
+	                                            {
+		                                            console.log('spin-elementlist --------------------population change callback for '+this.spintype)
+		                                            console.dir(arguments)
+                                                    this.push('list', popchange)
+	                                            }.bind(this)}).then(function(listenid)
+	                                            {
+		                                            this.listenerid = listenid
+	                                            }.bind(this))
+                                            },
+
+				onSelect: function(e)
+				          {
+
+				          }
+			});
+
+    </script>
+
+</dom-module>
