@@ -242,7 +242,7 @@ class SuperModel
         #console.log 'SuperModel did not find obj '+resolveobj.name+' ['+id+'] of type '+resolveobj.type+' in OStore. Getting from DB. typeof of id prop is '+(typeof id)
         DB.get(resolveobj.type, [id]).then( (records) =>
           record = undefined
-          if records[0] then record = records[0]
+          if records and records[0] then record = records[0]
           #console.log 'supermodel resolveObj got back from DB.get '+record
           if not record
             #console.log 'SuperModel::loadFromIds got back null record from DB for type '+resolveobj.type+' and id '+id
