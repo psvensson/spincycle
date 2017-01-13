@@ -1309,7 +1309,7 @@
         return done();
       });
     });
-    return it('should be able to extend a model with a new property', function(done) {
+    it('should be able to extend a model with a new property', function(done) {
       Foo.model.push({
         name: 'xyzzy4',
         "public": true,
@@ -1326,6 +1326,27 @@
           });
         };
       })(this));
+    });
+    it('should be able to tag a model', function(done) {
+      return new Bar({
+        id: 'f0f04b4b'
+      }).then(function(bar) {
+        return messageRouter.setTag('Bar', bar.id, 'footag').then(function(res) {
+          return done();
+        });
+      });
+    });
+    it('should be able to get all tags for a model', function(done) {
+      return messageRouter.getTagsFor('Bar', 'f0f04b4b').then(function(res) {
+        expect(res.indexOf('footag')).to.not.equal(-1);
+        return done();
+      });
+    });
+    return it('should be able to search for all models with a tag', function(done) {
+      return messageRouter.searchForTags('Bar', ['footag']).then(function(res) {
+        expect(res[0]).to.equal('f0f04b4b');
+        return done();
+      });
     });
   });
 

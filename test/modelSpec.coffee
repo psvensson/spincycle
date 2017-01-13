@@ -868,3 +868,21 @@ describe 'Spincycle Model Tests', ->
         console.dir res
         expect(res[0].xyzzy2).to.equal('quux')
         done()
+
+  it 'should be able to tag a model', (done)->
+    new Bar({id:'f0f04b4b'}).then (bar) ->
+      messageRouter.setTag('Bar', bar.id, 'footag').then (res)->
+        #console.log 'tagged a model'
+        done()
+
+  it 'should be able to get all tags for a model', (done)->
+    messageRouter.getTagsFor('Bar', 'f0f04b4b').then (res)->
+      #console.log 'tags for tagged Bar  obj is '+res
+      expect(res.indexOf('footag')).to.not.equal(-1)
+      done()
+
+  it 'should be able to search for all models with a tag', (done)->
+    messageRouter.searchForTags('Bar', ['footag']).then (res)->
+      #console.log 'models returned from searching for footag tags  is '+res
+      expect(res[0]).to.equal('f0f04b4b')
+      done()

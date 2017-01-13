@@ -194,18 +194,17 @@ class RethinkPersistence
     @getDbFor(type).then (db)=>
         # { sort: 'name', property: 'name', value: 'BolarsKolars' }
       rr = db.orderBy(query.sort or 'name')
-      rv = query.value == 'undefined' or query.value.indexOf('[') > -1 or query.value == 'null' or query.value.indexOf('bject') > -1
-      console.log 'rv = '+rv
-      console.log 'not rv and query.property ---> '+(not rv and query.property isnt undefined and query.property isnt null)
-      if not rv and query.property isnt undefined and query.property isnt null
-        value = query.value.toString()
-        #value = value.replace(/[^\w\s@.]/gi, '')
-        value = value.replace(/[`~!@#$%^&*()_|+\=?;:'",.<>\{\}\[\]\\\/]/gi, '')
-        if debug then console.log 'final search value is '+value
-        if query.wildcard then value = '^'+value+'$'
+      rv = @getValueForQuery('value', 'property', query)
+      if not rv.invalid
         rr = rr.filter( (element)=>
-            element(query.property).match(value)
+            element(query.property).match(rv.value)
         )
+        if query.property2
+          rv2 = @getValueForQuery('value2', 'property2', query)
+          if not rv2.invalid
+            rr = rr.filter( (el)=>
+              el(query.property2).match(rv2.value)
+            )
         if query.limit then rr = rr.skip(query.skip).limit(query.limit)
         if debug then console.log 'Rethink findQuery running query...'
         rr.run @connection, (err, cursor) ->
@@ -219,6 +218,19 @@ class RethinkPersistence
       else
         q.resolve([])
     return q
+
+  getValueForQuery: (val, prop, query)->
+    console.log 'getValueFor called with valname '+val+' and propname '+prop
+    rv = query[val] == 'undefined' or query[val].indexOf('[') > -1 or query[val] == 'null' or query[val].indexOf('bject') > -1
+    console.log 'rv = '+rv
+    console.log 'not rv and query.property ---> '+(not rv and query[prop] isnt undefined and query[prop] isnt null)
+    value = query[val].toString()
+    #value = value.replace(/[^\w\s@.]/gi, '')
+    value = value.replace(/[`~!@#$%^&*()_|+\=?;:'",.<>\{\}\[\]\\\/]/gi, '')
+    if debug then console.log 'final search value is '+value
+    if query.wildcard then value = '^'+value+'$'
+    console.log 'returning value "'+value+'"'
+    return {invalid: rv, value: value}
 
   search: (_type, property, _value) =>
     if debug then console.log 'Rethink.search called'

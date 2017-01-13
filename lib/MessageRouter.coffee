@@ -9,6 +9,7 @@ SuperModel      = require('./SuperModel')
 SpinModule      = require('./SpinModule')
 SpinApp         = require('./SpinApp')
 SpinFunction    = require('./SpinFunction')
+SpinTag         = require('./SpinTag')
 ClientEndpoints = require('./ClientEndpoints')
 OStore          = require('./OStore')
 ResolveModule   = require('./ResolveModule')
@@ -21,6 +22,7 @@ serveStatic     = require('serve-static')
 colors          = require('colors/safe')
 DDAPI           = require('./DDAPI')
 StatsD          = require('node-statsd').StatsD
+Taginator       = require('./Taginator')
 
 # The MessageRouter registers names on which messages can be sent.
 # The idea is to abstract away different messaging methods (WS, WebRTC, HTTP) from the logic
@@ -65,6 +67,7 @@ class MessageRouter
     ResolveModule.modulecache['SpinModule'] = SpinModule
     ResolveModule.modulecache['SpinFunction'] = SpinFunction
     ResolveModule.modulecache['SpinApp'] = SpinApp
+    ResolveModule.modulecache['SpinTag'] = SpinTag
     @targets  = []
     @debugtargets  = []
     @args     = []
@@ -115,13 +118,11 @@ class MessageRouter
       console.log 'no app  argument provided to MessageRouter! Unable to set up /spin route'
 
     console.log('**************** exposing SpinModule and SpinFunction')
-    DB.createDatabases(['SpinModule', 'SpinFunction']).then ()=>
+    DB.createDatabases(['SpinModule', 'SpinFunction', 'SpinApp', 'SpinTag']).then ()=>
       console.log ' DB init done..'
       @objectManager.expose 'SpinModule'
       @objectManager.expose 'SpinFunction'
       @objectManager.expose 'SpinApp'
-      ResolveModule.modulecache['SpinFunction'] = SpinFunction
-      ResolveModule.modulecache['SpinModule'] = SpinModule
 
   #---------------------------------------------------------------------------------------------------------------------
 
@@ -225,6 +226,27 @@ class MessageRouter
   uniqueMetric: (metric, val, tags) =>
     if @datadogOptions
       DDAPI.writePoint(metric, val, tags, 'unique')
+
+  setTag: (type, id, tag) =>
+    q = defer()
+    DB.getDataStore().then (store)=>
+      Taginator.setTag(store, type, id, tag).then (value)=>
+        q.resolve(value)
+    return q
+
+  getTagsFor: (type, id) =>
+    q = defer()
+    DB.getDataStore().then (store)=>
+      Taginator.getTagsFor(store, type, id).then (value)=>
+        q.resolve(value)
+    return q
+
+  searchForTags: (type, tags) =>
+    q = defer()
+    DB.getDataStore().then (store)=>
+      Taginator.searchForTags(store, type, tags).then (value)=>
+        q.resolve(value)
+    return q
 
 
 module.exports = MessageRouter

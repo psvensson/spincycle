@@ -53,12 +53,12 @@ class spinpolymer
 
     @subscribers['POPULATION_UPDATE'] = [(update) =>
       console.log 'spinpolymer +++++++++ population update message router got update'
-      #console.dir update
-      obj = update.added or update.deleted
+      console.dir update
+      obj = update.added or update.removed
       if obj
         objsubs = @populationsubscribers[obj.type] or {}
         for k,v of objsubs
-          if v.cb then v.cb obj
+          if v.cb then v.cb update
     ]
 
     @setup()

@@ -145,6 +145,7 @@ class ObjectManager
             if obj
               if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user, msg.sessionId)
                 tc = obj.toClient()
+                if @messageRouter.authMgr.filterOutgoing then tc = @messageRouter.authMgr.filterOutgoing(tc)
                 if debug then console.log '_getObject for '+msg.type+' returns '+JSON.stringify(tc)
                 #if debug then console.dir tc
                 @messageRouter.gaugeMetric('get', 1, {type:msg.type,'username': msg.user.name, 'useremail': msg.user.email, 'provider': msg.user.provider, 'organization': msg.user.organization})
@@ -224,7 +225,9 @@ class ObjectManager
           if debug then console.log 'ObjectManager.parseList --- result of getting record '+r.type+' id '+r.id+' is '+record
           if record and record[0]
             if debug then console.dir record[0]
-            rv.push record[0]
+            tc = record[0]
+            if @messageRouter.authMgr.filterOutgoing then tc = @messageRouter.authMgr.filterOutgoing(tc)
+            rv.push tc
             checkFinish(rv)
           else
             if debug then console.log ' empty records for '+r.id

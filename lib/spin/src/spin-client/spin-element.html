@@ -1,10 +1,10 @@
 
-<link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
-<link rel="import" href="../bower_components/paper-item/paper-item.html">
-<link rel="import" href="../bower_components/iron-icons/maps-icons.html">
-<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
 <dom-module id="spin-element">
 
@@ -12,8 +12,8 @@
         <style>
         </style>
         <div>
-            <template is="dom-if" if="{{edit}}" style="display:flex; flex-direction:row">
-                <paper-button raised on-tap="doSave">{{captions['save_button']}}</paper-button>
+            <template dom-if="showSave" style="display:flex; flex-direction:row">
+                <paper-button raised on-tap="doSave">{{captions.save_button}}</paper-button>
             </template>
             <content></content>
         </div>
@@ -24,11 +24,11 @@
 				is: 'spin-element',
 				properties:
 				    {
-					    client:{type:'Object', observer:'onStuff'},
+					    client:{type:'Object'},
 					    spintype:{type:String, observer:'onStuff'},
                         spinid:{type:String, observer:'onStuff'},
                         model:{type:Object, notify:true},
-                        edit:{type: Boolean, value: false},
+                        edit:{type: Boolean, value:false},
                         captions:{type:Object}
 				    },
 
@@ -39,7 +39,6 @@
 
                 getModelProperties: function()
                                     {
-                                    	console.log('--- spinelement getting '+this.spintype+' '+this.spinid)
 	                                    this.client.emitMessage({target: 'getModelFor', modelname: this.spintype}).then(function(mprops)
 	                                    {
 		                                    console.log('======================= spin-element.onModelChanged getModelFor returns ')
@@ -50,24 +49,39 @@
                                             this.client.emitMessage({target: '_get'+this.spintype, type: this.spintype, obj: {id: this.spinid, type: this.spintype}}).then(function(obj)
                                             {
                                                 this.set('model', obj)
+                                                this.client.registerObjectSubscriber({ id: obj.id, type: obj.type, cb: function(newobj)
+                                                {
+                                                    console.log('spin-element getting subscription changes. setting new model for '+newobj.type+' id = '+newobj.id)
+                                                    this.set('model', newobj)
+                                                }.bind(this)})
                                             }.bind(this))
 	                                    }.bind(this))
                                     },
 
 				attached: function()
 				          {
-
+                              console.log('spin-element attached. captions are')
+                              console.dir(this.captions)
+                              console.log('model is')
+                              console.dir(this.model)
+                              if(this.edit === true)
+                              {
+                                  this.showSave = true
+                              }
 				          },
 
                 onStuff:function()
                         {
-                        	console.log('-- -- spinelement onStuff')
-                            if(this.spintype && this.spinid && this.client)
+                            if(this.spintype && this.spinid)
                             {
                                 this.getModelProperties()
                             }
                         },
 
+                doSave: function()
+                        {
+                            console.log('spin-element doSave called')
+                        },
 
 				onSelect: function(e)
 				          {
