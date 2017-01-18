@@ -310,18 +310,10 @@ class ObjectManager
                 obj[k] = v if k isnt 'id'
               @resolveReferences(obj, obj.constructor.model).then (robj)=>
                 #console.log '++++++++++++++++++++++++++++++++++++++++++++++ onUpdateObject after resolveReferences:'
-                objStore.updateObj(robj)
-                objStore[robj.id] = obj
-                if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db. modifiedAt = '+obj.modifiedAt
-                obj.serialize(robj).then (res) =>
+                @persistUpdates(obj, robj).then (res)=>
                   if not res
                     msg.replyFunc({status: e.general.FAILURE, info: 'db error for object update', payload: msg.obj.id})
                   else
-                    record = obj.toClient()
-                    #objStore.sendUpdatesFor(obj, true)
-                    #console.log 'final object update result------>'
-                    #console.log record
-                    @updateObjectHooks.forEach (hook) => hook(record)
                     @messageRouter.gaugeMetric('update', 1, {type: msg.obj.type,'username': msg.user.name, 'useremail': msg.user.email, 'provider': msg.user.provider, 'organization': msg.user.organization})
                     msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
             else
@@ -340,6 +332,20 @@ class ObjectManager
       console.dir msg.obj
       msg.replyFunc({status: e.general.FAILURE, info: 'missing parameter(s) for object update', payload: msg.obj})
 
+  persistUpdates: (obj,robj)=>
+    q = defer()
+    objStore.updateObj(robj)
+    objStore[robj.id] = obj
+    if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db. modifiedAt = '+obj.modifiedAt
+    obj.serialize(robj).then (res) =>
+      if not res
+        q.resolve(false)
+      else
+        record = obj.toClient()
+        @updateObjectHooks.forEach (hook) => hook(record)
+        q.resolve(true)
+    return q
+      
   areDataTrashed: (obj) ->
     trashed = false
     for k of obj
