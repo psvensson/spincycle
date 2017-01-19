@@ -29,11 +29,22 @@
                 'user-changed': 'onUserChanged'
             },
 
+	        observers: [
+		        'onUserObserved(user.*)'
+	        ],
+
 
             ready: function()
                    {
 
                    },
+
+          onUserObserved:function(u)
+                          {
+                          	//console.log('spin-client onUserObserved')
+                            //console.dir(u)
+	                          this.saveUser()
+                          },
 
             onUserChanged: function ( e )
                            {
@@ -47,13 +58,7 @@
 		                           }
 		                           this.set( 'user', e )
 		                           //console.dir(this.user)
-		                           this.client.emitMessage( {
-			                           target: '_updateUser',
-			                           obj:    this.user
-		                           } ).then( function ( ures )
-		                           {
-			                           console.log( 'user update result: ' + ures )
-		                           }.bind( this ) )
+		                           this.saveUser()
 		                           if (this.subscriptionid)
 		                           {
 			                           this.client.deRegisterObjectsSubscriber( this.subscriptionid, this.user )
@@ -61,9 +66,8 @@
 		                           this.client.registerObjectSubscriber( {
 			                           id: this.user.id, type: this.user.type, cb: function ( nm )
 			                           {
-				                           console.log( '*** spin-client got user update ***' )
-				                           console.dir( nm )
-
+				                           //console.log( '*** spin-client got user update ***' )
+				                           //console.dir( nm )
 
 			                           }.bind( this )
 		                           } ).then( function ( sid )
@@ -76,6 +80,33 @@
 
                            },
 
+          saveUser: function()
+                    {
+                    	if(!this.saving)
+                        {
+	                        this.saving = true
+	                        this.client.emitMessage( {
+		                        target: '_updateUser',
+		                        obj:    this.user
+	                        } ).then( function ( ures )
+	                        {
+	                        	setTimeout(
+	                        		function(){
+							                        console.log( 'user update result: ' + ures )
+							                        this.saving = false
+                                    }.bind(this),100
+                                )
+
+	                        }.bind( this ) )
+                        }
+
+                    },
+
+            registerObjectSubscriber: function(detail)
+                                      {
+	                                      window.spinclient.registerObjectSubscriber(detail)
+                                      },
+
             attached: function()
                       {
                           window.spinclient = new window.SpinClient(this.serveruri || '')
@@ -86,6 +117,7 @@
                           this.addEventListener('user-changed', this.onUserChanged.bind(this))
 	                      window.spinclient.failureListeners = []
                           window.spinclient.addFailureListener = this.addFailureListener.bind(this)
+
 	                      this.set('client', window.spinclient)
                       },
 
