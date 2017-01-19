@@ -90,7 +90,7 @@ class OStore
 
       OStore.objects[record.id] = obj
       if OStore.anyoneIsListening(obj.id) or force
-        #console.log 'updateObj calling sendUpdates for '+record.id
+        console.log 'updateObj calling sendUpdates for '+record.id
         if not changed then changed = force
         OStore.sendUpdatesFor(obj, changed)
     else
@@ -105,8 +105,8 @@ class OStore
         rv = property
     rv
 
-  @sendUpdatesFor: (obj, changed, force) =>
-    #console.log 'OStore.sendUpdatesFor called for obj '+obj.id+' type '+obj.type+' changed = '+changed+', anyone is listening == '+OStore.anyoneIsListening(obj.id)
+  @sendUpdatesFor: (obj, changed) =>
+    console.log 'OStore.sendUpdatesFor called for obj '+obj.id+' type '+obj.type+' changed = '+changed+', anyone is listening == '+OStore.anyoneIsListening(obj.id)
     if changed and OStore.anyoneIsListening(obj.id)
       #console.dir obj
       #console.log 'adding obj to updateQueue..'
@@ -162,7 +162,7 @@ class OStore
     #console.log '-------------------------------------------------------sendAtInterval called '
     #console.dir OStore.updateQueue
     if OStore.updateQueue.length > 0
-      #if debug then console.log 'OStore.sendAtInterval queue length = '+OStore.updateQueue.length
+      if debug then console.log 'OStore.sendAtInterval queue length = '+OStore.updateQueue.length
       l = OStore.updateQueue.length
       count = 0
       while count < l
