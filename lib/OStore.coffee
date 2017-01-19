@@ -60,7 +60,7 @@ class OStore
       OStore.objectsByType[obj.type] = obj
 
   @updateObj = (record, force) ->
-    if debug then console.log '+ oStore.updateObj called for obj '+record.id
+    if debug then console.log '+ oStore.updateObj called for obj '+record.id+' force = '+force
     #console.log 'updateObj '+record
     #console.dir record
     obj = OStore.objects[record.id]
@@ -92,7 +92,7 @@ class OStore
       if OStore.anyoneIsListening(obj.id) or force
         console.log 'updateObj calling sendUpdates for '+record.id
         if not changed then changed = force
-        OStore.sendUpdatesFor(obj, changed)
+        OStore.sendUpdatesFor(obj, changed, force)
     else
       console.log 'OStore: tried to update an object which we did not have in cache!'
 
@@ -105,9 +105,9 @@ class OStore
         rv = property
     rv
 
-  @sendUpdatesFor: (obj, changed) =>
-    console.log 'OStore.sendUpdatesFor called for obj '+obj.id+' type '+obj.type+' changed = '+changed+', anyone is listening == '+OStore.anyoneIsListening(obj.id)
-    if changed and OStore.anyoneIsListening(obj.id)
+  @sendUpdatesFor: (obj, changed, force) =>
+    console.log 'OStore.sendUpdatesFor called for obj '+obj.id+' type '+obj.type+' changed = '+changed+', force = '+force+', anyone is listening == '+OStore.anyoneIsListening(obj.id)
+    if (changed or force) and OStore.anyoneIsListening(obj.id)
       #console.dir obj
       #console.log 'adding obj to updateQueue..'
       OStore.updateQueue.push obj
@@ -117,7 +117,7 @@ class OStore
     count = obj.list.length
     obj.list.forEach (id) =>
       OStore.getObject(id, obj.type).then (o) =>
-        if debug then console.log 'sendAllUpdatesFor adding list object '+id
+        console.log 'sendAllUpdatesFor adding list object '+id
         #if debug then console.dir o
         sendobj.list.push o.toClient()
         if --count == 0
