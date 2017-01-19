@@ -89,7 +89,7 @@ class OStore
                   #if debug then console.dir clean
 
       OStore.objects[record.id] = obj
-      if OStore.anyoneIsListening(obj.id)
+      if OStore.anyoneIsListening(obj.id) or force
         #console.log 'updateObj calling sendUpdates for '+record.id
         OStore.sendUpdatesFor(obj, changed)
     else

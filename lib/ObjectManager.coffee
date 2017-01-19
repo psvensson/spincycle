@@ -332,9 +332,9 @@ class ObjectManager
       console.dir msg.obj
       msg.replyFunc({status: e.general.FAILURE, info: 'missing parameter(s) for object update', payload: msg.obj})
 
-  persistUpdates: (obj,robj)=>
+  persistUpdates: (obj, robj, force)=>
     q = defer()
-    objStore.updateObj(robj)
+    objStore.updateObj(robj, force)
     objStore[robj.id] = obj
     if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db. modifiedAt = '+obj.modifiedAt
     obj.serialize(robj).then (res) =>
