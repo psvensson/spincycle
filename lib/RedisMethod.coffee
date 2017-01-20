@@ -6,7 +6,7 @@ debug = process.env["DEBUG"]
 
 class RedisMethod
 
-  constructor: (messageRouter, app, dbUrl) ->
+  constructor: (messageRouter, app, dbUrl, addr) ->
     @redisroutes = []
 
     if debug then console.log 'RediMethod dbUrl = '+dbUrl
@@ -17,7 +17,9 @@ class RedisMethod
     @listenclient = redis.createClient(rport, rhost)
     @sendclient = redis.createClient(rport, rhost)
 
-    @listenclient.subscribe('spinchannel')
+    chid = 'spinchannel'
+    if addr then chid = chid + '_' + addr
+    @listenclient.subscribe(chid)
     @listenclient.on('message', @onChannelMessage)
     messageRouter.addMethod 'redis', @
  
