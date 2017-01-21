@@ -82,7 +82,8 @@ class SuperModel
       else if (v.value and v.value isnt 0) and not v.type
         #if debug then console.log 'direct value '+v.value+' me[v.value] = '+(me[v.value])+' record[k] = '+(record[k])
         rv[k] = me[v.value]
-        if not rv[k] and rv[k] isnt 0 then rv[k] = record[k] # TODO: Why do we default to record, it's undefined
+        if not rv[k] and rv[k] isnt 0
+          if record and record[k] then rv[k] = record[k] else rv[k] = undefined
       else if v.hashtable
         #if debug then console.log 'hashtable '
         varr = []
