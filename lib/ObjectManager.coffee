@@ -132,8 +132,8 @@ class ObjectManager
   _getObject: (msg) =>
     #if debug then console.log '_getObject called for type '+msg.type
     #if debug then console.dir msg.obj
-    if msg.type and msg.obj and msg.obj.id
-      id = msg.obj.id
+    if msg.type and ((msg.obj and msg.obj.id) or msg.id)
+      id = msg.id or msg.obj.id
       if id.indexOf and id.indexOf('all_') > -1
         @getAggregateObjects(msg)
       else
@@ -154,12 +154,12 @@ class ObjectManager
                 console.log '_getObject got NOT ALLOWED for user '+msg.user.id+' for '+msg.type+' id '+obj.id
                 msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: id})
             else
-              console.log '_getObject No object found with id '+id+' of type '+msg.obj.type
-              msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'no such object', payload: msg.obj.id})
+              console.log '_getObject No object found with id '+id+' of type '+msg.type
+              msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'no such object', payload: id})
         else
-          console.log '_getObject provided id '+id+' of type '+msg.obj.type+' is an object!!'
+          console.log '_getObject provided id '+id+' of type '+msg.type+' is an object!!'
           console.dir id
-          msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'id value is an object!!!', payload: msg.obj.id})
+          msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'id value is an object!!!', payload: id})
     else
       msg.replyFunc({status: e.general.FAILURE, info: '_getObject for '+msg.type+' missing parameter', payload: null })
 
