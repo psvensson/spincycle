@@ -23,6 +23,7 @@ colors          = require('colors/safe')
 DDAPI           = require('./DDAPI')
 StatsD          = require('node-statsd').StatsD
 Taginator       = require('./Taginator')
+SpinMeta        = require('./SpinMeta')
 
 # The MessageRouter registers names on which messages can be sent.
 # The idea is to abstract away different messaging methods (WS, WebRTC, HTTP) from the logic
@@ -45,39 +46,44 @@ class MessageRouter
   debug = process.env["DEBUG"]
 
   constructor: (@authMgr, dburl, msgPS, @app, dbtype = 'mongodb', @datadogOptions) ->
+    q = defer()
     #console.log 'MessageRouter dbtype = '+dbtype
     # console.dir arguments
     MessageRouter.DB.dburl = dburl
     MessageRouter.DB.dbname = dbtype
-    DB.getDataStore(dbtype)
-    pjson = require('../package.json');
-    @messagesPerSecond = msgPS or 100
-    console.log colors.blue.inverse('---------------------------------------------------------------------------------------')
-    console.log colors.blue.bold.inverse(' SpinCycle messageRouter constructor. Version - '+pjson.version+' messages per second limit = '+@messagesPerSecond+' ')
-    console.log colors.blue.inverse('---------------------------------------------------------------------------------------')
-    if @datadogOptions
-      console.log 'datadog options are'
-      console.dir @datadogOptions
-      @dogstatsd  = new StatsD()
-      DDAPI.init(@datadogOptions)
-      #DDAPI.writePoint('swkjekjewjoew', 17, {xyz:42, abc:4711}, 'gauge')
-    #console.dir @authMgr
-    @authMgr.messagerouter = @
     @resolver = new ResolveModule()
     ResolveModule.modulecache['SpinModule'] = SpinModule
     ResolveModule.modulecache['SpinFunction'] = SpinFunction
     ResolveModule.modulecache['SpinApp'] = SpinApp
     ResolveModule.modulecache['SpinTag'] = SpinTag
-    @targets  = []
-    @debugtargets  = []
-    @args     = []
-    @methods  = []
-    #@authMgr  = AuthenticationManager
-    @objectManager = new ObjectManager(@)
-    @objectManager.setup()
-    if @authMgr.setup then @authMgr.setup(@)
+    ResolveModule.modulecache['SpinMeta'] = SpinMeta
+    DB.getDataStore(dbtype).then ()=>
+      pjson = require('../package.json');
+      @messagesPerSecond = msgPS or 100
+      console.log colors.blue.inverse('---------------------------------------------------------------------------------------')
+      console.log colors.blue.bold.inverse(' SpinCycle messageRouter constructor. Version - '+pjson.version+' messages per second limit = '+@messagesPerSecond+' ')
+      console.log colors.blue.inverse('---------------------------------------------------------------------------------------')
+      if @datadogOptions
+        console.log 'datadog options are'
+        console.dir @datadogOptions
+        @dogstatsd  = new StatsD()
+        DDAPI.init(@datadogOptions)
+        #DDAPI.writePoint('swkjekjewjoew', 17, {xyz:42, abc:4711}, 'gauge')
+      #console.dir @authMgr
+      @authMgr.messagerouter = @
 
-    @setup()
+      @targets  = []
+      @debugtargets  = []
+      @args     = []
+      @methods  = []
+      #@authMgr  = AuthenticationManager
+      @objectManager = new ObjectManager(@)
+      @objectManager.setup()
+      if @authMgr.setup then @authMgr.setup(@)
+      @setup()
+      q.resolve(@)
+
+    return q
 
   setup: () =>
     @addTarget 'listcommands', '<noargs>', (msg) =>
@@ -123,6 +129,11 @@ class MessageRouter
       @objectManager.expose 'SpinModule'
       @objectManager.expose 'SpinFunction'
       @objectManager.expose 'SpinApp'
+      @objectManager.expose 'SpinMeta'
+      @makeRESTful('SpinModule')
+      @makeRESTful('SpinFunction')
+      @makeRESTful('SpinApp')
+      @makeRESTful('SpinMeta')
 
   #---------------------------------------------------------------------------------------------------------------------
 

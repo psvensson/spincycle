@@ -131,28 +131,30 @@ describe 'Spincycle Model Tests', ->
   before (done)->
     #console.log '------------------------------------- before called'
     authMgr         = new AuthenticationManager()
+    messageRouter = undefined
     #messageRouter   = new SpinCycle(authMgr, null, 10, app, 'mongodb')
-    messageRouter   = new SpinCycle(authMgr, null, 10, app, 'rethinkdb')
-    """
-    options = {
-      api_key: "8a8c68a6193ac76c501f49b08e3a105f",
-      app_key: "1b9c45f6638bd01d8ef4c474ec87e15487f644a2",
-      #api_version: 'v1.5',
-      api_host: 'app.datadoghq.com'
-    }
-    messageRouter   = new SpinCycle(authMgr, null, 10, app, 'google', options)
-    """
-    httpMethod = new SpinCycle.HttpMethod(messageRouter, app, '/api/')
-    app.listen(8008)
-    ResolveModule.modulecache['foo'] = Foo
-    ResolveModule.modulecache['bar'] = Bar
-    ResolveModule.modulecache['dfoo'] = DFoo
-    ResolveModule.modulecache['directbar'] = DirectBar
-    ResolveModule.modulecache['hashbar'] = HashBar
-    DB.createDatabases(['foo','bar','dfoo','directbar','hashbar']).then () ->
-      console.log '++++++++++++++++++++++++++++++++++++spec dbs created'
-      messageRouter.open()
-      done()
+    new SpinCycle(authMgr, null, 10, app, 'rethinkdb').then (mr)=>
+      messageRouter = mr
+      """
+      options = {
+        api_key: "8a8c68a6193ac76c501f49b08e3a105f",
+        app_key: "1b9c45f6638bd01d8ef4c474ec87e15487f644a2",
+        #api_version: 'v1.5',
+        api_host: 'app.datadoghq.com'
+      }
+      messageRouter   = new SpinCycle(authMgr, null, 10, app, 'google', options)
+      """
+      httpMethod = new SpinCycle.HttpMethod(messageRouter, app, '/api/')
+      app.listen(8008)
+      ResolveModule.modulecache['foo'] = Foo
+      ResolveModule.modulecache['bar'] = Bar
+      ResolveModule.modulecache['dfoo'] = DFoo
+      ResolveModule.modulecache['directbar'] = DirectBar
+      ResolveModule.modulecache['hashbar'] = HashBar
+      DB.createDatabases(['foo','bar','dfoo','directbar','hashbar']).then () ->
+        console.log '++++++++++++++++++++++++++++++++++++spec dbs created'
+        messageRouter.open()
+        done()
 
 
 

@@ -31,12 +31,12 @@ ddoptions = {
 
 #--------------------------------------------------> Set up Message Router
 authMgr         = new AuthenticationManager(app)
-messageRouter   = new SpinCycle(authMgr, null, null, app, 'rethinkdb', ddoptions)
-#--------------------------------------------------> Express Routing
-new SpinCycle.HttpMethod(messageRouter, app, '/api/')
-#<-------------------------------------------------- Express Routing
-#--------------------------------------------------> WS Routing
-new SpinCycle.WsMethod(messageRouter, server)
-#<-------------------------------------------------- WS Routing
-messageRouter.open()
+new SpinCycle(authMgr, null, null, app, 'rethinkdb', ddoptions).then (mgr)->
+  #--------------------------------------------------> Express Routing
+  new SpinCycle.HttpMethod(mgr, app, '/api/')
+  #<-------------------------------------------------- Express Routing
+  #--------------------------------------------------> WS Routing
+  new SpinCycle.WsMethod(mgr, server)
+  #<-------------------------------------------------- WS Routing
+  mgr.open()
 

@@ -16,7 +16,7 @@ class RethinkPersistence
 
   connect: ()=>
     console.log 'connect called...  dburl = '+@dburl
-    console.dir @dburl
+    #console.dir @dburl
     q = defer()
     ccc = @dburl or {host: madr, port: mport}
     r.connect(ccc, (err, conn) =>

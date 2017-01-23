@@ -265,20 +265,25 @@
     })(SuperModel);
     before(function(done) {
       authMgr = new AuthenticationManager();
-      messageRouter = new SpinCycle(authMgr, null, 10, app, 'rethinkdb');
-      "options = {\n  api_key: \"8a8c68a6193ac76c501f49b08e3a105f\",\n  app_key: \"1b9c45f6638bd01d8ef4c474ec87e15487f644a2\",\n  #api_version: 'v1.5',\n  api_host: 'app.datadoghq.com'\n}\nmessageRouter   = new SpinCycle(authMgr, null, 10, app, 'google', options)";
-      httpMethod = new SpinCycle.HttpMethod(messageRouter, app, '/api/');
-      app.listen(8008);
-      ResolveModule.modulecache['foo'] = Foo;
-      ResolveModule.modulecache['bar'] = Bar;
-      ResolveModule.modulecache['dfoo'] = DFoo;
-      ResolveModule.modulecache['directbar'] = DirectBar;
-      ResolveModule.modulecache['hashbar'] = HashBar;
-      return DB.createDatabases(['foo', 'bar', 'dfoo', 'directbar', 'hashbar']).then(function() {
-        console.log('++++++++++++++++++++++++++++++++++++spec dbs created');
-        messageRouter.open();
-        return done();
-      });
+      messageRouter = void 0;
+      return new SpinCycle(authMgr, null, 10, app, 'rethinkdb').then((function(_this) {
+        return function(mr) {
+          messageRouter = mr;
+          "options = {\n  api_key: \"8a8c68a6193ac76c501f49b08e3a105f\",\n  app_key: \"1b9c45f6638bd01d8ef4c474ec87e15487f644a2\",\n  #api_version: 'v1.5',\n  api_host: 'app.datadoghq.com'\n}\nmessageRouter   = new SpinCycle(authMgr, null, 10, app, 'google', options)";
+          httpMethod = new SpinCycle.HttpMethod(messageRouter, app, '/api/');
+          app.listen(8008);
+          ResolveModule.modulecache['foo'] = Foo;
+          ResolveModule.modulecache['bar'] = Bar;
+          ResolveModule.modulecache['dfoo'] = DFoo;
+          ResolveModule.modulecache['directbar'] = DirectBar;
+          ResolveModule.modulecache['hashbar'] = HashBar;
+          return DB.createDatabases(['foo', 'bar', 'dfoo', 'directbar', 'hashbar']).then(function() {
+            console.log('++++++++++++++++++++++++++++++++++++spec dbs created');
+            messageRouter.open();
+            return done();
+          });
+        };
+      })(this));
     });
     postCreateState = -1;
     this.record3 = {

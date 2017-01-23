@@ -25,12 +25,14 @@ class DB
   @lrudiff: LRU()
   @dbname : ''
 
+
   @onUpdated: (record)=>
     if record and record.type and record.id
       resolver.createObjectFrom(record).then (ooo) =>
         OStore.updateObj(ooo)
 
   @getDataStore: (_name) =>
+    #console.log 'getDataStore called for '+_name
     name = _name or DB.dbname
     DB.dbname = name
     #console.log 'DB.getDataStore called name = '+name
@@ -45,10 +47,14 @@ class DB
       else if name == 'rethinkdb' then @DataStore = new Rethink(DB.dburl, DB)
       else if name == 'google' then @DataStore = new Google(DB.dburl, DB)
       @DataStore.connect().then (ds)=>
-        @DataStore = ds
-        if debug then console.log 'DB got back datastore for '+name
-        q.resolve(ds)
+        #console.log 'DB got back datastore for '+name
+        @getOrCreateObjectByRecord({id:11122333444, type:'SpinMeta'}).then (meta)=>
+          @meta = meta
+          meta.serialize()
+          @DataStore = ds
+          q.resolve(ds)
     else
+      #console.log '..resolving existing store'
       q.resolve(@DataStore)
     return q
 
@@ -61,6 +67,9 @@ class DB
       promises = []
       dblist.forEach (dbname) =>
         console.log 'attempting to get table for '+dbname
+        if not (dbname in @meta.knownModels)
+          @meta.knownModels.push dbname
+          @meta.serialize()
         db = store.getDbFor(dbname)
         promises.push db
       all(promises).then (results) =>
