@@ -226,8 +226,11 @@ class ObjectManager
           if record and record[0]
             if debug then console.dir record[0]
             tc = record[0]
-            if @messageRouter.authMgr.filterOutgoing then tc = @messageRouter.authMgr.filterOutgoing(tc)
-            rv.push tc
+            if @messageRouter.authMgr.filterOutgoing
+              tres = @messageRouter.authMgr.filterOutgoing(tc)
+              if tres then rv.push tres
+            else
+              rv.push tc
             checkFinish(rv)
           else
             if debug then console.log ' empty records for '+r.id
