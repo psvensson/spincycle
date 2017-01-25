@@ -19,6 +19,23 @@ In more detail, this is what SpinCycle helps you with:
 4. The models are always flat, using ids or arrays of ids to refer to other models
 5. The models are created and persisted using records that are separated from the DB used (currently working adapters are CouchDB and MongoDB, with MongoDB being used as default)
 6. A web client can subscribe to changes to object properties (if using the WebSockets transport method) as well as update objects, both using any custom AuthenticationManager for control.
+(New)
+7. Can easily create HTTP REST interface for models, using the following call:  @messageRouter.makeRESTful('Device') with the model name as argument. You can then use /rest/device for data access (/rest/device/12345 et.c.) using POST,PUT,GET and DEL
+8. There's a new experimental Google Datastore database layer, which can be used by changing the 5th argument to 'google' instead of the default 'rethinkdb'
+9. Automatic throttling of messages sent per second, per user. By setting the third argument, you can choose what level is appropriate for you. Users will get error messages whne they try to go over the limits
+10. Automatic datadog integration! By adding a sixth argument to the contructor, you can pass Datadog options, like this;
+
+      """
+      options = {
+        api_key: "8a8z0a6155576ccccc4966605f",
+        app_key: "1zz2235f6638bd01deee4ec8799006ga2",
+        #api_version: 'v1.5',
+        api_host: 'app.datadoghq.com'
+      }
+      messageRouter   = new SpinCycle(authMgr, null, 10, app, 'google', options)
+      """
+      All basic events like get, update, list, et.c. will be logged and if user name and email are present, they will be added as metadata. A new target endpoint is also exposed called 'ddapi' which takes three arguments; metric, value and tags.
+      
 
 So you really only need to create your model classes and expose functions giving access to them and all client updates will occur automatically.
 
@@ -48,15 +65,19 @@ To call an exposed target function on the server
     server          = require("http").createServer(app)
     AuthenticationManager = require('./backend/AuthenticationManager')  # We're coming to this in a bit
     app.use express.static("app")
+    msgps = 100 # throttling on number of messages per second, per user
     #--------------------------------------------------> Set up Message Router
     authMgr       = new AuthenticationManager(app)
-    messageRouter = new SpinCycle(authMgr)
-    #--------------------------------------------------> Express Routing
-    new SpinCycle.HttpMethod(messageRouter, app, '/api/')
-    #<-------------------------------------------------- Express Routing
-    #--------------------------------------------------> WS Routing
-    new SpinCycle.WsMethod(messageRouter, server)
-    #<-------------------------------------------------- WS Routing
+    #
+    # NOTE: Breaking change from 1.9.79, you must now use a promise when creating the messaeg router;
+    #
+    new SpinCycle(authMgr, dbUrl, msgps, app, 'rethinkdb').then (messageRouter)->
+        #--------------------------------------------------> Express Routing
+        new SpinCycle.HttpMethod(messageRouter, app, '/api/')
+        #<-------------------------------------------------- Express Routing
+        #--------------------------------------------------> WS Routing
+        new SpinCycle.WsMethod(messageRouter, server)
+        #<-------------------------------------------------- WS Routing
     
 # Making use of SpinCycle:
 
@@ -168,6 +189,11 @@ A very simple implementation could look like this;
         # When a user sends a '_create'+<object_type> message, this method gets called to allow or disallow creating of the object
         canUserListTheseObjects: (type, user) =>
           true # same here
+          
+        # gets called, if present, for all objects returned by get or list operations, so that different users can see different
+        # subsets of proeprties of different objects (eg. you only see email on users if you are that user or an admin)
+        filterOutgoing: (toclient, user)=>  
+            toclient
 
     module.exports = AuthenticationManager
     
