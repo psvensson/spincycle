@@ -25,7 +25,7 @@ In more detail, this is what SpinCycle helps you with:
 9. Automatic throttling of messages sent per second, per user. By setting the third argument, you can choose what level is appropriate for you. Users will get error messages whne they try to go over the limits
 10. Automatic datadog integration! By adding a sixth argument to the contructor, you can pass Datadog options, like this;
 
-      """
+      
       options = {
         api_key: "8a8z0a6155576ccccc4966605f",
         app_key: "1zz2235f6638bd01deee4ec8799006ga2",
@@ -33,7 +33,7 @@ In more detail, this is what SpinCycle helps you with:
         api_host: 'app.datadoghq.com'
       }
       messageRouter   = new SpinCycle(authMgr, null, 10, app, 'google', options)
-      """
+      
       All basic events like get, update, list, et.c. will be logged and if user name and email are present, they will be added as metadata. A new target endpoint is also exposed called 'ddapi' which takes three arguments; metric, value and tags.
       
 
