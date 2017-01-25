@@ -119,7 +119,7 @@ class RethinkPersistence
       rr = db
       if query?.limit
         if debug then console.log 'skipping '+query.skip+' limiting '+query.limit
-        rr = rr.skip(parseInt(query.skip)).limit(parseInt(query.limit))
+        rr = rr.skip(parseInt(query.skip or 0)).limit(parseInt(query.limit))
       if query?.sort then rr = db.orderBy(query?.sort or 'name')
       rr.run @connection, (err, cursor) ->
         if err
@@ -205,7 +205,7 @@ class RethinkPersistence
             rr = rr.filter( (el)=>
               el(query.property2).match(rv2.value)
             )
-        if query.limit then rr = rr.skip(query.skip).limit(query.limit)
+        if query.limit then rr = rr.skip(query.skip or 0).limit(query.limit)
         if debug then console.log 'Rethink findQuery running query...'
         rr.run @connection, (err, cursor) ->
           if err
