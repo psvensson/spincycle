@@ -186,8 +186,8 @@ class RethinkPersistence
     return q
 
   findQuery: (_type, query) =>
-    console.log 'Rethink findQuery called for type '+_type
-    console.dir query
+    if debug then console.log 'Rethink findQuery called for type '+_type
+    if debug then console.dir query
     if not query.property then query.property = 'name'
     q = defer()
     type = _type.toLowerCase()
@@ -220,16 +220,16 @@ class RethinkPersistence
     return q
 
   getValueForQuery: (val, prop, query)->
-    console.log 'getValueFor called with valname '+val+' and propname '+prop
+    #console.log 'getValueFor called with valname '+val+' and propname '+prop
     rv = query[val] == 'undefined' or query[val].indexOf('[') > -1 or query[val] == 'null' or query[val].indexOf('bject') > -1
-    console.log 'rv = '+rv
-    console.log 'not rv and query.property ---> '+(not rv and query[prop] isnt undefined and query[prop] isnt null)
+    #console.log 'rv = '+rv
+    #console.log 'not rv and query.property ---> '+(not rv and query[prop] isnt undefined and query[prop] isnt null)
     value = query[val].toString()
     #value = value.replace(/[^\w\s@.]/gi, '')
     value = value.replace(/[`~!@#$%^&*()_|+\=?;:'",.<>\{\}\[\]\\\/]/gi, '')
     if debug then console.log 'final search value is '+value
     if query.wildcard then value = '^'+value
-    console.log 'returning value "'+value+'"'
+    #console.log 'returning value "'+value+'"'
     return {invalid: rv, value: value}
 
   search: (_type, property, _value) =>
