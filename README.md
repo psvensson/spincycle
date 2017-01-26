@@ -4,6 +4,9 @@
 Opinionated message router and generalized ORM (with automatically persisted and loaded hierarchies) that let front-end clients subscribe to object property changes on the node.js server.
 SpinCycle uses Node.js and Express and is written in CoffeeScript. 
 
+**Shoutout** 
+I thought that noone but me actually use this, but it seems a fair number of donwload have been made the last year. Please let me know what you'd like to see/to see fixed in the issues! Hugs and beer.
+
 ## Overview
 SpinCycle tries to remove as much boilerplate as possible between client and server communication. Just write models, define model relations, set up endpoints and you're ready to go.
 
@@ -21,7 +24,7 @@ In more detail, this is what SpinCycle helps you with:
 6. A web client can subscribe to changes to object properties (if using the WebSockets transport method) as well as update objects, both using any custom AuthenticationManager for control.
 (New)
 7. Can easily create HTTP REST interface for models, using the following call:  @messageRouter.makeRESTful('Device') with the model name as argument. You can then use /rest/device for data access (/rest/device/12345 et.c.) using POST,PUT,GET and DEL
-8. There's a new experimental Google Datastore database layer, which can be used by changing the 5th argument to 'google' instead of the default 'rethinkdb'
+8. There's a new experimental Google Datastore database layer, which can be used by changing the 5th argument to 'google' instead of the default 'rethinkdb'. You need to declare the GCLOUD_PROJECT environment var to hold your project name and be loggin through gcloud.
 9. Automatic throttling of messages sent per second, per user. By setting the third argument, you can choose what level is appropriate for you. Users will get error messages whne they try to go over the limits
 10. Automatic datadog integration! By adding a sixth argument to the contructor, you can pass Datadog options, like this;
 
