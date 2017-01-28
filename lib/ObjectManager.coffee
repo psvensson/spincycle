@@ -43,6 +43,13 @@ class ObjectManager
   registerUpdateObjectHook: (hook) =>
     @updateObjectHooks.push hook
 
+    #TODO: Make sure that all method check if type arguments actually exists as models!
+  getTypes: ()=>
+    types = []
+    for k,v of ResolveModule.modulecache
+      types.push k
+    types  
+
   onListTypes: (msg) =>
     types = []
     for k,v of ResolveModule.modulecache
@@ -494,15 +501,18 @@ class ObjectManager
 
   onRegisterForPopulationChanges: (msg) =>
     if msg.type
-      poplistenid = uuid.v4()
-      sublist = @populationListeners[msg.type] or {}
-      sublist[poplistenid] = msg.client
-      @populationListeners[msg.type] = sublist
-      msg.replyFunc({status: e.general.SUCCESS, info: 'registered for population changes for type '+msg.type, payload: poplistenid})
-      ClientEndpoints.onDisconnect (adr) =>
-        if adr == msg.client
-          sublist = @populationListeners[msg.type] or {}
-          delete sublist[poplistenid]
+      if msg.type in @getTypes()
+        poplistenid = uuid.v4()
+        sublist = @populationListeners[msg.type] or {}
+        sublist[poplistenid] = msg.client
+        @populationListeners[msg.type] = sublist
+        msg.replyFunc({status: e.general.SUCCESS, info: 'registered for population changes for type '+msg.type, payload: poplistenid})
+        ClientEndpoints.onDisconnect (adr) =>
+          if adr == msg.client
+            sublist = @populationListeners[msg.type] or {}
+            delete sublist[poplistenid]
+      else
+        msg.replyFunc({status: e.general.FAILURE, info: 'onRegisterForPopulationChanges unknown type', payload: msg.type })
     else
       msg.replyFunc({status: e.general.FAILURE, info: 'onRegisterForPopulationChanges missing parameter', payload: null })
 

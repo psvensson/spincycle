@@ -24,9 +24,9 @@ In more detail, this is what SpinCycle helps you with:
 6. A web client can subscribe to changes to object properties (if using the WebSockets transport method) as well as update objects, both using any custom AuthenticationManager for control.
 (New)
 7. Can easily create HTTP REST interface for models, using the following call:  @messageRouter.makeRESTful('Device') with the model name as argument. You can then use /rest/device for data access (/rest/device/12345 et.c.) using POST,PUT,GET and DEL
-8. There's a new experimental Google Datastore database layer, which can be used by changing the 5th argument to 'google' instead of the default 'rethinkdb'. You need to declare the GCLOUD_PROJECT environment var to hold your project name and be loggin through gcloud.
-9. Automatic throttling of messages sent per second, per user. By setting the third argument, you can choose what level is appropriate for you. Users will get error messages whne they try to go over the limits
-10. Automatic datadog integration! By adding a sixth argument to the contructor, you can pass Datadog options, like this;
+8. There's a new experimental Google Datastore database layer, which can be used by changing the 5th argument to 'google' instead of the default 'rethinkdb'. You need to declare the GCLOUD_PROJECT environment var to hold your project name and be logged in through gcloud.
+9. Automatic throttling of messages sent per second, per user. By setting the third argument, you can choose what level is appropriate for you. Users will get error messages when they try to go over the limits
+10. Automatic datadog integration! By adding a sixth argument to the constructor, you can pass Datadog options, like this;
 
       
       options = {

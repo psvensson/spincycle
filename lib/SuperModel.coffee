@@ -154,6 +154,9 @@ class SuperModel
       q.resolve(@)
     return q
 
+  delete:()=>
+    DB.remove(@)
+
   prettyPrint: (name, value) =>
     rv = value
     #if (name == 'createdAt' or name == 'modifiedAt') and (value and value isnt 0) then rv = new Date(parseInt(value)).toUTCString()
