@@ -61,7 +61,7 @@ class HttpMethod
     HttpMethod.httproutes[targetName] = targetFunc
 
   makeRESTful: (type) =>
-    console.log 'HttpMethod.makeRESTful called for type '+type+' restpath is '+@restPath
+    #console.log 'HttpMethod.makeRESTful called for type '+type+' restpath is '+@restPath
 
     listall = (req,res) =>
       #console.log 'listall'
