@@ -258,21 +258,24 @@ class RethinkPersistence
     type = _type.toLowerCase()
     if debug then console.log 'Rethink.set called for '+type
     if debug then console.dir obj
-    @getDbFor(type).then (db)=>
-      try
-        db.insert(obj, {conflict: "update", return_changes: true}).run @connection, (err, result) ->
-          if err
-            console.log 'set err: '+err
-            console.dir err
-            throw err
-            cb()
-          else
-            cb(result)
-      catch ex
-        console.log 'caught exception!'
-        console.dir ex
-        console.dir obj
-        cb()
+    if obj
+      @getDbFor(type).then (db)=>
+        try
+          db.insert(obj, {conflict: "update", return_changes: true}).run @connection, (err, result) ->
+            if err
+              console.log 'set err: '+err
+              console.dir err
+              throw err
+              cb()
+            else
+              cb(result)
+        catch ex
+          console.log 'caught exception!'
+          console.dir ex
+          console.dir obj
+          cb()
+     else
+       cb()
 
   remove: (_type, obj, cb) =>
     if debug then console.log 'Rethink.remove called'

@@ -103,7 +103,7 @@ class SuperModel
             varr.push av._getRecord(av, av.constructor.model, av.record)
           else
             #console.log '====================== hashtable prop id is '+av.id+' typeof '+(typeof av.id)
-            varr.push av.id
+            if av.id then varr.push av.id
         rv[k] = varr
       else
         if debug then console.log '**************** AAAUAGHH!!! property '+k+' was not resolved in SuperMOde::_getRecord'
