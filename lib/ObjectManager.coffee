@@ -459,10 +459,7 @@ class ObjectManager
             listenerId = objStore.addListenerFor(msg.obj.id, msg.obj.type, (uobj) =>
               #console.log '--------------------- onRegisterForUpdates on callback sending update of object '+msg.obj.id+' type '+msg.obj.type+' to client'
               #console.dir uobj
-              if @isAlreadyToCliented(uobj)
-                toclient = uobj
-              else
-                toclient = uobj.toClient()
+              toclient = uobj.toClient()
               #if debug then console.dir(toclient)
               if ClientEndpoints.exists(msg.client)
                 ClientEndpoints.sendToEndpoint(msg.client, {status: e.general.SUCCESS, info: 'OBJECT_UPDATE', payload: toclient })
@@ -485,14 +482,6 @@ class ObjectManager
 
     else
       msg.replyFunc({status: e.general.FAILURE, info: 'onRegisterForUpdatesOn missing parameter', payload: null })
-
-  isAlreadyToCliented:(o)=>
-    rv = false
-    for k,v of o
-      if Array.isArray(v)
-        v.forEach (el)->
-          if (el.length and el.length == 36) then rv = true
-    rv
 
   onDeregisterForUpdatesOn: (msg) =>
     if debug then console.log 'onDeregisterForUpdatesOn called for id '+msg.id+' and listener id '+msg.listenerid
