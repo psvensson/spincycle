@@ -269,6 +269,7 @@ class RethinkPersistence
               throw err
               cb()
             else
+              if debug then console.log 'Rethink.set OK'
               cb(result)
         catch ex
           console.log 'caught exception!'
@@ -276,7 +277,8 @@ class RethinkPersistence
           console.dir obj
           cb()
      else
-       cb()
+        if debug then console.log 'Rethink.set not OK (empty obj)'
+        cb()
 
   remove: (_type, obj, cb) =>
     if debug then console.log 'Rethink.remove called'

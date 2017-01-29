@@ -141,11 +141,11 @@ class SuperModel
       delete record.record if record.record
       if @_rev then record._rev = @_rev
       if debug then console.log 'SuperModel.serialize called'
-      if debug then console.dir record
-      if debug then console.log 'actual object is '
+      #if debug then console.dir record
+      #if debug then console.log 'actual object is '
       if debug then console.dir @
-      if debug then console.log 'toClient is '
-      if debug then console.dir @toClient()
+      #if debug then console.log 'toClient is '
+      #if debug then console.dir @toClient()
       DB.set @.constructor.type, record, (res) =>
         #if debug then console.log ' * serialized and persisted '+@type+" id "+@id
         @_serializing = false
