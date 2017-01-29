@@ -349,10 +349,12 @@ class ObjectManager
     if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db. modifiedAt = '+obj.modifiedAt
     obj.serialize(robj).then (res) =>
       if not res
+        if debug then console.log 'persisting failed'
         q.resolve(false)
       else
         record = obj.toClient()
         @updateObjectHooks.forEach (hook) => hook(record)
+        if debug then console.log 'persisting succeeded'
         q.resolve(true)
     return q
       
