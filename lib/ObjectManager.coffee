@@ -348,6 +348,7 @@ class ObjectManager
     objStore[robj.id] = obj
     if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db. modifiedAt = '+obj.modifiedAt
     obj.serialize(robj).then (res) =>
+      if debug then console.log 'persisting returned from serialize'
       if not res
         if debug then console.log 'persisting failed'
         q.resolve(false)

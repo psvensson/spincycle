@@ -131,27 +131,25 @@ class SuperModel
 
   serialize: (updatedObj) =>
     q = defer()
-    #if not @_serializing
-    if 1 == 1
-      @_serializing = true
-      OMgr.storeObject()
-      delete updatedObj.record if updatedObj
-      #OMgr.updateObj(updatedObj) if updatedObj
-      record = @getRecord()
-      delete record.record if record.record
-      if @_rev then record._rev = @_rev
-      #if debug then console.log 'SuperModel.serialize called'
-      #if debug then console.dir record
-      #if debug then console.log 'actual object is '
-      #if debug then console.dir @
-      #if debug then console.log 'toClient is '
-      #if debug then console.dir @toClient()
-      DB.set @.constructor.type, record, (res) =>
-        #if debug then console.log ' * serialized and persisted '+@type+" id "+@id
-        @_serializing = false
-        if res then q.resolve(@) else q.resolve()
-    else
-      q.resolve(@)
+
+    @_serializing = true
+    OMgr.storeObject()
+    delete updatedObj.record if updatedObj
+    #OMgr.updateObj(updatedObj) if updatedObj
+    record = @getRecord()
+    delete record.record if record.record
+    if @_rev then record._rev = @_rev
+    #if debug then console.log 'SuperModel.serialize called'
+    #if debug then console.dir record
+    #if debug then console.log 'actual object is '
+    #if debug then console.dir @
+    #if debug then console.log 'toClient is '
+    #if debug then console.dir @toClient()
+    DB.set @.constructor.type, record, (res) =>
+      if debug then console.log ' * serialized and persisted '+@type+" id "+@id
+      @_serializing = false
+      if res then q.resolve(@) else q.resolve()
+
     return q
 
   delete:()=>
