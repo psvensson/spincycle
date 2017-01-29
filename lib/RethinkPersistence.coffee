@@ -260,6 +260,7 @@ class RethinkPersistence
     if debug then console.dir obj
     if obj
       @getDbFor(type).then (db)=>
+        if debug then console.log 'Rethink.set using db '+db
         try
           db.insert(obj, {conflict: "update", return_changes: true}).run @connection, (err, result) ->
             if err
