@@ -997,6 +997,38 @@
         });
       });
     });
+    it('should be able to limit search results', function(done) {
+      var query;
+      query = {
+        sort: 'name',
+        property: 'name',
+        value: 'A*',
+        limit: 1
+      };
+      return DB.findQuery('DFoo', query).then((function(_this) {
+        return function(records) {
+          console.log('limit query got back');
+          console.dir(records);
+          expect(records.length).to.equal(1);
+          return done();
+        };
+      })(this));
+    });
+    it('should be able to limit all search results', function(done) {
+      var query;
+      query = {
+        sort: 'name',
+        limit: 2
+      };
+      return DB.all('DFoo', query, (function(_this) {
+        return function(records) {
+          console.log('limit query got back');
+          console.dir(records);
+          expect(records.length).to.equal(2);
+          return done();
+        };
+      })(this));
+    });
     it('should be able to do specific searches', function(done) {
       var record12;
       record12 = {

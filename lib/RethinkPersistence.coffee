@@ -117,10 +117,11 @@ class RethinkPersistence
       #if debug then console.log 'all got query'
       #if debug then console.dir query
       rr = db
-      if query?.limit
+      if query
+        if query.limit then rr = rr.limit(parseInt(query.limit))
         if debug then console.log 'skipping '+query.skip+' limiting '+query.limit
-        rr = rr.skip(parseInt(query.skip or 0)).limit(parseInt(query.limit))
-      if query?.sort then rr = db.orderBy(query?.sort or 'name')
+        if query.skip then rr = rr.skip(parseInt(query.skip or 0))
+        if query.sort then rr = rr.orderBy(query.sort or 'name')
       rr.run @connection, (err, cursor) ->
         if err
           console.log 'all err: '+err
@@ -290,7 +291,7 @@ class RethinkPersistence
           console.log 'remove err: '+err
           console.dir err
           throw err
-        console.log 'remove result = '+result
+        #console.log 'remove result = '+result
         cb result
 
 

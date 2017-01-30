@@ -71,10 +71,10 @@ class ObjectManager
   onGetModelFor: (msg) =>
     if msg.modelname
       @messageRouter.resolver.resolve msg.modelname, (path) =>
-        if debug then console.log 'onGetModelFor '+msg.modelname+' got back require path '+path
+        #if debug then console.log 'onGetModelFor '+msg.modelname+' got back require path '+path
         model = ResolveModule.modulecache[msg.modelname]
-        if debug then console.log 'got model resolved to'
-        if debug then console.dir model.model
+        #if debug then console.log 'got model resolved to'
+        #if debug then console.dir model.model
         rv = []
         model.model.forEach (property) -> if property.public then rv.push(property)
         msg.replyFunc({status: e.general.SUCCESS, info: 'get model', payload: rv})
@@ -457,10 +457,10 @@ class ObjectManager
           if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user, msg.sessionId)
             rememberedListenerId = undefined
             listenerId = objStore.addListenerFor(msg.obj.id, msg.obj.type, (uobj) =>
-              #console.log '--------------------- onRegisterForUpdates on callback sending update of object '+msg.obj.id+' type '+msg.obj.type+' to client'
+              console.log '--------------------- onRegisterForUpdates on callback sending update of object '+msg.obj.id+' type '+msg.obj.type+' to client'
               #console.dir uobj
               toclient = uobj.toClient()
-              #if debug then console.dir(toclient)
+              if debug then console.dir(toclient)
               if ClientEndpoints.exists(msg.client)
                 ClientEndpoints.sendToEndpoint(msg.client, {status: e.general.SUCCESS, info: 'OBJECT_UPDATE', payload: toclient })
               else

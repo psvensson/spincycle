@@ -618,6 +618,22 @@ describe 'Spincycle Model Tests', ->
           expect(records.length).to.equal(0)
           done()
 
+  it 'should be able to limit search results', (done)->
+      query = {sort:'name', property: 'name', value: 'A*', limit: 1}
+      DB.findQuery('DFoo', query).then (records) =>
+        console.log 'limit query got back'
+        console.dir records
+        expect(records.length).to.equal(1)
+        done()
+
+  it 'should be able to limit all search results', (done)->
+    query = {sort:'name', limit: 2}
+    DB.all 'DFoo', query,(records) =>
+      console.log 'limit query got back'
+      console.dir records
+      expect(records.length).to.equal(2)
+      done()
+
   it 'should be able to do specific searches', (done)->
     record12=
       id: 'b44rrb3356'
