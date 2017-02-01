@@ -25,32 +25,26 @@ class SuperModel
     #console.dir @model
     @id         = @record.id or uuid.v4()
     @record = @unPrettify(@record)
-
     missing = true
-    @constructor.model.forEach (mp) -> if mp.name == 'createdAt' or mp.name == 'createdBy' then missing = false
+    @constructor.model.forEach (mp) =>
+      if not @record[mp.name] then @record[mp.name] = mp.default or ' '
+      if mp.name == 'createdAt' or mp.name == 'createdBy' then missing = false
     if missing
       @constructor.model.push({ name: 'createdAt',    public: true,   value: 'createdAt' })
       @constructor.model.push({ name: 'modifiedAt',   public: true,   value: 'modifiedAt' })
       @constructor.model.push({ name: 'createdBy',    public: true,   value: 'createdBy' })
       #@updateAllModels()
-
-
     @type = @constructor.type
     q = defer()
-
     OMgr.storeObject(@)
     if @record._rev
       #if debug then console.log 'setting _rev to '+@record._rev+' for '+@constructor.type+' '+@id
       @_rev = @record._rev
-
     @loadFromIds(@constructor.model).then( () =>
-
       @createdAt = @createdAt or Date.now()
       @modifiedAt = @modifiedAt or Date.now()
       @createdBy = @createdBy or 'SYSTEM'
-
       if not @record.id then SuperModel.oncreatelisteners.forEach (listener) => listener(@)
-
       if @postCreate
         @postCreate(q)
       else
