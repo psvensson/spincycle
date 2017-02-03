@@ -34,7 +34,10 @@ class SuperModel
           @record[mp.name] = {}
         else
           if debug then console.log 'instantiating empty recod value for '+mp.name+' with '+mp.default
-          @record[mp.name] = mp.default or ' '
+          if Array.isArray(mp.default)
+            @record[mp.name] = new Array(mp.default)
+          else
+            @record[mp.name] = mp.default or ' '
       if mp.name == 'createdAt' or mp.name == 'createdBy' then missing = false
     if missing
       @constructor.model.push({ name: 'createdAt',    public: true,   value: 'createdAt' })
