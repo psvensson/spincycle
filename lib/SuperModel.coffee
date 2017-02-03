@@ -22,7 +22,7 @@ class SuperModel
 
   constructor:(@record={})->
     #console.log 'SuperModel constructor for '+@record?.id
-    #console.dir @model
+    if debug then console.dir @model
     @id         = @record.id or uuid.v4()
     @record = @unPrettify(@record)
     missing = true
@@ -33,6 +33,7 @@ class SuperModel
         else if mp.hashtable == 'true'
           @record[mp.name] = {}
         else
+          if debug then console.log 'instantiating empty recod value for '+mp.name+' with '+mp.default
           @record[mp.name] = mp.default or ' '
       if mp.name == 'createdAt' or mp.name == 'createdBy' then missing = false
     if missing

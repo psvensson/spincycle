@@ -420,6 +420,20 @@
         });
       });
     });
+    it('should not spill over old array contents from one object creation to another', function() {
+      return new Bar().then(function(bar) {
+        bar.foos.push('123456789');
+        return bar.serialize().then(function() {
+          console.dir(bar);
+          return new Bar({
+            name: 'a bar'
+          }).then(function(bar2) {
+            console.dir(bar2);
+            return expect(bar2.foos[0]).to.not.exist;
+          });
+        });
+      });
+    });
     it('should create an object that has a direct reference and be able to set and update that reference', function(done) {
       return new Foo({
         id: '12345'

@@ -246,6 +246,15 @@ describe 'Spincycle Model Tests', ->
         #console.dir bar
         expect(bar.theFoo).to.exist
 
+  it 'should not spill over old array contents from one object creation to another', ()->
+    new Bar().then (bar) ->
+      bar.foos.push '123456789'
+      bar.serialize().then ()->
+        console.dir bar
+        new Bar({name: 'a bar'}).then (bar2) ->
+          console.dir bar2
+          expect(bar2.foos[0]).to.not.exist
+
   it 'should create an object that has a direct reference and be able to set and update that reference', (done)->
     new Foo({id:'12345'}).then (o) ->
       o.serialize().then ()->
