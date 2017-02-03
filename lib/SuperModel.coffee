@@ -72,7 +72,7 @@ class SuperModel
     rv = {}
     rv._rev = @_rev if @_rev
     model.forEach (v) =>
-      #if debug then console.log 'getRecord resolving value '+v.name
+      if debug then console.log 'getRecord resolving value '+v.name
       #if debug then console.dir v
       k = v.name
       if (v.value and v.value isnt 0) and v.type # direct object reference
@@ -97,7 +97,7 @@ class SuperModel
           if v.storedirectly
             varr.push hv._getRecord(hv, hv.constructor.model, hv.record)
           else
-            #console.log '====================== array prop id is '+hv.id+' typeof '+(typeof hv.id)
+            #console.log '====================== hashtable prop id is '+hv.id+' typeof '+(typeof hv.id)
             varr.push hv.id
         rv[k] = varr
       else if v.array
@@ -107,11 +107,11 @@ class SuperModel
           if v.storedirectly
             varr.push av._getRecord(av, av.constructor.model, av.record)
           else
-            #console.log '====================== hashtable prop id is '+av.id+' typeof '+(typeof av.id)
+            if debug then console.log '====================== array prop id is '+av.id+' typeof '+(typeof av.id)
             if av.id then varr.push av.id
         rv[k] = varr
       else
-        if debug then console.log '**************** AAAUAGHH!!! property '+k+' was not resolved in SuperMOde::_getRecord'
+        if debug then console.log '**************** AAAUAGHH!!! property '+k+' was not resolved in SuperModel::_getRecord'
 
     rv.id = @id
     rv.type = @.constructor.type
