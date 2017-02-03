@@ -33,7 +33,7 @@ class SuperModel
         else if mp.hashtable == 'true'
           @record[mp.name] = {}
         else
-          if debug then console.log 'instantiating empty recod value for '+mp.name+' with '+mp.default
+          #if debug then console.log 'instantiating empty record value for '+mp.name+' with '+mp.default
           if Array.isArray(mp.default)
             @record[mp.name] = []
           else

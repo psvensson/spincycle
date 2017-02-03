@@ -296,7 +296,7 @@ class DB
     if (typeof id == 'object')
       console.log 'DB.get was served an object instead of an id!!!'
       console.dir id
-      q.resolve([])
+      xyzzy
     else
       #console.log 'DB.get id is '+id
       rv = @lru.get id
