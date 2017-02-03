@@ -248,7 +248,7 @@ class ObjectManager
                  checkFinish(rv)
             else
               rv.push tc
-            checkFinish(rv)
+              checkFinish(rv)
           else
             if debug then console.log ' empty records for '+r.id
             checkFinish(rv)
