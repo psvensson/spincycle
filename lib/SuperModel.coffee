@@ -144,8 +144,8 @@ class SuperModel
     record = @getRecord()
     delete record.record if record.record
     if @_rev then record._rev = @_rev
-    #if debug then console.log 'SuperModel.serialize called'
-    #if debug then console.dir record
+    if debug then console.log 'SuperModel.serialize called'
+    if debug then console.dir record
     #if debug then console.log 'actual object is '
     #if debug then console.dir @
     #if debug then console.log 'toClient is '
