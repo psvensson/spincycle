@@ -242,7 +242,7 @@ class ObjectManager
             tc = record[0]
             if @messageRouter.authMgr.filterOutgoing
                @messageRouter.authMgr.filterOutgoing(tc, msg.user).then (tres)=>
-                 if tres then rv.push tres
+                 if tres then rv.push(tres)
                  checkFinish(rv)
             else
               rv.push tc
