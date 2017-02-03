@@ -35,7 +35,7 @@ class SuperModel
         else
           if debug then console.log 'instantiating empty recod value for '+mp.name+' with '+mp.default
           if Array.isArray(mp.default)
-            @record[mp.name] = new Array(mp.default)
+            @record[mp.name] = []
           else
             @record[mp.name] = mp.default or ' '
       if mp.name == 'createdAt' or mp.name == 'createdBy' then missing = false
