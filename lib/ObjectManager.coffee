@@ -20,6 +20,7 @@ class ObjectManager
    SuperModel.onCreate (newmodel)=>
      #if debug then console.log 'ObjectManager got onCreate event'
      #if debug then console.dir newmodel
+
      #if debug then console.dir @populationListeners
      sublist = @populationListeners[newmodel.type] or {}
      #console.log 'sublist for population updtaes is'
