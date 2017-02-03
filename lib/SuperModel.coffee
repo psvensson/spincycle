@@ -27,7 +27,13 @@ class SuperModel
     @record = @unPrettify(@record)
     missing = true
     @constructor.model.forEach (mp) =>
-      if not @record[mp.name] then @record[mp.name] = mp.default or ' '
+      if not @record[mp.name]
+        if mp.array == 'true'
+          @record[mp.name] = []
+        else if mp.hashtable == 'true'
+          @record[mp.name] = {}
+        else
+          @record[mp.name] = mp.default or ' '
       if mp.name == 'createdAt' or mp.name == 'createdBy' then missing = false
     if missing
       @constructor.model.push({ name: 'createdAt',    public: true,   value: 'createdAt' })
