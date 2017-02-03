@@ -56,6 +56,7 @@ class SuperModel
       @createdBy = @createdBy or 'SYSTEM'
       if not @record.id then SuperModel.oncreatelisteners.forEach (listener) => listener(@)
       if @postCreate
+        if debug then console.log 'calling PostCreate on '+@type+' with deferred '+q
         @postCreate(q)
       else
         #console.log '-- done resolving constructor for '+@constructor.type
