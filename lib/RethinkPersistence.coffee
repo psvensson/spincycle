@@ -112,7 +112,7 @@ class RethinkPersistence
 
   all: (_type, query, cb)=>
     type = _type.toLowerCase()
-    if debug then console.log 'Rethink.all called for '+type
+    if debug then console.log '-Rethink.all called for '+type
     @getDbFor(type).then (db)=>
       if debug then console.log 'all got query for db '+db
       if debug then console.dir query
