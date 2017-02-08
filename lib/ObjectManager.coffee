@@ -86,21 +86,23 @@ class ObjectManager
   _createObject: (msg) =>
     console.log 'objmgr.createObject called'
     if msg.obj and msg.obj.type
-      if @messageRouter.authMgr.canUserCreateThisObject(msg.obj.type, msg.user, msg.sessionId)
-
-        if debug then console.dir msg
-        msg.obj.createdAt = Date.now()
-        msg.obj.modifiedAt = Date.now()
-        msg.obj.createdBy = msg.user.id
-        msg.obj.userRef = msg.user.id
-        console.log 'objmgr.createObject called. record is now'
-        console.dir msg.obj
-        SuperModel.resolver.createObjectFrom(msg.obj).then (o) =>
-          o.serialize().then () =>
-            @messageRouter.gaugeMetric('create',1,{type:  msg.obj.type,'username': msg.user.name, 'useremail': msg.user.email, 'provider': msg.user.provider, 'organization': msg.user.organization})
-            msg.replyFunc({status: e.general.SUCCESS, info: 'new '+msg.obj.type, payload: o})
+      if msg.obj.type in @getTypes()
+        if @messageRouter.authMgr.canUserCreateThisObject(msg.obj.type, msg.user, msg.sessionId)
+          if debug then console.dir msg
+          msg.obj.createdAt = Date.now()
+          msg.obj.modifiedAt = Date.now()
+          msg.obj.createdBy = msg.user.id
+          msg.obj.userRef = msg.user.id
+          console.log 'objmgr.createObject called. record is now'
+          console.dir msg.obj
+          SuperModel.resolver.createObjectFrom(msg.obj).then (o) =>
+            o.serialize().then () =>
+              @messageRouter.gaugeMetric('create',1,{type:  msg.obj.type,'username': msg.user.name, 'useremail': msg.user.email, 'provider': msg.user.provider, 'organization': msg.user.organization})
+              msg.replyFunc({status: e.general.SUCCESS, info: 'new '+msg.obj.type, payload: o})
+        else
+          msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to create objects of that type', payload: msg.obj.type})
       else
-        msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to create objects of that type', payload: msg.obj.type})
+        msg.replyFunc({status: e.general.FAILURE, info: 'unkown model type', payload: msg.obj.type })
     else
       msg.replyFunc({status: e.general.FAILURE, info: '_createObject missing parameter', payload: null })
 
@@ -108,29 +110,32 @@ class ObjectManager
     #console.log 'delete called'
     if msg.obj and msg.obj.type and msg.obj.id
       console.log 'delete got type '+msg.obj.type+', and id '+msg.obj.id
-      objStore.getObject(msg.obj.id, msg.obj.type).then (obj) =>
-        #console.log 'got object form objstore -> '+obj
-        if obj
-          if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user, msg.obj, msg.sessionId)
-            #console.log 'user could write this object'
-            #console.dir obj
-            DB.remove obj, (removestatus) =>
-              @messageRouter.gaugeMetric('delete', 1, {type:  msg.obj.type, 'username': msg.user.name, 'useremail': msg.user.email, 'provider': msg.user.provider, 'organization': msg.user.organization})
-              #console.log 'object removed callback'
-              sublist = @populationListeners[msg.type] or {}
-              for k,client of sublist
-                if ClientEndpoints.exists(client)
-                  #console.log 'updating population changes callback'
-                  ClientEndpoints.sendToEndpoint(client, {status: e.general.SUCCESS, info: 'POPULATION_UPDATE', payload: { removed: obj.toClient() } })
-              objStore.removeObject(obj)
-              #console.log 'object removed from objstore'
-              msg.replyFunc({status: e.general.SUCCESS, info: 'delete object', payload: obj.id})
+      if msg.obj.type in @getTypes()
+        objStore.getObject(msg.obj.id, msg.obj.type).then (obj) =>
+          #console.log 'got object form objstore -> '+obj
+          if obj
+            if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user, msg.obj, msg.sessionId)
+              #console.log 'user could write this object'
+              #console.dir obj
+              DB.remove obj, (removestatus) =>
+                @messageRouter.gaugeMetric('delete', 1, {type:  msg.obj.type, 'username': msg.user.name, 'useremail': msg.user.email, 'provider': msg.user.provider, 'organization': msg.user.organization})
+                #console.log 'object removed callback'
+                sublist = @populationListeners[msg.type] or {}
+                for k,client of sublist
+                  if ClientEndpoints.exists(client)
+                    #console.log 'updating population changes callback'
+                    ClientEndpoints.sendToEndpoint(client, {status: e.general.SUCCESS, info: 'POPULATION_UPDATE', payload: { removed: obj.toClient() } })
+                objStore.removeObject(obj)
+                #console.log 'object removed from objstore'
+                msg.replyFunc({status: e.general.SUCCESS, info: 'delete object', payload: obj.id})
+            else
+              msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to delete object', payload: msg.obj.id})
           else
-            msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to delete object', payload: msg.obj.id})
-        else
-          console.log 'No object found with id '+msg.obj.id
-          console.dir objStore.objects.map (o) -> o.type == msg.obj.type
-          msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
+            console.log 'No object found with id '+msg.obj.id
+            console.dir objStore.objects.map (o) -> o.type == msg.obj.type
+            msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
+      else
+        msg.replyFunc({status: e.general.FAILURE, info: 'unkown model type', payload: msg.obj.type })
     else
       msg.replyFunc({status: e.general.FAILURE, info: '_deleteObject missing parameter', payload: null })
 
@@ -141,39 +146,42 @@ class ObjectManager
     #if debug then console.log '_getObject called for type '+msg.type
     #if debug then console.dir msg.obj
     if msg.type and ((msg.obj and msg.obj.id) or msg.id)
-      id = msg.id or msg.obj.id
-      if id.indexOf and id.indexOf('all_') > -1
-        @getAggregateObjects(msg)
-      else
-        #if debug then console.log '_getObject calling getObjectPullThrough for type '+msg.type
-        if typeof id isnt 'object'
-          @getObjectPullThrough(id, msg.type).then (obj) =>
-            if debug then '_getObject got back obj from getObjectPullThrough: '
-            #if debug then console.dir obj
-            if obj
-              if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user, msg.sessionId)
-                tc = obj.toClient()
-                @messageRouter.gaugeMetric('get', 1, {type:msg.type,'username': msg.user.name, 'useremail': msg.user.email, 'provider': msg.user.provider, 'organization': msg.user.organization})
-                if @messageRouter.authMgr.filterOutgoing
-                  @messageRouter.authMgr.filterOutgoing(tc, msg.user).then (ftc)=>
-                    if ftc
-                      msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: ftc})
-                    else
-                      msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: obj.id})
-                else
-                  if debug then console.log '_getObject for '+msg.type+' returns '+JSON.stringify(tc)
-                  #if debug then console.dir tc
-                  msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: tc})
-              else
-                console.log '_getObject got NOT ALLOWED for user '+msg.user.id+' for '+msg.type+' id '+obj.id
-                msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: id})
-            else
-              console.log '_getObject No object found with id '+id+' of type '+msg.type
-              msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'no such object', payload: id})
+      if msg.type in @getTypes()
+        id = msg.id or msg.obj.id
+        if id.indexOf and id.indexOf('all_') > -1
+          @getAggregateObjects(msg)
         else
-          console.log '_getObject provided id '+id+' of type '+msg.type+' is an object!!'
-          console.dir id
-          msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'id value is an object!!!', payload: id})
+          #if debug then console.log '_getObject calling getObjectPullThrough for type '+msg.type
+          if typeof id isnt 'object'
+            @getObjectPullThrough(id, msg.type).then (obj) =>
+              if debug then '_getObject got back obj from getObjectPullThrough: '
+              #if debug then console.dir obj
+              if obj
+                if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user, msg.sessionId)
+                  tc = obj.toClient()
+                  @messageRouter.gaugeMetric('get', 1, {type:msg.type,'username': msg.user.name, 'useremail': msg.user.email, 'provider': msg.user.provider, 'organization': msg.user.organization})
+                  if @messageRouter.authMgr.filterOutgoing
+                    @messageRouter.authMgr.filterOutgoing(tc, msg.user).then (ftc)=>
+                      if ftc
+                        msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: ftc})
+                      else
+                        msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: obj.id})
+                  else
+                    if debug then console.log '_getObject for '+msg.type+' returns '+JSON.stringify(tc)
+                    #if debug then console.dir tc
+                    msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: tc})
+                else
+                  console.log '_getObject got NOT ALLOWED for user '+msg.user.id+' for '+msg.type+' id '+obj.id
+                  msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: id})
+              else
+                console.log '_getObject No object found with id '+id+' of type '+msg.type
+                msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'no such object', payload: id})
+          else
+            console.log '_getObject provided id '+id+' of type '+msg.type+' is an object!!'
+            console.dir id
+            msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'id value is an object!!!', payload: id})
+      else
+        msg.replyFunc({status: e.general.FAILURE, info: 'unkown model type', payload: msg.obj.type })
     else
       msg.replyFunc({status: e.general.FAILURE, info: '_getObject for '+msg.type+' missing parameter', payload: null })
 
@@ -188,32 +196,38 @@ class ObjectManager
   _listObjects: (msg) =>
     if debug then console.log 'listObjects called for type '+msg.type
     if typeof msg.type != 'undefined'
-      if @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user, msg.sessionId) == no
-        msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to list objects of type '+msg.type, payload: msg.type})
-      else
-        if msg.query
-          if debug then console.log 'executing query for property '+msg.query.property+', value '+msg.query.value
-          if msg.query.limit or msg.query.skip or msg.query.sort or msg.query.wildcard
-            if msg.query.value and msg.query.value != ''
-              DB.findQuery(msg.type, msg.query).then (records) => @parseList(records, msg)
-            else
-              DB.all(msg.type, msg.query, (records) => @parseList(records, msg))
-          else
-            DB.findMany(msg.type, msg.query.property, msg.query.value).then (records) => @parseList(records, msg)
+      if msg.type in @getTypes()
+        if @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user, msg.sessionId) == no
+          msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to list objects of type '+msg.type, payload: msg.type})
         else
-          DB.all(msg.type, msg.query, (records) => @parseList(records, msg))
+          if msg.query
+            if debug then console.log 'executing query for property '+msg.query.property+', value '+msg.query.value
+            if msg.query.limit or msg.query.skip or msg.query.sort or msg.query.wildcard
+              if msg.query.value and msg.query.value != ''
+                DB.findQuery(msg.type, msg.query).then (records) => @parseList(records, msg)
+              else
+                DB.all(msg.type, msg.query, (records) => @parseList(records, msg))
+            else
+              DB.findMany(msg.type, msg.query.property, msg.query.value).then (records) => @parseList(records, msg)
+          else
+            DB.all(msg.type, msg.query, (records) => @parseList(records, msg))
+      else
+        msg.replyFunc({status: e.general.FAILURE, info: 'unkown model type', payload: msg.obj.type })
     else
       msg.replyFunc({status: e.general.FAILURE, info: '_listObjects missing parameter', payload: null })
 
   _countObjects: (msg) =>
     console.log 'countObjects called for type '+msg.type
     if typeof msg.type != 'undefined'
-      if @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user, msg.sessionId) == no
-        @messageRouter.gaugeMetric('count', 1, {type: msg.type, 'username': msg.user.name, 'useremail': msg.user.email, 'provider': msg.user.provider, 'organization': msg.user.organization})
-        msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to count objects of type '+msg.type, payload: msg.type})
+      if msg.type in @getTypes()
+        if @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user, msg.sessionId) == no
+          @messageRouter.gaugeMetric('count', 1, {type: msg.type, 'username': msg.user.name, 'useremail': msg.user.email, 'provider': msg.user.provider, 'organization': msg.user.organization})
+          msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to count objects of type '+msg.type, payload: msg.type})
+        else
+          DB.count(msg.type).then (v)=>
+            msg.replyFunc({status: e.general.SUCCESS, info: 'count objects', payload: v})
       else
-        DB.count(msg.type).then (v)=>
-          msg.replyFunc({status: e.general.SUCCESS, info: 'count objects', payload: v})
+        msg.replyFunc({status: e.general.FAILURE, info: 'unknown model type', payload: msg.type })
     else
       msg.replyFunc({status: e.general.FAILURE, info: '_listObjects missing parameter', payload: null })
 
@@ -316,37 +330,40 @@ class ObjectManager
     #console.log 'onUpdateObject called for '+msg
     #console.dir msg
     if msg.obj and msg.obj.type and msg.obj.id
-      DB.getFromStoreOrDB(msg.obj.type, msg.obj.id).then( (obj) =>
-        #console.log 'onUpdateObject getFromStoreOrDB returned '+obj
-        #console.dir obj
-        if obj
-          #console.log 'have an object'
-          canwrite = @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user, msg.obj, msg.sessionId)
-          if canwrite
-            #console.log 'can write'
-            # Make sure to resolve object references in arrays and hashtables
-            if not @areDataTrashed(obj)
-              for k,v of msg.obj
-                obj[k] = v if k isnt 'id'
-              @resolveReferences(obj, obj.constructor.model).then (robj)=>
-                #console.log '++++++++++++++++++++++++++++++++++++++++++++++ onUpdateObject after resolveReferences:'
-                @persistUpdates(obj, robj).then (res)=>
-                  if not res
-                    msg.replyFunc({status: e.general.FAILURE, info: 'db error for object update', payload: msg.obj.id})
-                  else
-                    @messageRouter.gaugeMetric('update', 1, {type: msg.obj.type,'username': msg.user.name, 'useremail': msg.user.email, 'provider': msg.user.provider, 'organization': msg.user.organization})
-                    msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
+      if msg.obj.type in @getTypes()
+        DB.getFromStoreOrDB(msg.obj.type, msg.obj.id).then( (obj) =>
+          #console.log 'onUpdateObject getFromStoreOrDB returned '+obj
+          #console.dir obj
+          if obj
+            #console.log 'have an object'
+            canwrite = @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user, msg.obj, msg.sessionId)
+            if canwrite
+              #console.log 'can write'
+              # Make sure to resolve object references in arrays and hashtables
+              if not @areDataTrashed(obj)
+                for k,v of msg.obj
+                  obj[k] = v if k isnt 'id'
+                @resolveReferences(obj, obj.constructor.model).then (robj)=>
+                  #console.log '++++++++++++++++++++++++++++++++++++++++++++++ onUpdateObject after resolveReferences:'
+                  @persistUpdates(obj, robj).then (res)=>
+                    if not res
+                      msg.replyFunc({status: e.general.FAILURE, info: 'db error for object update', payload: msg.obj.id})
+                    else
+                      @messageRouter.gaugeMetric('update', 1, {type: msg.obj.type,'username': msg.user.name, 'useremail': msg.user.email, 'provider': msg.user.provider, 'organization': msg.user.organization})
+                      msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
+              else
+                console.log 'object update fail: data is TRASHED!!!!'
+                msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'one or more arrays have ben contaminated with null values', payload: msg.obj.id})
             else
-              console.log 'object update fail: data is TRASHED!!!!'
-              msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'one or more arrays have ben contaminated with null values', payload: msg.obj.id})
+              console.log 'object update fail: not allowed to write'
+              msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.UPDATE_OBJECT_FAIL, payload: msg.obj.id})
           else
-            console.log 'object update fail: not allowed to write'
-            msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.UPDATE_OBJECT_FAIL, payload: msg.obj.id})
-        else
-          console.log 'No object of type '+msg.obj.type+' found with id '+msg.obj.id
-          #console.dir objStore.objects.map (o) -> o.type == msg.obj.type
-          msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
-      )
+            console.log 'No object of type '+msg.obj.type+' found with id '+msg.obj.id
+            #console.dir objStore.objects.map (o) -> o.type == msg.obj.type
+            msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id})
+        )
+      else
+        msg.replyFunc({status: e.general.FAILURE, info: 'missing parameter(s) for object update', payload: msg.obj})
     else
       console.log 'onUpdateObject got wrong or missing parameters'
       console.dir msg.obj
@@ -459,7 +476,7 @@ class ObjectManager
   #---------------------------------------------------------------------------------------------------------------------
 
   onRegisterForUpdatesOn: (msg) =>
-    #if debug then console.dir msg
+    if debug then console.dir msg
     if msg.obj or not msg.obj.id or not msg.obj.type
       if debug then console.log 'onRegisterForUpdatesOn  called for '+msg.obj.type+' '+msg.obj.id
       DB.getFromStoreOrDB(msg.obj.type, msg.obj.id).then( (obj) =>
