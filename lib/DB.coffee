@@ -239,13 +239,13 @@ class DB
 
   @findMany: (type, property, value) =>
     q = defer()
-    console.log 'DB.findMany called'
-    console.dir arguments
+    #console.log 'DB.findMany called'
+    #console.dir arguments
     @getDataStore().then (store) => store.findMany(type, property, value).then (results) =>
       if debug then console.log 'DB.findMany results are..'
       if debug then console.dir results
-      if not results or not results.length
-        console.log 'DB.findMany type '+type+', property '+property+', value '+value+' got back '+results
+      if not results or not results.length or results.length == 0
+        #console.log 'DB.findMany type '+type+', property '+property+', value '+value+' got back '+results
         q.resolve([])
       else
         #console.log 'DB.findMany got back'
@@ -273,7 +273,7 @@ class DB
       #console.log 'DB.search results were..'
      # console.dir results
       if not results
-        console.log 'DB.search type '+type+', property '+property+', value '+value+' got back '+results
+        if debug then console.log 'DB.search type '+type+', property '+property+', value '+value+' got back '+results
       else
         results.forEach (result) => @lru.set(result.id, result)
       q.resolve(results)
