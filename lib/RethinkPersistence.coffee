@@ -229,7 +229,7 @@ class RethinkPersistence
     #value = value.replace(/[^\w\s@.]/gi, '')
     value = value.replace(/[`~!@#$%^&*()_|+\=?;:'",.<>\{\}\[\]\\\/]/gi, '')
     if debug then console.log 'final search value is '+value
-    if query.wildcard then value = '^'+value
+    #if query.wildcard then value = '^'+value
     #console.log 'returning value "'+value+'"'
     return {invalid: rv, value: value}
 
