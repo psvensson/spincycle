@@ -289,7 +289,7 @@ class DB
         x = [x]
       return x
 
-    if debug then console.log 'DB.get called for type "'+type+'" and ids "'+ids+'"'
+    #if debug then console.log 'DB.get called for type "'+type+'" and ids "'+ids+'"'
     if not ids.length then ids = [ids]
     q = defer()
     id = ids[0]
@@ -301,8 +301,8 @@ class DB
       #console.log 'DB.get id is '+id
       rv = @lru.get id
       if rv
-        if debug then console.log 'DB found '+id+'  in lru: '+rv
-        if debug then console.dir rv
+        #if debug then console.log 'DB found '+id+'  in lru: '+rv
+        #if debug then console.dir rv
         q.resolve(toarr(rv))
       else
         #console.log ' attempting to use datastore for type '+type+' and id '+id+' typeof = '+(typeof id)

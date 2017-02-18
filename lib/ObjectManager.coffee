@@ -252,11 +252,11 @@ class ObjectManager
         DB.get(r.type, [r.id]).then (record) =>
           if debug then console.log 'ObjectManager.parseList --- result of getting record '+r.type+' id '+r.id+' is '+record
           if record and record[0]
-            if debug then console.dir record[0]
+            #if debug then console.dir record[0]
             tc = record[0]
             if @messageRouter.authMgr.filterOutgoing
                @messageRouter.authMgr.filterOutgoing(tc, msg.user).then (tres)=>
-                 if debug then console.log 'parseList got reply from filterOutgoing and it was'
+                 if debug then console.log 'parseList got reply from filterOutgoing and it was a '+tres.type+' count = '+count
                  if debug then console.dir tres
                  if tres then rv.push(tres)
                  checkFinish(rv)
