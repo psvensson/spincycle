@@ -51,9 +51,9 @@ class SuperModel
       #if debug then console.log 'setting _rev to '+@record._rev+' for '+@constructor.type+' '+@id
       @_rev = @record._rev
     @loadFromIds(@constructor.model).then( () =>
-      @createdAt = @createdAt or Date.now()
-      @modifiedAt = @modifiedAt or Date.now()
-      @createdBy = @createdBy or 'SYSTEM'
+      if (not @createdAt or @createdAt == ' ') then @createdAt = Date.now()
+      if (not @modifiedAt or @modifiedAt == ' ') then @modifiedAt = Date.now()
+      if (not @createdBy or @createdBy == ' ') then @createdBy = 'SYSTEM'
       if not @record.id then SuperModel.oncreatelisteners.forEach (listener) => listener(@)
       if @postCreate
         if debug then console.log 'calling PostCreate on '+@type+' with deferred '+q

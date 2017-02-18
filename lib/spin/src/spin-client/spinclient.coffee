@@ -11,6 +11,41 @@ opts =
 debug = true
 uuid = UUID4
 
+class Chillman
+
+  @underwayCache: new LRUCache()
+  @callbackCache: new LRUCache()
+
+  @lookup: (key, type, resolveFunc) =>
+#console.log 'Chillman.lookup for '+key+' '+type
+    q = $q.defer()
+    underway = Chillman.underwayCache.get(key+'_'+type)
+    if underway
+      callbacks = Chillman.callbackCache.get(key+'_'+type) or []
+      callbacks.push q
+      Chillman.callbackCache.set(key+'_'+type, callbacks)
+    else
+      Chillman.underwayCache.set(key+'_'+type, true)
+      Chillman._doLookup(key, type, resolveFunc, q)
+    return q.promise
+
+  @_doLookup: (key, type, resolveFunc, q) =>
+#console.log 'Chillman._doLookup for '+key+' '+type
+    resolveFunc(key, type).then (result) =>
+# console.log 'Chillman._doLookup got reply from resoolvefunc for '+key+' '+type
+      Chillman.underwayCache.remove(key+'_'+type)
+      callbacks = Chillman.callbackCache.get(key+'_'+type) or []
+      cbcount = callbacks.length
+      callbacks.forEach (_q) =>
+#console.log 'calling callback '+cbcount+' for '+key+' and '+type
+        _q.resolve(result)
+        if --cbcount == 0
+#console.log 'removing callback cache entry for '+key+'_'+type
+          Chillman.callbackCache.remove(key+'_'+type)
+      q.resolve(result)
+
+
+
 class spinpolymer
 
   constructor: (@dbUrl) ->
@@ -20,6 +55,7 @@ class spinpolymer
     @popsubscribers = {}
     @populationsubscribers = {}
     @objectsSubscribedTo = []
+    @onsubscribers = {}
 
     @outstandingMessages = []
     @modelcache = []
@@ -36,9 +72,9 @@ class spinpolymer
     if debug then console.log 'polymer-spincycle dbUrl = ' + @dbUrl
 
     @subscribers['OBJECT_UPDATE'] = [(obj) =>
-      console.log 'spinpolymer +++++++++ obj update message router got obj '+obj.id+' of type '+obj.type
-      #console.dir(obj);
-      #console.dir(@objsubscribers)
+#console.log 'spinpolymer +++++++++ obj update message router got obj '+obj.id+' of type '+obj.type
+#console.dir(obj);
+#console.dir(@objsubscribers)
       objsubs = @objsubscribers[obj.id] or []
       for k,v of objsubs
 #console.log 'updating subscriber to @objects updates on id '+k
@@ -52,8 +88,8 @@ class spinpolymer
     ]
 
     @subscribers['POPULATION_UPDATE'] = [(update) =>
-      console.log 'spinpolymer +++++++++ population update message router got update'
-      console.dir update
+#console.log 'spinpolymer +++++++++ population update message router got update'
+#console.dir update
       obj = update.added or update.removed
       if obj
         objsubs = @populationsubscribers[obj.type] or {}
@@ -63,16 +99,31 @@ class spinpolymer
 
     @setup()
 
+  on: (id,type,cb, onlyupdates)->
+    if typeof id == 'object' then xyzzy()
+    if not onlyupdates then @get(type,id).then (o)->cb(o)
+    @_registerObjectSubscriber({id:id,type:type,cb:cb})
+
   get: (type, id)->
+    if typeof id == 'object' then xyzzy()
     d = $q.defer()
     o = @objects.get(id)
     if not o
-      @emitMessage( {target: '_get'+type, type: type, obj: {id: id, type: type}} ).then (oo)=>
-        @objects.set(oo.id, oo)
-        d.resolve(oo)
+#console.log '******************X get calling server for obj '+id+' of type '+type
+      Chillman.lookup(id, type, @_doGet).then (oo)-> d.resolve(oo)
     else
+#console.log 'get found obj for '+id+' in cache of type '+type
       d.resolve(o)
     return d.promise
+
+  _doGet: (k,t)=>
+#console.log '******************* _doGet calling server for obj '+k+' of type '+t
+    dd = $q.defer()
+    @emitMessage( {target: '_get'+t, type: t, obj: {id: k, type: t}} ).then (_oo)=>
+#console.log '******************* server replied for obj '+k+' of type '+t
+      @objects.set(_oo.id, _oo)
+      dd.resolve(_oo)
+    return dd.promise
 
   save: (o) ->
     @objects.set(o.id, o)
@@ -97,7 +148,7 @@ class spinpolymer
     @_emit(message)
 
   _emit:(message)=>
-    #console.log 'emitting message '+message
+    #console.log 'emitting message '+message.target
     #console.dir message
     @savedMessagesInCaseOfRetries.set(message.messageId, message)
     @socket.emit('message', JSON.stringify(message))
@@ -109,9 +160,9 @@ class spinpolymer
       @emit({target:'listcommands'})
 
     @socket.on 'message', (reply) =>
-      #console.log '***** got message ******'
-      #console.dir reply
-      
+#console.log '***** got message ******'
+#console.dir reply
+
       status = reply.status
       message = reply.payload
       info = reply.info
@@ -158,7 +209,7 @@ class spinpolymer
                   detail.d.reject reply
                   break
                 else
-                  #console.log 'delivering message '+message+' reply to '+detail.target+' to '+reply.messageId
+#console.log 'delivering message '+message+' reply to '+detail.target+' to '+reply.messageId
                   detail.d.resolve(message)
                   break
                 detail.delivered = true
@@ -208,7 +259,7 @@ class spinpolymer
 
 
   registerPopulationChangeSubscriber: (detail) =>
-    #console.log 'registerPopulationChangeSubscriber called for '+detail.type
+#console.log 'registerPopulationChangeSubscriber called for '+detail.type
     d = $q.defer()
     sid = uuid.generate()
     localsubs = @populationsubscribers[detail.type]
@@ -223,13 +274,13 @@ class spinpolymer
               if (v.cb)
                 v.cb updatedobj
         }).then( (remotesid) =>
-          localsubs['remotesid'] = remotesid
-          localsubs[sid] = detail
-          @populationsubscribers[detail.type] = localsubs
-          d.resolve(sid)
-        ,(rejection)=>
-          console.log 'spinpolymer registerPopulationSubscriber rejection: '+rejection
-          console.dir rejection
+        localsubs['remotesid'] = remotesid
+        localsubs[sid] = detail
+        @populationsubscribers[detail.type] = localsubs
+        d.resolve(sid)
+      ,(rejection)=>
+        console.log 'spinpolymer registerPopulationSubscriber rejection: '+rejection
+        console.dir rejection
       )
     else
       localsubs[sid] = detail
@@ -265,6 +316,7 @@ class spinpolymer
         localsubs['remotesid'] = remotesid
         localsubs[sid] = detail
         @objectsSubscribedTo[detail.id] = localsubs
+        #console.log 'spinclient registered observer for object type '+detail.type+' id '+detail.id
         d.resolve(sid)
       ,(rejection)=>
         console.log 'spinpolymer registerObjectSubscriber rejection: '+rejection
@@ -290,7 +342,7 @@ class spinpolymer
   deRegisterObjectsSubscriber: (sid, o) =>
     localsubs = @objectsSubscribedTo[o.id] or []
     if localsubs[sid]
-      console.log 'deregistering local updates for @objects ' + o.id
+#console.log 'deregistering local updates for @objects ' + o.id
       delete localsubs[sid]
       count = 0
       for k,v in localsubs
@@ -304,7 +356,7 @@ class spinpolymer
       delete subs[sid]
       @objsubscribers[o.id] = subs
       @emitMessage({target: 'deRegisterForUpdatesOn', id: o.id, type: o.type, listenerid: sid}).then (reply)->
-        console.log 'deregistering server updates for @objects ' + o.id
+#console.log 'deregistering server updates for @objects ' + o.id
 
   emitMessage: (detail) =>
 #if debug then console.log 'emitMessage called'
@@ -324,13 +376,17 @@ class spinpolymer
   getModelFor: (type) =>
     d = $q.defer()
     if @modelcache[type]
+      #console.log 'getModelFor found model in cache..'
       d.resolve(@modelcache[type])
     else
-      @emitMessage({target: 'getModelFor', modelname: type}).then((model)->
+      @emitMessage({target: 'getModelFor', modelname: type}).then((model)=>
+        #console.log 'getModelFor got model from server'
+        #console.dir model
         @modelcache[type] = model
+        #console.log 'getModelFor resolving.....'
         d.resolve(model)
       ,(rejection)=>
-        console.log 'spinpolymer getModelFor rejection: '+rejection
+        console.log '+++++++++++++++++ spinpolymer getModelFor rejection: '+rejection
         console.dir rejection
       )
     return d.promise

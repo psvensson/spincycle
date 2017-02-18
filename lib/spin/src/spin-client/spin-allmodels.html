@@ -1,8 +1,8 @@
 
-<link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
-<link rel="import" href="../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="spin-list.html">
 
 <dom-module id="spin-allmodels">
@@ -26,7 +26,8 @@
                 </paper-dropdown-menu>
                 <paper-input label="Search Value" value="{{searchvalue}}"></paper-input>
             </div>
-            <spin-list client="{{client}}" delete="true" model="[[model]]" itemselected="{{listitemselected}}" spinitems="{{shownItems}}"></spin-list>
+            shownItems={{shownItems.length}}
+            <spin-list client="{{client}}" delete="true" model="[[model]]" itemselected="{{listitemselected}}" spinids="[[shownItems]]" show="true"></spin-list>
             <template is="dom-repeat" items="[[listpages]]" as="p">
                 <paper-button on-tap="selectPage" value="{{p.foo}}"> {{p.foo}}</paper-button>
             </template>
@@ -74,13 +75,13 @@
 
             onSearchChange:function(e)
             {
-                if(this.searchproperty && this.searchvalue)
-                {
+                //if(this.searchproperty && this.searchvalue)
+                //{
                     if(this.client)
                     {
                         this.fetchPage()
                     }
-                }
+                //}
             },
 
             onModelChange: function()
@@ -97,6 +98,7 @@
                  {
                      this.client.emitMessage({target: 'getModelFor', modelname: this.model}).then(function(mprops)
                      {
+                     	console.log('alltypes got model for '+this.model)
                          var props = []
                          mprops.forEach(function(p)
                          {
@@ -181,11 +183,12 @@
             {
                 if(this.model)
                 {
-                    //console.log('------------------------------------- spin-allmodels fetchpage called for '+this.model)
+                    console.log('------------------------------------- spin-allmodels fetchpage called for '+this.model)
                     var q = {property: this.searchproperty, wildcard:true, value: this.searchvalue, limit:this.itemsPerPage, skip: this.itemsPerPage*this.currentPage}
+                    console.dir(q)
                     this.client.emitMessage({ target:'_list'+this.model+'s', query: q}).then(function(newlist)
                     {
-                        //console.log('spin-allmodels fetchpage got '+newlist.length+' items back')
+                        console.log('spin-allmodels fetchpage got '+newlist.length+' items back')
                         //console.dir(newlist)
                         newlist.sort(function(a,b)
                         {
@@ -193,12 +196,24 @@
                         })
                         if(!this.shownItems)
                         {
-                            this.shownItems = newlist
+                        	var ids = []
+                            newlist.forEach(function(el)
+                            {
+                            	//console.log('allmodels pushing id '+el.id+' to ids list')
+                            	ids.push(el.id)
+                            })
+                          this.set('shownItems', ids)
                         }
                         else
                         {
                             this.splice('shownItems', 0, this.shownItems.length)
-                            newlist.forEach(function(el){this.push('shownItems', el)}.bind(this))
+                            var nids = []
+                            newlist.forEach(function(el)
+                            {
+                            	//console.log('adding new item '+el.name+' to showItems id list')
+                            	nids.push(el.id)
+                            }.bind(this))
+                            this.set('shownItems', nids)
                             this.drawQuickSelectBar()
                         }
                     }.bind(this))

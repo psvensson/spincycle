@@ -1,15 +1,15 @@
 
-<link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
-<link rel="import" href="../bower_components/paper-item/paper-item.html">
-<link rel="import" href="../bower_components/iron-icons/maps-icons.html">
-<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../bower_components/paper-input/paper-textarea.html">
-<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
-<link rel="import" href="../bower_components/ace-widget/ace-widget.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/ace-widget/ace-widget.html">
 
-<link rel="import" href="../bower_components/carbon-i18n-behavior/carbon-i18n-behavior.html">
+<link rel="import" href="../../bower_components/carbon-i18n-behavior/carbon-i18n-behavior.html">
 
 <script src="../i18n/spin-model.en.i18.js"></script>
 <script src="../i18n/spin-model.se.i18.js"></script>
@@ -41,7 +41,7 @@
                         <paper-item >
                              <!-- {{item.key}}__ -->
                             <template is="dom-if" if="{{isType(item,'array')}}">
-                                <spin-list propname="{{item.key}}" delete="true" incallbacks="[[outCallbacks]]" client="{{client}}" user="{{user}}" model="{{getTypeFor(item)}}" spinids="{{item.value}}" itemselected="{{selectedlistitem}}"></spin-list>
+                                <spin-list propname="{{item.key}}" delete="true" incallbacks="[[outCallbacks]]" client="{{client}}" user="{{user}}" model="{{getTypeFor(item)}}" spinids="{{item.value}}" itemselected="{{selectedlistitem}}" show="true"></spin-list>
                                 <paper-button raised on-tap="addModel">[[i18n.add]] {{getTypeFor(item)}}</paper-button>
                                 <paper-dialog style="padding:20px;overflow:auto"  id="addmodeldialog_{{getModelId()}}_{{getTypeFor(item)}}">
                                     <h2>[[i18n.add]] {{item.type}}</h2>

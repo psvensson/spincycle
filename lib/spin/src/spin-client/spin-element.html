@@ -1,4 +1,3 @@
-
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
@@ -20,74 +19,95 @@
     </template>
 
     <script>
-			Polymer({
-				is: 'spin-element',
-				properties:
-				    {
-					    client:{type:'Object'},
-					    spintype:{type:String, observer:'onStuff'},
-                        spinid:{type:String, observer:'onStuff'},
-                        model:{type:Object, notify:true},
-                        edit:{type: Boolean, value:false},
-                        captions:{type:Object}
-				    },
+			Polymer( {
+				is:         'spin-element',
+				properties: {
+					client:   {type: 'Object', observer: 'onStuff'},
+					spintype: {type: String, observer: 'onStuff'},
+					spinid:   {type: String, observer: 'onStuff'},
+					model:    {type: Object, notify: true},
+					edit:     {type: Boolean, value: false},
+					captions: {type: Object}
+				},
 
-				ready: function()
+				ready: function ()
 				       {
-
+					       //this.getModelProperties()
 				       },
 
-                getModelProperties: function()
-                                    {
-	                                    this.client.emitMessage({target: 'getModelFor', modelname: this.spintype}).then(function(mprops)
-	                                    {
-		                                    console.log('======================= spin-element.onModelChanged getModelFor returns ')
-		                                    console.dir(mprops)
+				getModelProperties: function ()
+				                    {
+					                    //console.log( '======================= spin-element getting model for ' + this.spintype+' spinid = '+this.spinid )
+					                    this.client.getModelFor( this.spintype ).then( function ( mprops )
+					                    {
+						                    //console.log('======================= spin-element.onModelChanged getModelFor returns ')
+						                    //console.dir(mprops)
 
-		                                    this.set('modelproperties', mprops)
-		                                    this.set('model', this.model)
-                                            this.client.emitMessage({target: '_get'+this.spintype, type: this.spintype, obj: {id: this.spinid, type: this.spintype}}).then(function(obj)
-                                            {
-                                                this.set('model', obj)
-                                                this.client.registerObjectSubscriber({ id: obj.id, type: obj.type, cb: function(newobj)
-                                                {
-                                                    console.log('spin-element getting subscription changes. setting new model for '+newobj.type+' id = '+newobj.id)
-                                                    this.set('model', newobj)
-                                                }.bind(this)})
-                                            }.bind(this))
-	                                    }.bind(this))
-                                    },
+						                    this.set( 'modelproperties', mprops )
+						                    //this.set( 'model', this.model )
+						                    //console.log('**************************** spin-element calling _get'+this.spintype+' for id '+this.spinid)
+						                    if (this.spinid == ' ' || this.spinid == 'false')
+						                    {
+							                    this.set( 'model', undefined )
+						                    }
+						                    else
+						                    {
+							                    this.client.get( this.spintype, this.spinid ).then( function ( obj )
+							                    {
+								                    //console.log( 'spin-element got model ' + this.spintype )
+								                    //console.dir( obj )
+								                    this.set( 'model', obj )
+								                    //console.log('================ spin-element subscribing to changes to '+this.spintype+' '+this.spinid)
+								                    this.client.on(
+									                    obj.id, obj.type, function ( newobj )
+									                    {
+										                    console.log('================ spin-element getting subscription changes. setting new model for '+newobj.type+' id = '+newobj.id+' our id == '+obj.id)
+										                    //console.dir(newobj)
+										                    this.set( 'model', newobj )
+									                    }.bind( this )
+								                    )
+							                    }.bind( this ) )
+						                    }
+					                    }.bind( this ) )
+				                    },
 
-				attached: function()
+				attached: function ()
 				          {
-                              console.log('spin-element attached. captions are')
-                              console.dir(this.captions)
-                              console.log('model is')
-                              console.dir(this.model)
-                              if(this.edit === true)
-                              {
-                                  this.showSave = true
-                              }
+					          //console.log('spin-element attached. captions are')
+					          //console.dir(this.captions)
+					          //console.log('model is')
+					          //console.dir(this.model)
+					          if (this.edit === true)
+					          {
+						          this.showSave = true
+					          }
 				          },
 
-                onStuff:function()
-                        {
-                            if(this.spintype && this.spinid)
+				onStuff: function ()
+				         {
+					         //console.log('spin-element onstuff type='+this.spintype+' client='+this.client+' id='+this.spinid)
+					         if (this.spintype && this.spinid && this.client)
+					         {
+						         this.getModelProperties()
+					         }
+				         },
+
+				doSave: function ()
+				        {
+				        	if(this.model)
                             {
-                                this.getModelProperties()
+	                            console.log( 'spin-element doSave called type = '+this.spintype )
+                                console.dir(this.model)
+	                            this.client.save(this.model)
                             }
-                        },
 
-                doSave: function()
-                        {
-                            console.log('spin-element doSave called')
-                        },
+				        },
 
-				onSelect: function(e)
+				onSelect: function ( e )
 				          {
 
 				          }
-			});
+			} );
 
     </script>
 

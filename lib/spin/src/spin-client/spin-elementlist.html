@@ -1,9 +1,9 @@
-<link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
-<link rel="import" href="../bower_components/paper-item/paper-item.html">
-<link rel="import" href="../bower_components/iron-icons/maps-icons.html">
-<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
 <dom-module id="spin-elementlist">
 
@@ -22,15 +22,18 @@
 					client:     {type: 'Object', observer: 'onStuff'},
 					user:       {type: 'Object', observer: 'onStuff'},
 					spintype:   {type: String, observer: 'onStuff'},
-					list:       {type: Array, notify: true},
+					list:       {type: Array, notify: true, value: []},
 					filteruser: {type: Boolean, value: false},
 					filterids:  {type: Array},
 					captions:   {type: Object, observer: 'onStuff'},
-					query:      {type: Object, observer: 'onStuff'}
+					query:      {type: Object, observer: 'onStuff'},
+					loading:    {type: String, notify: true}
 				},
 
 				ready: function ()
 				       {
+				       	console.log('spin-elementlist ready')
+					       this.subscriptions = {}
 					       this.getModelList()
 				       },
 
@@ -41,6 +44,7 @@
 
 				onStuff: function ()
 				         {
+					         console.log('spin-elementlist onStuff -------- spintype='+this.spintype+' client='+this.client+' user='+this.user)
 					         if (this.spintype && this.client && this.captions && this.user)
 					         {
 						         this.getModelList()
@@ -50,81 +54,97 @@
 				getModelList: function ()
 				              {
 					              console.log( '---spin-elementlist get all elements. this.filteruser = ' + this.filteruser + ' this.user = ' + this.user + ' query = ' + this.query )
-					              console.dir( this.query )
+					              //console.dir( this.query )
 					              var q = {sort: 'name'}
 					              if (this.filteruser == true && this.user)
 					              {
 						              q = {sort: 'name', property: 'createdBy', value: this.user.id}
 					              }
+					              q.limit = 20
 					              if (this.query)
 					              {
 						              q = this.query
 					              }
-					              console.log( 'query is' )
+					              console.log( 'spin-elementlist query is' )
 					              console.dir( q )
+					              this.loading = 'block'
 					              this.client.emitMessage( {
 						              target: '_list' + this.spintype + 's',
 						              query:  q
 					              } ).then( function ( newlist )
 					              {
+						              this.loading = 'none'
 						              console.log( 'spin-elementlist for ' + this.spintype + ' fetchpage got ' + newlist.length + ' items back' )
-						              //console.dir( newlist )
+						              console.dir( newlist )
+						              newlist = this.filterIds( newlist )
 						              newlist.sort( function ( a, b )
 						              {
 							              return a.modifiedAt == b.modifiedAt ? 0 : a.modifiedAt < b.modifiedAt ? 1 : -1
 						              } )
-						              if (!this.list)
+						              this.list = newlist
+						              newlist.forEach( function ( el )
 						              {
-							              this.list = this.filterIds( newlist )
-							              this.list.forEach( function ( el, idx )
+							              //console.log('spin-elementlist calling on: for '+el.id+' '+el.type)
+							              this.client.on( el.id, el.type, function ( newobj )
 							              {
-								              (function ( i )
-								              {
-									              this.client.registerObjectSubscriber( {
-										              id: el.id, type: el.type, cb: function ( co )
-										              {
-											              //console.log('spin-elementlist getting object update')
-											              //console.dir(co)
-											              this.splice( 'list', i, co )
-										              }.bind( this )
-									              } )
-								              }.bind( this ))( idx )
-							              }.bind( this ) )
-						              }
-						              else
-						              {
-							              var _newlist = this.filterIds( newlist )
-							              this.splice( 'list', 0, this.list.length )
-							              _newlist.forEach( function ( el )
-							              {
-								              this.push( 'list', el )
-							              }.bind( this ) )
-							              this.drawQuickSelectBar()
-						              }
+								              console.log( 'spin-elementlist got object from on: ' + newobj.id+' '+newobj.type )
+								              this.replaceInList( this.list, newobj.id, newobj )
+							              }.bind( this ), true )
+						              }.bind( this ) )
+
+
 						              this.registerPopulationListener()
 					              }.bind( this ) )
 				              },
+
+
+				replaceInList: function ( list, id, objWithId )
+				               {
+					               console.log( 'replaceInList called with list of ' + list.length + ' elements, id = ' + id + ' and objWithId ' + objWithId )
+					               var idx = -1
+					               list.forEach( function ( el, i )
+					               {
+						               //console.log('checking if '+el.id+' == '+id)
+						               if (el.id == id)
+						               {
+							               //console.log( 'found match with old object at index ' + i )
+							               idx = i
+						               }
+					               } )
+					               if (idx > -1)
+					               {
+						               //console.log( 'splicing away at index ' + idx )
+						               if (objWithId)
+						               {
+							               this.splice( 'list', idx, 1, objWithId )
+						               }
+						               else
+						               {
+							               this.splice( 'list', idx, 1 )
+						               }
+
+					               }
+					               else
+					               {
+						               if (objWithId)
+						               {
+							               //console.log( 'pushing new element with no prior found id to list' )
+							               this.push('list', objWithId )
+
+						               }
+					               }
+					               //console.log('list is now')
+					               //console.dir(this.list)
+				               },
 
 				filterIds: function ( newlist )
 				           {
 					           var rv = newlist
 					           if (this.filterids && this.filterids.length > 0)
 					           {
-						           var away = []
 						           this.filterids.forEach( function ( fid )
 						           {
-							           var idx = -1
-							           rv.forEach( function ( el, i )
-							           {
-								           if (el.id == fid)
-								           {
-									           idx = i
-								           }
-							           } )
-							           if (idx > -1)
-							           {
-								           rv.splice( idx, 1 )
-							           }
+							           this.replaceInList( rv, fid )
 						           } )
 					           }
 					           return rv
@@ -146,22 +166,11 @@
 							                            console.dir( popchange )
 							                            if (popchange.removed)
 							                            {
-								                            var idx = -1
-								                            this.list.forEach( function ( el, i )
-								                            {
-									                            if (el.id === popchange.removed.id)
-									                            {
-										                            idx = i
-									                            }
-								                            } )
-								                            if (idx > -1)
-								                            {
-									                            this.splice( 'list', idx, 1 )
-								                            }
+								                            this.replaceInList( this.list, popchange.removed.id )
 							                            }
 							                            else
 							                            {
-								                            this.unshift( 'list', popchange.added )
+								                            this.replaceInList( this.list, popchange.added.id, popchange.added )
 							                            }
 
 							                            console.log( 'elementlist is now..' )

@@ -128,7 +128,7 @@ class RethinkPersistence
           console.dir err
           throw err
         cursor.toArray (ce, result)=>
-          #console.log 'all result is '+result.length+' records'
+          console.log 'all result is '+result.length+' records'
           #if debug then console.dir result
           cb result
 

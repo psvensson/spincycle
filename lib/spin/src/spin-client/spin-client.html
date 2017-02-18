@@ -1,6 +1,6 @@
-<script src="../bower_components/q/q.js"></script>
-<script src="../bower_components/uuid4/lib/browser/index.js"></script>
-<script src="../bower_components/lrucache/index.js"></script>
+<script src="../../bower_components/q/q.js"></script>
+<script src="../../bower_components/uuid4/lib/browser/index.js"></script>
+<script src="../../bower_components/lrucache/index.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <!-- <script src="http://localhost:6006/socket.io/socket.io.js"></script> -->
 <script src="spinclient.js"></script>
@@ -43,7 +43,7 @@
                           {
                           	//console.log('spin-client onUserObserved')
                             //console.dir(u)
-	                          this.saveUser()
+	                          //this.saveUser()
                           },
 
             onUserChanged: function ( e )
@@ -58,7 +58,7 @@
 		                           }
 		                           this.set( 'user', e )
 		                           //console.dir(this.user)
-		                           this.saveUser()
+		                           //this.saveUser()
 		                           if (this.subscriptionid)
 		                           {
 			                           this.client.deRegisterObjectsSubscriber( this.subscriptionid, this.user )
@@ -82,24 +82,36 @@
 
           saveUser: function()
                     {
+                    	/*
                     	if(!this.saving)
                         {
 	                        this.saving = true
+                            //console.log('---- saving user..')
 	                        this.client.emitMessage( {
-		                        target: '_updateUser',
+		                        target: '_updateGEUser',
 		                        obj:    this.user
 	                        } ).then( function ( ures )
 	                        {
 	                        	setTimeout(
 	                        		function(){
-							                        console.log( 'user update result: ' + ures )
+							                        //console.log( 'user update result: ' + ures )
 							                        this.saving = false
                                     }.bind(this),100
                                 )
 
 	                        }.bind( this ) )
                         }
-
+                      else
+                        {
+                        	//console.log('---- waiting to save user becasue user is already being saved')
+                        	setTimeout(function()
+                            {
+	                            //console.log('---- tryin again to save user...')
+                            	this.saveUser()
+                            }.bind(this), 100)
+                        }
+                        */
+                    	xyzzy
                     },
 
             registerObjectSubscriber: function(detail)
