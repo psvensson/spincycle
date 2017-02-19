@@ -1190,8 +1190,12 @@
             bar.foos.push(foo);
             return bar.serialize().then(function() {
               var brecord, msg, umsg;
+              console.log('------------------------- initial bar object foos is ');
+              console.dir(bar.foos);
               ClientEndpoints.registerEndpoint('fooclient', function(reply) {
-                expect(reply.payload.foos[0]).to.equal(foo.id);
+                console.log('--__--__--__ object update __--__--__--');
+                console.dir(reply);
+                expect(reply.payload.foos.length).to.equal(0);
                 return done();
               });
               msg = {
@@ -1199,7 +1203,8 @@
                 client: 'fooclient',
                 obj: {
                   id: bar.id,
-                  type: 'Bar'
+                  type: 'Bar',
+                  foos: []
                 },
                 user: {
                   isAdmin: true

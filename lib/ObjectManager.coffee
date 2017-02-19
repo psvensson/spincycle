@@ -340,17 +340,13 @@ class ObjectManager
             if canwrite
               #console.log 'can write'
               # Make sure to resolve object references in arrays and hashtables
-              if not @areDataTrashed(obj)
-                for k,v of msg.obj
-                  obj[k] = v if k isnt 'id'
-                @resolveReferences(obj, obj.constructor.model).then (robj)=>
-                  #console.log '++++++++++++++++++++++++++++++++++++++++++++++ onUpdateObject after resolveReferences:'
-                  @persistUpdates(obj, robj).then (res)=>
-                    if not res
-                      msg.replyFunc({status: e.general.FAILURE, info: 'db error for object update', payload: msg.obj.id})
-                    else
-                      @messageRouter.gaugeMetric('update', 1, {type: msg.obj.type,'username': msg.user.name, 'useremail': msg.user.email, 'provider': msg.user.provider, 'organization': msg.user.organization})
-                      msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
+              if not @areDataTrashed(msg.obj)
+                @persistUpdates(obj, msg.obj).then (res)=>
+                  if not res
+                    msg.replyFunc({status: e.general.FAILURE, info: 'db error for object update', payload: msg.obj.id})
+                  else
+                    @messageRouter.gaugeMetric('update', 1, {type: msg.obj.type,'username': msg.user.name, 'useremail': msg.user.email, 'provider': msg.user.provider, 'organization': msg.user.organization})
+                    msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.UPDATE_OBJECT_SUCCESS, payload: msg.obj.id})
               else
                 console.log 'object update fail: data is TRASHED!!!!'
                 msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'one or more arrays have ben contaminated with null values', payload: msg.obj.id})

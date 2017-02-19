@@ -743,19 +743,19 @@ describe 'Spincycle Model Tests', ->
         foo.serialize().then ()->
           bar.foos.push foo
           bar.serialize().then ()->
-            #console.log '------------------------- initial bar object'
-            #console.dir bar
+            console.log '------------------------- initial bar object foos is '
+            console.dir bar.foos
 
             ClientEndpoints.registerEndpoint 'fooclient',(reply)->
-              #console.log '--__--__--__ object update __--__--__--'
-              #console.dir reply
-              expect(reply.payload.foos[0]).to.equal(foo.id)
+              console.log '--__--__--__ object update __--__--__--'
+              console.dir reply
+              expect(reply.payload.foos.length).to.equal(0)
               done()
 
             msg =
               type: 'Bar'
               client: 'fooclient'
-              obj:{id: bar.id, type: 'Bar'}
+              obj:{id: bar.id, type: 'Bar', foos:[]}
               user:
                 isAdmin: true
               replyFunc: (reply)->#console.log "we're listening to "+bar.id
