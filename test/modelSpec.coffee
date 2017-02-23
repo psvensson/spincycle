@@ -872,7 +872,7 @@ describe 'Spincycle Model Tests', ->
       abc: 123
       obj:{name: 'foobar17', type: 'Foo', id: '21008877'}
     console.log '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-    request.put {url:'http://localhost:8008/rest/Foo/21008877', headers:{"Content-Type": "application/json"}, form: record, body: record}, (req,res,_body)=>
+    request.put {url:'http://localhost:8008/rest/Foo/21008877/?apitoken=abcdef123456', headers:{"Content-Type": "application/json"}, form: record, body: record}, (req,res,_body)=>
       #console.log('put returns '+_body)
       request.get 'http://localhost:8008/rest/Foo/21008877', (req2,res2,_body2)=>
         console.log('rest get returns '+_body)

@@ -108,7 +108,8 @@ class HttpMethod
       url_parts = req.body
       #console.dir url_parts
       req.query.id = req.params.id
-      url_parts.apitoken = req.params.apitoken
+      url_parts.apitoken = req.query.apitoken
+      url_parts.sessionId = req.query.sessionId
       req.query.type = type
       req.query.obj = req.body.obj
       if typeof url_parts.obj == 'string' then url_parts.obj = JSON.parse(url_parts.obj)

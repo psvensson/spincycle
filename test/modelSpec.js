@@ -1344,7 +1344,7 @@
       };
       console.log('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
       return request.put({
-        url: 'http://localhost:8008/rest/Foo/21008877',
+        url: 'http://localhost:8008/rest/Foo/21008877/?apitoken=abcdef123456',
         headers: {
           "Content-Type": "application/json"
         },
