@@ -67,6 +67,7 @@ class OStore
     if obj
       whitelist = obj.getRecord() #FFS
       delete whitelist.id
+      delete whitelist.type
       diff = {}
       changed = false;
       record.modifiedAt = Date.now()

@@ -94,7 +94,7 @@ class HttpMethod
       #console.dir url_parts
       req.query.id = req.params.id
       req.query.type = type
-      req.query.obj = {id: req.query.id, type: req.query.type}
+      req.query.obj = req.query
       req.query.target = '_update'+type
       @doSend(req, res, url_parts)
 
