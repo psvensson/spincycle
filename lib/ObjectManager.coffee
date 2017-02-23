@@ -327,8 +327,8 @@ class ObjectManager
     return q
 
   onUpdateObject: (msg) =>
-    #console.log 'onUpdateObject called for '+msg
-    #console.dir msg
+    if debug then console.log 'onUpdateObject called for '+msg
+    if debug then console.dir msg
     if msg.obj and msg.obj.type and msg.obj.id
       if msg.obj.type in @getTypes()
         DB.getFromStoreOrDB(msg.obj.type, msg.obj.id).then( (obj) =>
