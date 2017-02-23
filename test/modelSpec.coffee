@@ -870,15 +870,15 @@ describe 'Spincycle Model Tests', ->
       id: '21008877'
       type: 'Foo'
       abc: 123
-      obj:{name: 'foobar17', type: 'Foo', id: '21008877'}
+      obj:{name: 'xxxxfoobar17', type: 'Foo', id: '21008877'}
     console.log '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-    request.put {url:'http://localhost:8008/rest/Foo/21008877/?apitoken=abcdef123456', headers:{"Content-Type": "application/json"}, form: record, body: record}, (req,res,_body)=>
+    request.put {url:'http://localhost:8008/rest/Foo/21008877/?apitoken=abcdef123456', headers:{"Content-Type": "application/x-www-form-urlencoded"}, form: record, body: record}, (req,res,_body)=>
       #console.log('put returns '+_body)
       request.get 'http://localhost:8008/rest/Foo/21008877', (req2,res2,_body2)=>
-        console.log('rest get returns '+_body)
+        console.log('rest get returns '+_body2)
         res = JSON.parse(_body2)
         console.dir res.payload
-        expect(res.payload.name).to.equal('foobar17')
+        expect(res.payload.name).to.equal('xxxxfoobar17')
         done()
 
   it 'should be able to delete a restified object through delete /rest/Object/:id and HttpMethod', (done)->

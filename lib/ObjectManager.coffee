@@ -73,14 +73,18 @@ class ObjectManager
     if msg.modelname
       @messageRouter.resolver.resolve msg.modelname, (path) =>
         #if debug then console.log 'onGetModelFor '+msg.modelname+' got back require path '+path
-        model = ResolveModule.modulecache[msg.modelname]
-        #if debug then console.log 'got model resolved to'
-        #if debug then console.dir model.model
-        rv = []
-        model.model.forEach (property) -> if property.public then rv.push(property)
+        rv = @getModelFor(msg.modelname)
         msg.replyFunc({status: e.general.SUCCESS, info: 'get model', payload: rv})
     else
       msg.replyFunc({status: e.general.FAILURE, info: "getModelFor missing parameter", payload: null})
+
+  getModelFor:(modelname)=>
+    model = ResolveModule.modulecache[modelname]
+    #if debug then console.log 'got model resolved to'
+    #if debug then console.dir model.model
+    rv = []
+    model.model.forEach (property) -> if property.public then rv.push(property)
+    rv
 
   #---------------------------------------------------------------------------------------------------------------------
   _createObject: (msg) =>
@@ -371,19 +375,31 @@ class ObjectManager
     q = defer()
     console.log 'persistUpdates for record'
     console.dir robj
-    objStore.updateObj(robj, force)
-    objStore[robj.id] = obj
-    if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db. modifiedAt = '+obj.modifiedAt
-    obj.serialize(robj).then (res) =>
-      if debug then console.log 'persisting returned from serialize'
-      if not res
-        if debug then console.log 'persisting failed'
-        q.resolve(false)
-      else
-        record = obj.toClient()
-        @updateObjectHooks.forEach (hook) => hook(record)
-        if debug then console.log 'persisting succeeded'
-        q.resolve(true)
+    model = @getModelFor(obj.type)
+    borked = false
+    model.forEach (row)=>
+      if row.array and typeof robj[row.name] != 'array'
+        console.log 'BORK detected for property '+row.name
+        borked = true
+    if borked
+      console.log 'borketh object entered. scalar where there should be an array..'
+      console.log '---------------------------------------------------------------'
+      console.dir robj
+      q.resolve(false)
+    else
+      objStore.updateObj(robj, force)
+      objStore[robj.id] = obj
+      if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db. modifiedAt = '+obj.modifiedAt
+      obj.serialize(robj).then (res) =>
+        if debug then console.log 'persisting returned from serialize'
+        if not res
+          if debug then console.log 'persisting failed'
+          q.resolve(false)
+        else
+          record = obj.toClient()
+          @updateObjectHooks.forEach (hook) => hook(record)
+          if debug then console.log 'persisting succeeded'
+          q.resolve(true)
     return q
       
   areDataTrashed: (obj) ->

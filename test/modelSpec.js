@@ -1337,7 +1337,7 @@
         type: 'Foo',
         abc: 123,
         obj: {
-          name: 'foobar17',
+          name: 'xxxxfoobar17',
           type: 'Foo',
           id: '21008877'
         }
@@ -1346,17 +1346,17 @@
       return request.put({
         url: 'http://localhost:8008/rest/Foo/21008877/?apitoken=abcdef123456',
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/x-www-form-urlencoded"
         },
         form: record,
         body: record
       }, (function(_this) {
         return function(req, res, _body) {
           return request.get('http://localhost:8008/rest/Foo/21008877', function(req2, res2, _body2) {
-            console.log('rest get returns ' + _body);
+            console.log('rest get returns ' + _body2);
             res = JSON.parse(_body2);
             console.dir(res.payload);
-            expect(res.payload.name).to.equal('foobar17');
+            expect(res.payload.name).to.equal('xxxxfoobar17');
             return done();
           });
         };
