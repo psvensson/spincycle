@@ -55,6 +55,10 @@ class HttpMethod
       doSend(req, res, url_parts)
 
     app.put basePath, (req, res) ->
+      if debug then console.log 'Alternate PUT handler. params are'
+      if debug then console.dir req.params
+      if debug then console.log 'query is'
+      if debug then console.dir req.query
       url_parts = req.body
       doSend(req, res, url_parts)
 
