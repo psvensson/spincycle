@@ -85,6 +85,10 @@ class HttpMethod
 
     getone = (req,res) =>
       #console.log 'getone'
+      if debug then console.log 'PUT handler. params are'
+      if debug then console.dir req.params
+      if debug then console.log 'query is'
+      if debug then console.dir req.query
       url_parts = req.query
       req.query.id = req.params.id
       req.query.type = type
