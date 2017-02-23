@@ -284,8 +284,8 @@ class DB
       xyzzy
     toarr = (x)->
       if !Array.isArray(x)
-        if debug then console.dir x
-        if debug then console.log 'result is not array, so putting it into one..'
+        #if debug then console.dir x
+        #if debug then console.log 'result is not array, so putting it into one..'
         x = [x]
       return x
 

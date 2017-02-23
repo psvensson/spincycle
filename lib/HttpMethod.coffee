@@ -38,6 +38,7 @@ class HttpMethod
         #console.log 'message is now'
         #console.dir message
         message.replyFunc = (reply) ->
+          if reply.statuscode then res.status(reply.statuscode)
           res.json(reply)
           if debug then console.log 'HttpMethod calling target '+target
         target(message)
