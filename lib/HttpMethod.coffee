@@ -54,6 +54,10 @@ class HttpMethod
       url_parts = req.body
       doSend(req, res, url_parts)
 
+    app.put basePath, (req, res) ->
+      url_parts = req.body
+      doSend(req, res, url_parts)
+
     messageRouter.addMethod 'express', @
 
 
