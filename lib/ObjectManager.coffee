@@ -378,7 +378,7 @@ class ObjectManager
     model = @getModelFor(obj.type)
     borked = false
     model.forEach (row)=>
-      if row.array and typeof robj[row.name] != 'array'
+      if row.array and robj[row.name] and typeof robj[row.name] != 'array'
         console.log 'BORK detected for property '+row.name
         borked = true
     if borked
