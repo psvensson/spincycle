@@ -34,6 +34,7 @@ class HttpMethod
       if target
         message = { client: ip+':'+port, target: req.query.target, messageId: url_parts.messageId || uuid.v4(), sessionId: cookies.sid }
         for p, part of url_parts
+          if typeof part == 'string' then part = JSON.parse(part)
           message[p] = part # TODO: Guard against hax0r dataz
         #console.log 'message is now'
         #console.dir message
