@@ -28,7 +28,7 @@ class HttpMethod
       ip    = req.connection.remoteAddress
       port  = req.connection.remotePort
       cookies = cookie.parse(req.headers.cookie or '')
-      console.log 'express request from '+ip+':'+port+' target is "'+req.query.target+'" cookies are '+req.headers.cookie
+      console.log 'Express request from '+ip+':'+port+' target is "'+req.query.target+'" cookies are '+req.headers.cookie
       #console.dir req.query
       target = HttpMethod.httproutes[req.query.target]
       if target
@@ -54,6 +54,7 @@ class HttpMethod
       url_parts = req.body
       doSend(req, res, url_parts)
 
+    """
     app.put basePath, (req, res) ->
       if debug then console.log 'Alternate PUT handler. params are'
       if debug then console.dir req.params
@@ -61,7 +62,7 @@ class HttpMethod
       if debug then console.dir req.query
       url_parts = req.body
       doSend(req, res, url_parts)
-
+    """
     messageRouter.addMethod 'express', @
 
 
@@ -89,10 +90,6 @@ class HttpMethod
 
     getone = (req,res) =>
       #console.log 'getone'
-      if debug then console.log 'PUT handler. params are'
-      if debug then console.dir req.params
-      if debug then console.log 'query is'
-      if debug then console.dir req.query
       url_parts = req.query
       req.query.id = req.params.id
       req.query.type = type
@@ -102,11 +99,18 @@ class HttpMethod
 
     updateone = (req,res) =>
       #console.log 'updateone'
-      url_parts = req.query
+      if debug then console.log 'PUT handler. params are'
+      if debug then console.dir req.params
+      if debug then console.log 'query is'
+      if debug then console.dir req.query
+      if debug then console.log 'body is'
+      if debug then console.dir req.body
+      #console.dir req
+      url_parts = req.body
       #console.dir url_parts
       req.query.id = req.params.id
       req.query.type = type
-      req.query.obj = req.query.obj
+      req.query.obj = req.body.obj
       req.query.target = '_update'+type
       @doSend(req, res, url_parts)
 
@@ -121,7 +125,9 @@ class HttpMethod
 
     console.log 'adding REST paths for "'+(@restPath+type)+'"'
     @app.route(@restPath+type).get(listall).post(createone)
-    @app.route(@restPath+type+'/:id').get(getone).put(updateone).delete(deleteone)
+    @app.route(@restPath+type+'/:id').get(getone)
+    @app.route(@restPath+type+'/:id').put(updateone)
+    @app.route(@restPath+type+'/:id').delete(deleteone)
 
     @app.get('/foo', (req,res,next)->
       console.log 'foo'

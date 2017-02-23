@@ -7,7 +7,17 @@ request         = require('request')
 unirest         = require('unirest')
 AuthenticationManager = require('../example/AuthenticationManager')
 express         = require("express")
+bodyParser      = require("body-parser")
 app             = express()
+
+app.use(bodyParser.urlencoded({
+  extended: true
+}))
+app.use(bodyParser.json())
+
+app.use(bodyParser());
+
+
 SpinCycle       = require('../lib/MessageRouter')
 ClientEndpoints  = require('../lib/ClientEndpoints')
 
@@ -857,14 +867,19 @@ describe 'Spincycle Model Tests', ->
   it 'should be able to update a restified object through put /rest/Object/:id and HttpMethod', (done)->
     #messageRouter.makeRESTful('Foo')
     record =
-      id: 'f117'
-      name: 'foobar'
-    request.put {url:'http://localhost:8008/rest/Foo/21008877', headers:{"Content-Type": "application/json"}, body:JSON.stringify(record)}, (req,res,_body)->
+      id: '21008877'
+      type: 'Foo'
+      abc: 123
+      obj:{name: 'foobar17', type: 'Foo', id: '21008877'}
+    console.log '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+    request.put {url:'http://localhost:8008/rest/Foo/21008877', headers:{"Content-Type": "application/json"}, form: record, body: record}, (req,res,_body)=>
       #console.log('put returns '+_body)
-      body = JSON.parse(_body)
-      #console.dir arguments
-      expect(body.status).to.equal('SUCCESS')
-      done()
+      request.get 'http://localhost:8008/rest/Foo/21008877', (req2,res2,_body2)=>
+        console.log('rest get returns '+_body)
+        res = JSON.parse(_body2)
+        console.dir res.payload
+        expect(res.payload.name).to.equal('foobar17')
+        done()
 
   it 'should be able to delete a restified object through delete /rest/Object/:id and HttpMethod', (done)->
     #messageRouter.makeRESTful('Foo')

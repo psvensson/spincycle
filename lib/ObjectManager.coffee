@@ -238,7 +238,7 @@ class ObjectManager
     checkFinish = (rv)=>
       if --count == 0
         if debug then console.log 'ObjectManager.parseList returns '+rv.length+' records'
-        if debug then console.log JSON.stringify(rv)
+        #if debug then console.log JSON.stringify(rv)
         msg.replyFunc({status: e.general.SUCCESS, info: 'list objects', payload: rv})
 
     count = _records.length
@@ -250,7 +250,7 @@ class ObjectManager
       rv = []
       _records.forEach (r) =>
         DB.get(r.type, [r.id]).then (record) =>
-          if debug then console.log 'ObjectManager.parseList --- result of getting record '+r.type+' id '+r.id+' is '+record
+         # if debug then console.log 'ObjectManager.parseList --- result of getting record '+r.type+' id '+r.id+' is '+record
           if record and record[0]
             #if debug then console.dir record[0]
             tc = record[0]
@@ -280,6 +280,8 @@ class ObjectManager
       @_deleteObject(msg)
 
     @messageRouter.addTarget '_update'+type, 'obj', (msg) =>
+      #console.log 'expose update got message'
+      #console.dir msg
       msg.type = type
       @_updateObject(msg)
 
@@ -463,5 +465,83 @@ class ObjectManager
       delete sublist[poplistenid]
     else
       msg.replyFunc({status: e.general.FAILURE, info: 'onDeregisterForPopulationChanges missing parameter', payload: null })
+
+
+  resolveReferences: (record, model) =>
+    rv = {id: record.id}
+    q = defer()
+    count = model.length
+
+    checkFinished = (pname) ->
+#if debug then console.log 'checkFinished for property '+pname+' count = '+count
+#console.dir rv
+      if --count == 0
+#if debug then console.log 'Objectmanager.resolveReferences resolving back object'
+#console.dir(rv)
+        q.resolve(rv)
+
+    model.forEach (property) =>
+#if debug then console.log 'going through array property '+property.name
+#console.dir property
+      if property.array
+#console.log 'going through array property '+property.name
+        resolvedarr = []
+        arr = record[property.name] or []
+        arr = arr.filter (el) -> el and el isnt null and el isnt 'null' and el isnt 'undefined'
+        acount = arr.length
+        #console.log 'acount = '+acount
+        if acount == 0
+          rv[property.name] = []
+          checkFinished(property.name)
+        else
+          arr.forEach (idorobj) =>
+            id = idorobj
+            if typeof idorobj == 'object' then id = idorobj.id
+            #if debug then console.log 'attempting to get array name '+property.name+' object type '+property.type+' id '+id
+            @getObjectPullThrough(id, property.type).then (o)=>
+              if o then resolvedarr.push(o)
+              #if debug then console.log 'adding array reference '+o.id+' name '+o.name+' acount = '+acount
+              if --acount == 0
+                rv[property.name] = resolvedarr
+                checkFinished(property.name)
+      else if property.hashtable
+        if debug then console.log '======================================== going through hashtable property '+property.name
+        #console.dir record[property.name]
+        resolvedhash = {}
+        if record[property.name]
+          harr = record[property.name] or []
+          if not harr.length then harr = []
+          if debug then console.dir harr
+          if typeof harr == 'string' then harr = [harr]
+          hcount = harr.length
+          if !hcount or hcount == 0
+            rv[property.name] = []
+            checkFinished(property.name)
+          else
+            harr.forEach (id) =>
+              @getObjectPullThrough(id, property.type).then (o)=>
+                if o then resolvedhash[o.name] = o
+                #console.log 'adding hashtable reference '+o.id+' name '+o.name
+                if --hcount == 0
+                  rv[property.name] = resolvedhash
+                  checkFinished(property.name)
+        else
+          rv[property.name] = []
+          checkFinished(property.name)
+      else
+# test for direct reference!
+        if property.type and property.value
+#console.log property.name+' = direct ref'
+          @getObjectPullThrough(record[property.name], property.type).then (o)=>
+            rv[property.name] = o
+            checkFinished(property.name)
+        else
+#console.log property.name+' = scalar'
+          rv[property.name] = record[property.name]
+          checkFinished(property.name)
+
+
+    return q
+
 
 module.exports = ObjectManager
