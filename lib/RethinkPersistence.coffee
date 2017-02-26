@@ -174,7 +174,7 @@ class RethinkPersistence
     type = _type.toLowerCase()
     @getDbFor(type).then (db)=>
       db.filter( (element)=>
-        element(property).match(value)
+        if property then element(property).eq(value)
       ).run @connection, (err, cursor) ->
         if err
           console.log 'findMany err: '+err
@@ -198,13 +198,19 @@ class RethinkPersistence
       rv = @getValueForQuery('value', 'property', query)
       if not rv.invalid
         rr = rr.filter( (element)=>
-            element(query.property).match(rv.value)
+          if query.wildcard
+            element(query.property).match("^"+query.value)
+          else
+            element(query.property).eq(query.value)
         )
         if query.property2
           rv2 = @getValueForQuery('value2', 'property2', query)
           if not rv2.invalid
             rr = rr.filter( (el)=>
-              el(query.property2).match(rv2.value)
+              if query.wildcard
+                el(query.property2).match(rv2.value)
+              else
+                el(query.property2).eq(rv2.value)
             )
         if query.limit then rr = rr.skip(query.skip or 0).limit(query.limit)
         if debug then console.log 'Rethink findQuery running query...'
@@ -243,7 +249,10 @@ class RethinkPersistence
     q = defer()
     @getDbFor(type).then (db)=>
       db.filter( (element)=>
-        element(property).match("^"+value)
+        if query.wildcard
+          element(property).match("^"+value)
+        else
+          element(property).eq(value)
       ).run @connection, (err, cursor) ->
         if err
           console.log 'search err: '+err

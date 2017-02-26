@@ -541,6 +541,18 @@ describe 'Spincycle Model Tests', ->
           expect(records.length).to.equal(1)
           done()
 
+  it 'should not get any hits when using part of a string value to search on a property, and not using wildcard', (done)->
+    record7=
+      id: 'bbb456'
+      type: 'DFoo'
+      name: 'aaaaabbbbb'
+    new DFoo(record7).then (dfoo) ->
+      dfoo.serialize().then ()->
+        query = {sort:'name', property: 'name', value: 'aaaaa'}
+        DB.findQuery('DFoo', query).then (records) =>
+          console.dir records
+          expect(records.length).to.equal(0)
+          done()
 
   it 'should not get any results when searching on the wrong property', (done)->
     record7=
@@ -639,7 +651,7 @@ describe 'Spincycle Model Tests', ->
           done()
 
   it 'should be able to limit search results', (done)->
-      query = {sort:'name', property: 'name', value: 'A*', limit: 1}
+      query = {sort:'name', property: 'name', value: 'M', limit: 1, wildcard:true}
       DB.findQuery('DFoo', query).then (records) =>
         console.log 'limit query got back'
         console.dir records

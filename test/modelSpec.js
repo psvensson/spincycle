@@ -854,6 +854,31 @@
         });
       });
     });
+    it('should not get any hits when using part of a string value to search on a property, and not using wildcard', function(done) {
+      var record7;
+      record7 = {
+        id: 'bbb456',
+        type: 'DFoo',
+        name: 'aaaaabbbbb'
+      };
+      return new DFoo(record7).then(function(dfoo) {
+        return dfoo.serialize().then(function() {
+          var query;
+          query = {
+            sort: 'name',
+            property: 'name',
+            value: 'aaaaa'
+          };
+          return DB.findQuery('DFoo', query).then((function(_this) {
+            return function(records) {
+              console.dir(records);
+              expect(records.length).to.equal(0);
+              return done();
+            };
+          })(this));
+        });
+      });
+    });
     it('should not get any results when searching on the wrong property', function(done) {
       var record7;
       record7 = {
@@ -1031,8 +1056,9 @@
       query = {
         sort: 'name',
         property: 'name',
-        value: 'A*',
-        limit: 1
+        value: 'M',
+        limit: 1,
+        wildcard: true
       };
       return DB.findQuery('DFoo', query).then((function(_this) {
         return function(records) {
