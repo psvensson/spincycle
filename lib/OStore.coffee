@@ -36,17 +36,18 @@ class OStore
     if obj
       OStore.objects[obj.id] = obj
       OStore.types[obj.type] = obj.type
-      objs = OStore.objectsByType[obj.type] or []
+      objs = OStore.objectsByType[obj.type] or {}
       objs[obj.id] = obj
       OStore.objectsByType[obj.type] = objs
-      #if debug then console.log 'storeObject storing '+obj.id+' with rev '+obj.rev+" and _rev "+obj._rev
-      #@sendUpdatesFor(obj, sendUpdates)
+      #console.log 'storeObject storing '+obj.id+' with type '+obj.type
+      @sendUpdatesFor(obj, sendUpdates)
 
   @getObject: (id, type) =>
     q = defer()
-    obj = OStore.objects[id]
+    hash = OStore.objectsByType[type] or {}
+    obj = hash[id]
     if obj
-      #console.log 'getObject getting '+obj.id+' with rev '+obj.rev+" and _rev "+obj._rev
+      #console.log 'getObject getting '+obj.id+' with type '+obj.type
     else
       #console.log '-- * -- getObject could not find object type '+type+' with id '+id
     q.resolve(obj)
@@ -91,7 +92,7 @@ class OStore
 
       OStore.objects[record.id] = obj
       if OStore.anyoneIsListening(obj.id) or force
-        #console.log 'updateObj calling sendUpdates for '+record.id
+        console.log 'updateObj calling sendUpdates for '+record.id
         if not changed then changed = force
         OStore.sendUpdatesFor(obj, changed, force)
     else
@@ -112,6 +113,7 @@ class OStore
       #console.dir obj
       #console.log 'adding obj to updateQueue..'
       OStore.updateQueue.push obj
+      @sendAtInterval()
 
   @sendAllUpdatesFor: (obj, changed) =>
     sendobj = {id: obj.id, type:obj.type, list:[], toClient: () -> {id: obj.id, type:obj.type, list:sendobj.list}}
@@ -172,7 +174,7 @@ class OStore
         #console.dir OStore.listeners
         listeners = OStore.listeners[obj.id] or []
         for lid of listeners
-          #if debug then console.log 'sending to listener '+lid+' -> '+listeners[lid]
+          #console.log 'sending to listener '+lid+' -> '+listeners[lid]
           listeners[lid](obj)
 
       if debug then console.log 'queue length after send = '+OStore.updateQueue.length

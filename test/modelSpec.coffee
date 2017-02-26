@@ -69,7 +69,7 @@ describe 'Spincycle Model Tests', ->
     @type = 'Foo'
     @model=
       [
-        {name: 'name', value: 'name', default:'foo'}
+        {name: 'name', value: 'name', default:'foo', public: true}
       ]
     constructor:(@record={})->
       return super
@@ -104,7 +104,7 @@ describe 'Spincycle Model Tests', ->
       [
         {name: 'name', public: true, value: 'name', default: 'yohoo'}
         {name: 'theFoo', value: 'theFoo', type: 'Foo' }
-        {name: 'foos', public: true, array: true, ids: 'foos'}
+        {name: 'foos', public: true, array: true, ids: 'foos', type: 'Foo'}
         {name: 'footable', hashtable: true, ids: 'footable', type: 'Foo', keyproperty: 'id'}
       ]
     constructor: (@record={}) ->
@@ -161,7 +161,8 @@ describe 'Spincycle Model Tests', ->
       ResolveModule.modulecache['dfoo'] = DFoo
       ResolveModule.modulecache['directbar'] = DirectBar
       ResolveModule.modulecache['hashbar'] = HashBar
-      DB.createDatabases(['foo','bar','dfoo','directbar','hashbar']).then () ->
+      ResolveModule.modulecache['fooznaz'] = Fooznaz
+      DB.createDatabases(['foo','bar','dfoo','directbar','hashbar','fooznaz']).then () ->
         console.log '++++++++++++++++++++++++++++++++++++spec dbs created'
         messageRouter.open()
         done()
@@ -277,8 +278,8 @@ describe 'Spincycle Model Tests', ->
               email: 'foo@bar.com'
               name: 'Mr. Xyzzy'
             replyFunc: (ureply)->
-              #console.log 'update reply was'
-              #console.dir(ureply)
+              console.log 'update reply was'
+              console.dir(ureply)
               expect(ureply.status).to.equal('SUCCESS')
               done()
           messageRouter.objectManager._updateObject(umsg)
@@ -710,12 +711,13 @@ describe 'Spincycle Model Tests', ->
           umsg =
             obj:
               id: bar.id
+              type: 'Bar'
               foos: [foo.id]
             user:
               isAdmin: true
             replyFunc: (ureply)->
-              #console.log 'update reply was'
-              #console.dir(ureply)
+              console.log 'update reply was'
+              console.dir(ureply)
           messageRouter.objectManager._updateObject(umsg)
           msg =
             type: 'Bar'
@@ -753,19 +755,19 @@ describe 'Spincycle Model Tests', ->
         foo.serialize().then ()->
           bar.foos.push foo
           bar.serialize().then ()->
-            console.log '------------------------- initial bar object foos is '
-            console.dir bar.foos
+            #console.log '------------------------- initial bar object foos is '
+            #console.dir bar.foos
 
             ClientEndpoints.registerEndpoint 'fooclient',(reply)->
-              console.log '--__--__--__ object update __--__--__--'
-              console.dir reply
+              #console.log '--__--__--__ object update __--__--__--'
+              #console.dir reply
               expect(reply.payload.foos.length).to.equal(0)
               done()
 
             msg =
               type: 'Bar'
               client: 'fooclient'
-              obj:{id: bar.id, type: 'Bar', foos:[]}
+              obj:{id: bar.id, type: 'Bar'}
               user:
                 isAdmin: true
               replyFunc: (reply)->#console.log "we're listening to "+bar.id
@@ -774,6 +776,7 @@ describe 'Spincycle Model Tests', ->
 
             brecord = bar.toClient()
             brecord.name = '*** Extra Doctored Bar object'
+            brecord.foos = []
             umsg =
               obj: brecord
               user:
@@ -784,8 +787,8 @@ describe 'Spincycle Model Tests', ->
 
   it 'should be able to get population change callbacks on create', (done)->
     ClientEndpoints.registerEndpoint 'updateclient',(reply)->
-      console.log '--__--__--__  update client got population change __--__--__--'
-      console.dir reply
+      #console.log '--__--__--__  update client got population change __--__--__--'
+      #console.dir reply
       expect(reply.payload.added).to.exist
       ClientEndpoints.removeEndpoint 'updateclient'
       done()
@@ -804,8 +807,8 @@ describe 'Spincycle Model Tests', ->
 
   it 'should be able to get population change callbacks on delete', (done)->
     ClientEndpoints.registerEndpoint 'updateclient2',(reply)->
-      console.log '--__--__--__  update client got population change __--__--__--'
-      console.dir reply
+      #console.log '--__--__--__  update client got population change __--__--__--'
+      #console.dir reply
       expect(reply.payload.removed).to.exist
       ClientEndpoints.removeEndpoint 'updateclient2'
       done()
@@ -867,19 +870,23 @@ describe 'Spincycle Model Tests', ->
   it 'should be able to update a restified object through put /rest/Object/:id and HttpMethod', (done)->
     #messageRouter.makeRESTful('Foo')
     record =
-      id: '21008877'
       type: 'Foo'
       abc: 123
-      obj:{name: 'xxxxfoobar17', type: 'Foo', id: '21008877'}
-    console.log '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-    request.put {url:'http://localhost:8008/rest/Foo/21008877/?apitoken=abcdef123456', headers:{"Content-Type": "application/x-www-form-urlencoded"}, form: record, body: record}, (req,res,_body)=>
-      #console.log('put returns '+_body)
-      request.get 'http://localhost:8008/rest/Foo/21008877', (req2,res2,_body2)=>
-        console.log('rest get returns '+_body2)
-        res = JSON.parse(_body2)
-        console.dir res.payload
-        expect(res.payload.name).to.equal('xxxxfoobar17')
-        done()
+      obj:{name: 'xxxxx17', type: 'Foo'}
+    new Foo(record).then (fobj)->
+      fobj.serialize().then ()->
+        record2 =
+          obj:{name: 'qfoobar17', type: 'Foo', id: fobj.id}
+        console.log '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+        #console.dir fobj
+        request.put {url:'http://localhost:8008/rest/Foo/'+fobj.id+'/?apitoken=abcdef123456', headers:{"Content-Type": "application/x-www-form-urlencoded"}, form: record2, body: record2}, (req,res,_body)=>
+          console.log('put returns '+_body)
+          request.get 'http://localhost:8008/rest/Foo/'+fobj.id, (req2,res2,_body2)=>
+            console.log('rest get returns '+_body2)
+            res = JSON.parse(_body2)
+            console.dir res.payload
+            expect(res.payload.name).to.equal('qfoobar17')
+            done()
 
   it 'should be able to delete a restified object through delete /rest/Object/:id and HttpMethod', (done)->
     #messageRouter.makeRESTful('Foo')
@@ -906,8 +913,8 @@ describe 'Spincycle Model Tests', ->
     Foo.model.push {name:'xyzzy4', public: true, value:'xyzzy', default:'quux'}
     DB.extendSchemaIfNeeded(DB.DataStore, 'Foo').then ()=>
       DB.get('foo',['f417']).then (res)=>
-        console.log 'DB.get got back '+res
-        console.dir res
+        #console.log 'DB.get got back '+res
+        #console.dir res
         expect(res[0].xyzzy2).to.equal('quux')
         done()
 

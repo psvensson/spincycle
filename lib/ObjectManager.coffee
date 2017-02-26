@@ -72,16 +72,18 @@ class ObjectManager
   onGetModelFor: (msg) =>
     if msg.modelname
       @messageRouter.resolver.resolve msg.modelname, (path) =>
-        #if debug then console.log 'onGetModelFor '+msg.modelname+' got back require path '+path
+        if debug then console.log 'onGetModelFor '+msg.modelname+' got back require path '+path
         rv = @getModelFor(msg.modelname)
         msg.replyFunc({status: e.general.SUCCESS, info: 'get model', payload: rv})
     else
       msg.replyFunc({status: e.general.FAILURE, info: "getModelFor missing parameter", payload: null})
 
   getModelFor:(modelname)=>
-    model = ResolveModule.modulecache[modelname]
-    #if debug then console.log 'got model resolved to'
-    #if debug then console.dir model.model
+    model = ResolveModule.modulecache[modelname] or ResolveModule.modulecache[modelname.toLowerCase()]
+    #console.log '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ got model for '+modelname+' resolved to '+model
+    if not model
+      for k,v of ResolveModule.modulecache
+        console.log '------- model in modulecache : '+k
     rv = []
     model.model.forEach (property) -> if property.public then rv.push(property)
     rv
@@ -97,8 +99,8 @@ class ObjectManager
           msg.obj.modifiedAt = Date.now()
           msg.obj.createdBy = msg.user.id
           msg.obj.userRef = msg.user.id
-          console.log 'objmgr.createObject called. record is now'
-          console.dir msg.obj
+          #console.log 'objmgr.createObject called. record is now'
+          #console.dir msg.obj
           SuperModel.resolver.createObjectFrom(msg.obj).then (o) =>
             o.serialize().then () =>
               @messageRouter.gaugeMetric('create',1,{type:  msg.obj.type,'username': msg.user.name, 'useremail': msg.user.email, 'provider': msg.user.provider, 'organization': msg.user.organization})
@@ -158,8 +160,8 @@ class ObjectManager
           #if debug then console.log '_getObject calling getObjectPullThrough for type '+msg.type
           if typeof id isnt 'object'
             @getObjectPullThrough(id, msg.type).then (obj) =>
-              if debug then '_getObject got back obj from getObjectPullThrough: '
-              #if debug then console.dir obj
+              #console.log '_getObject got back obj from getObjectPullThrough: '
+              #console.dir obj
               if obj
                 if @messageRouter.authMgr.canUserReadFromThisObject(obj, msg.user, msg.sessionId)
                   tc = obj.toClient()
@@ -171,8 +173,8 @@ class ObjectManager
                       else
                         msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: obj.id, statuscode: 403})
                   else
-                    if debug then console.log '_getObject for '+msg.type+' returns '+JSON.stringify(tc)
-                    #if debug then console.dir tc
+                    #console.log '_getObject for '+msg.type+' returns '+JSON.stringify(tc)
+                    #console.dir tc
                     msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: tc})
                 else
                   console.log '_getObject got NOT ALLOWED for user '+msg.user.id+' for '+msg.type+' id '+obj.id
@@ -333,8 +335,8 @@ class ObjectManager
     return q
 
   onUpdateObject: (msg) =>
-    if debug then console.log 'onUpdateObject called for '+msg
-    if debug then console.dir msg
+    #console.log 'onUpdateObject called for '+msg
+    #console.dir msg.obj
     if msg.obj and msg.obj.type and msg.obj.id
       if msg.obj.type in @getTypes()
         DB.getFromStoreOrDB(msg.obj.type, msg.obj.id).then( (obj) =>
@@ -373,12 +375,14 @@ class ObjectManager
 
   persistUpdates: (obj, robj, force)=>
     q = defer()
-    console.log 'persistUpdates for record'
-    console.dir robj
+    #console.log 'persistUpdates for record'
+    #console.dir robj
+    #console.log '..and old object'
+    #console.dir obj
     model = @getModelFor(obj.type)
     borked = false
     model.forEach (row)=>
-      if row.array and robj[row.name] and typeof robj[row.name] != 'array'
+      if row.array and robj[row.name] and not Array.isArray(robj[row.name])
         console.log 'BORK detected for property '+row.name
         borked = true
     if borked
@@ -387,19 +391,26 @@ class ObjectManager
       console.dir robj
       q.resolve(false)
     else
-      objStore.updateObj(robj, force)
-      objStore[robj.id] = obj
-      if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db. modifiedAt = '+obj.modifiedAt
-      obj.serialize(robj).then (res) =>
-        if debug then console.log 'persisting returned from serialize'
-        if not res
-          if debug then console.log 'persisting failed'
-          q.resolve(false)
-        else
-          record = obj.toClient()
-          @updateObjectHooks.forEach (hook) => hook(record)
-          if debug then console.log 'persisting succeeded'
-          q.resolve(true)
+      for k,v of robj
+        if k isnt 'id' and k isnt 'type'and k isnt 'createdAt' and k isnt 'modifiedAt'
+          #console.log '---- setting obj prop '+k+' to -> '+v
+          obj.record[k] = v
+      obj.loadFromIds(obj.constructor.model).then () =>
+        #console.log 'setting OStore '+obj.id+' to obj '+obj
+        objStore.storeObject(obj)
+        objStore.updateObj(obj, force)
+        if debug then console.log 'persisting '+obj.id+' type '+obj.type+' in db. modifiedAt = '+obj.modifiedAt+' createdAt = '+obj.createdAt
+        obj.serialize(robj).then (res) =>
+          if not res
+            console.log 'persisting failed'
+            console.dir obj
+            q.resolve(false)
+          else
+            record = obj.toClient()
+            @updateObjectHooks.forEach (hook) => hook(record)
+            #console.log 'persisting succeeded'
+            #console.dir record
+            q.resolve(true)
     return q
       
   areDataTrashed: (obj) ->

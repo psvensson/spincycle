@@ -281,6 +281,8 @@ class DB
 
   @get: (type, ids) =>
     if not type or not ids
+      console.log '********************************* DB.get called with null type or id ***********************'
+      console.dir arguments
       xyzzy
     toarr = (x)->
       if !Array.isArray(x)
@@ -310,9 +312,8 @@ class DB
           #if debug then console.log 'DB.get calling datastore '+store
           store.get(type, id, (result) =>
             if not result
-              if debug
-                console.log 'DB.get for type '+type+' and id '+id+' got back '+result
-                console.dir result
+              #if debug then console.log 'DB.get for type '+type+' and id '+id+' got back '+result
+              #if debug then console.dir result
             else
               result = toarr(result)
               @lru.set(id, result)

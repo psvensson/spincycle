@@ -91,7 +91,8 @@
         {
           name: 'name',
           value: 'name',
-          "default": 'foo'
+          "default": 'foo',
+          "public": true
         }
       ];
 
@@ -185,7 +186,8 @@
           name: 'foos',
           "public": true,
           array: true,
-          ids: 'foos'
+          ids: 'foos',
+          type: 'Foo'
         }, {
           name: 'footable',
           hashtable: true,
@@ -287,7 +289,8 @@
           ResolveModule.modulecache['dfoo'] = DFoo;
           ResolveModule.modulecache['directbar'] = DirectBar;
           ResolveModule.modulecache['hashbar'] = HashBar;
-          return DB.createDatabases(['foo', 'bar', 'dfoo', 'directbar', 'hashbar']).then(function() {
+          ResolveModule.modulecache['fooznaz'] = Fooznaz;
+          return DB.createDatabases(['foo', 'bar', 'dfoo', 'directbar', 'hashbar', 'fooznaz']).then(function() {
             console.log('++++++++++++++++++++++++++++++++++++spec dbs created');
             messageRouter.open();
             return done();
@@ -460,6 +463,8 @@
                 name: 'Mr. Xyzzy'
               },
               replyFunc: function(ureply) {
+                console.log('update reply was');
+                console.dir(ureply);
                 expect(ureply.status).to.equal('SUCCESS');
                 return done();
               }
@@ -1147,12 +1152,16 @@
             umsg = {
               obj: {
                 id: bar.id,
+                type: 'Bar',
                 foos: [foo.id]
               },
               user: {
                 isAdmin: true
               },
-              replyFunc: function(ureply) {}
+              replyFunc: function(ureply) {
+                console.log('update reply was');
+                return console.dir(ureply);
+              }
             };
             messageRouter.objectManager._updateObject(umsg);
             msg = {
@@ -1200,11 +1209,7 @@
             bar.foos.push(foo);
             return bar.serialize().then(function() {
               var brecord, msg, umsg;
-              console.log('------------------------- initial bar object foos is ');
-              console.dir(bar.foos);
               ClientEndpoints.registerEndpoint('fooclient', function(reply) {
-                console.log('--__--__--__ object update __--__--__--');
-                console.dir(reply);
                 expect(reply.payload.foos.length).to.equal(0);
                 return done();
               });
@@ -1213,8 +1218,7 @@
                 client: 'fooclient',
                 obj: {
                   id: bar.id,
-                  type: 'Bar',
-                  foos: []
+                  type: 'Bar'
                 },
                 user: {
                   isAdmin: true
@@ -1224,6 +1228,7 @@
               messageRouter.objectManager.onRegisterForUpdatesOn(msg);
               brecord = bar.toClient();
               brecord.name = '*** Extra Doctored Bar object';
+              brecord.foos = [];
               umsg = {
                 obj: brecord,
                 user: {
@@ -1240,8 +1245,6 @@
     it('should be able to get population change callbacks on create', function(done) {
       var msg;
       ClientEndpoints.registerEndpoint('updateclient', function(reply) {
-        console.log('--__--__--__  update client got population change __--__--__--');
-        console.dir(reply);
         expect(reply.payload.added).to.exist;
         ClientEndpoints.removeEndpoint('updateclient');
         return done();
@@ -1261,8 +1264,6 @@
     });
     it('should be able to get population change callbacks on delete', function(done) {
       ClientEndpoints.registerEndpoint('updateclient2', function(reply) {
-        console.log('--__--__--__  update client got population change __--__--__--');
-        console.dir(reply);
         expect(reply.payload.removed).to.exist;
         ClientEndpoints.removeEndpoint('updateclient2');
         return done();
@@ -1333,34 +1334,44 @@
     });
     it('should be able to update a restified object through put /rest/Object/:id and HttpMethod', function(done) {
       record = {
-        id: '21008877',
         type: 'Foo',
         abc: 123,
         obj: {
-          name: 'xxxxfoobar17',
-          type: 'Foo',
-          id: '21008877'
+          name: 'xxxxx17',
+          type: 'Foo'
         }
       };
-      console.log('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
-      return request.put({
-        url: 'http://localhost:8008/rest/Foo/21008877/?apitoken=abcdef123456',
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        },
-        form: record,
-        body: record
-      }, (function(_this) {
-        return function(req, res, _body) {
-          return request.get('http://localhost:8008/rest/Foo/21008877', function(req2, res2, _body2) {
-            console.log('rest get returns ' + _body2);
-            res = JSON.parse(_body2);
-            console.dir(res.payload);
-            expect(res.payload.name).to.equal('xxxxfoobar17');
-            return done();
-          });
-        };
-      })(this));
+      return new Foo(record).then(function(fobj) {
+        return fobj.serialize().then(function() {
+          record2 = {
+            obj: {
+              name: 'qfoobar17',
+              type: 'Foo',
+              id: fobj.id
+            }
+          };
+          console.log('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
+          return request.put({
+            url: 'http://localhost:8008/rest/Foo/' + fobj.id + '/?apitoken=abcdef123456',
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded"
+            },
+            form: record2,
+            body: record2
+          }, (function(_this) {
+            return function(req, res, _body) {
+              console.log('put returns ' + _body);
+              return request.get('http://localhost:8008/rest/Foo/' + fobj.id, function(req2, res2, _body2) {
+                console.log('rest get returns ' + _body2);
+                res = JSON.parse(_body2);
+                console.dir(res.payload);
+                expect(res.payload.name).to.equal('qfoobar17');
+                return done();
+              });
+            };
+          })(this));
+        });
+      });
     });
     it('should be able to delete a restified object through delete /rest/Object/:id and HttpMethod', function(done) {
       return request["delete"]('http://localhost:8008/rest/Foo/21008877', function(req, res, _body) {
@@ -1398,8 +1409,6 @@
       return DB.extendSchemaIfNeeded(DB.DataStore, 'Foo').then((function(_this) {
         return function() {
           return DB.get('foo', ['f417']).then(function(res) {
-            console.log('DB.get got back ' + res);
-            console.dir(res);
             expect(res[0].xyzzy2).to.equal('quux');
             return done();
           });
