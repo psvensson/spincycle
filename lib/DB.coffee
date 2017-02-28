@@ -108,7 +108,7 @@ class DB
             #if debug then console.log 'checking property '+property.name+' and if it exist in lookup table -> '+lookup[property.name]
             #console.dir property
             if not lookup[property.name] then missing.push property
-          console.log 'found '+missing.length+' missing properties on first object of '+dbname+' compared to current model : '
+          #console.log 'found '+missing.length+' missing properties on first object of '+dbname+' compared to current model : '
           #console.dir missing
           if missing.length > 0
             @count(dbname).then (modelcount)=>

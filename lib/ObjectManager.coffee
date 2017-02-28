@@ -44,11 +44,10 @@ class ObjectManager
   registerUpdateObjectHook: (hook) =>
     @updateObjectHooks.push hook
 
-    #TODO: Make sure that all method check if type arguments actually exists as models!
   getTypes: ()=>
     types = []
     for k,v of ResolveModule.modulecache
-      types.push k
+      types.push k.toLowerCase()
     types  
 
   onListTypes: (msg) =>
@@ -92,7 +91,7 @@ class ObjectManager
   _createObject: (msg) =>
     console.log 'objmgr.createObject called'
     if msg.obj and msg.obj.type
-      if msg.obj.type in @getTypes()
+      if msg.obj.type.toLowerCase() in @getTypes()
         if @messageRouter.authMgr.canUserCreateThisObject(msg.obj.type, msg.user, msg.sessionId)
           if debug then console.dir msg
           msg.obj.createdAt = Date.now()
@@ -116,7 +115,7 @@ class ObjectManager
     #console.log 'delete called'
     if msg.obj and msg.obj.type and msg.obj.id
       console.log 'delete got type '+msg.obj.type+', and id '+msg.obj.id
-      if msg.obj.type in @getTypes()
+      if msg.obj.type.toLowerCase() in @getTypes()
         objStore.getObject(msg.obj.id, msg.obj.type).then (obj) =>
           #console.log 'got object form objstore -> '+obj
           if obj
@@ -152,7 +151,7 @@ class ObjectManager
     #if debug then console.log '_getObject called for type '+msg.type
     #if debug then console.dir msg.obj
     if msg.type and ((msg.obj and msg.obj.id) or msg.id)
-      if msg.type in @getTypes()
+      if msg.type.toLowerCase() in @getTypes()
         id = msg.id or msg.obj.id
         if id.indexOf and id.indexOf('all_') > -1
           @getAggregateObjects(msg)
@@ -200,9 +199,10 @@ class ObjectManager
       msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: obj})
 
   _listObjects: (msg) =>
-    if debug then console.log 'listObjects called for type '+msg.type
+    console.log 'listObjects called for type '+msg.type
+    console.dir msg
     if typeof msg.type != 'undefined'
-      if msg.type in @getTypes()
+      if msg.type.toLowerCase() in @getTypes()
         if @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user, msg.sessionId) == no
           msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to list objects of type '+msg.type, payload: msg.type})
         else
@@ -225,7 +225,7 @@ class ObjectManager
   _countObjects: (msg) =>
     console.log 'countObjects called for type '+msg.type
     if typeof msg.type != 'undefined'
-      if msg.type in @getTypes()
+      if msg.type.toLowerCase() in @getTypes()
         if @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user, msg.sessionId) == no
           @messageRouter.gaugeMetric('count', 1, {type: msg.type, 'username': msg.user.name, 'useremail': msg.user.email, 'provider': msg.user.provider, 'organization': msg.user.organization})
           msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to count objects of type '+msg.type, payload: msg.type})
@@ -338,7 +338,7 @@ class ObjectManager
     #console.log 'onUpdateObject called for '+msg
     #console.dir msg.obj
     if msg.obj and msg.obj.type and msg.obj.id
-      if msg.obj.type in @getTypes()
+      if msg.obj.type.toLowerCase() in @getTypes()
         DB.getFromStoreOrDB(msg.obj.type, msg.obj.id).then( (obj) =>
           #console.log 'onUpdateObject getFromStoreOrDB returned '+obj
           #console.dir obj
@@ -375,10 +375,10 @@ class ObjectManager
 
   persistUpdates: (obj, robj, force)=>
     q = defer()
-    #console.log 'persistUpdates for record'
-    #console.dir robj
-    #console.log '..and old object'
-    #console.dir obj
+    console.log 'persistUpdates for record'
+    console.dir robj
+    console.log '..and old object'
+    console.dir obj
     model = @getModelFor(obj.type)
     borked = false
     model.forEach (row)=>
@@ -391,10 +391,18 @@ class ObjectManager
       console.dir robj
       q.resolve(false)
     else
-      for k,v of robj
+      model.forEach (m)=>
+        k = m.name
+        v = robj[k]
         if k isnt 'id' and k isnt 'type'and k isnt 'createdAt' and k isnt 'modifiedAt'
-          #console.log '---- setting obj prop '+k+' to -> '+v
-          obj.record[k] = v
+          add = true
+          #if Array.isArray(v) and v.length == 0 then add = false
+          if not v then add = false
+          if add
+            console.log '---- setting obj prop '+k+' to -> '+v
+            obj.record[k] = v
+      console.log 'record is now'
+      console.dir obj.record
       obj.loadFromIds(obj.constructor.model).then () =>
         #console.log 'setting OStore '+obj.id+' to obj '+obj
         objStore.storeObject(obj)
@@ -471,7 +479,7 @@ class ObjectManager
 
   onRegisterForPopulationChanges: (msg) =>
     if msg.type
-      if msg.type in @getTypes()
+      if msg.type.toLowerCase() in @getTypes()
         poplistenid = uuid.v4()
         sublist = @populationListeners[msg.type] or {}
         sublist[poplistenid] = msg.client

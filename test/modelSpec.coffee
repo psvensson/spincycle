@@ -91,7 +91,7 @@ describe 'Spincycle Model Tests', ->
     @model=
       [
         {name: 'name', public: true, value: 'name', default: 'yohoo'}
-        {name: 'theFoo', value: 'theFoo', type: 'Foo' }
+        {name: 'theFoo', value: 'theFoo', public: true, type: 'Foo' }
         {name: 'foos', public: true, array: true, ids: 'foos', type: 'Foo'}
         {name: 'footable', hashtable: true, ids: 'footable', type: 'Foo'}
       ]
@@ -136,7 +136,17 @@ describe 'Spincycle Model Tests', ->
     constructor: (@record={}) ->
       return super
 
-
+  class VeryBar extends SuperModel
+    @type = 'VeryBar'
+    @model=
+      [
+        {name: 'name', public: true, value: 'name', default: 'directyohoo'}
+        {name: 'theFoo', value: 'theFoo', type: 'DFoo', storedirectly: true }
+        {name: 'foos', public: true, type: 'Foo', array: true, ids: 'foos'}
+        {name: 'bars', public: true, type: 'Bar', array: true, ids: 'bars'}
+      ]
+    constructor: (@record={}) ->
+      return super
 
   before (done)->
     #console.log '------------------------------------- before called'
@@ -160,9 +170,10 @@ describe 'Spincycle Model Tests', ->
       ResolveModule.modulecache['bar'] = Bar
       ResolveModule.modulecache['dfoo'] = DFoo
       ResolveModule.modulecache['directbar'] = DirectBar
+      ResolveModule.modulecache['verybar'] = VeryBar
       ResolveModule.modulecache['hashbar'] = HashBar
       ResolveModule.modulecache['fooznaz'] = Fooznaz
-      DB.createDatabases(['foo','bar','dfoo','directbar','hashbar','fooznaz']).then () ->
+      DB.createDatabases(['foo','bar','dfoo','directbar','hashbar','fooznaz', 'verybar']).then () ->
         console.log '++++++++++++++++++++++++++++++++++++spec dbs created'
         messageRouter.open()
         done()
@@ -268,18 +279,23 @@ describe 'Spincycle Model Tests', ->
 
   it 'should create an object that has a direct reference and be able to set and update that reference', (done)->
     new Foo({id:'12345'}).then (o) ->
+      #console.log 'got new foo'
+      #console.dir o
+      #console.log 'trying to serialize...'
       o.serialize().then ()->
         new Bar().then (bar) ->
+          #console.log 'got new bar'
+          #console.dir bar
           bar.theFoo = '12345'
           umsg =
-            obj: bar
+            obj: bar.toClient()
             user:
               isAdmin: true
               email: 'foo@bar.com'
               name: 'Mr. Xyzzy'
             replyFunc: (ureply)->
-              console.log 'update reply was'
-              console.dir(ureply)
+              #console.log 'update reply was'
+              #console.dir(ureply)
               expect(ureply.status).to.equal('SUCCESS')
               done()
           messageRouter.objectManager._updateObject(umsg)
@@ -402,6 +418,7 @@ describe 'Spincycle Model Tests', ->
           done()
 
   it 'should resolve multiple cold array references to objects not yet in ostore, only in db', (done)->
+    console.log '--------------------------------------------------------------------- cold array test start'
     foo = {id: '11008877', name: 'fooname', value: 'name', default:'foo', type: 'Foo'}
     foo2 = {id: '77778877', name: 'fooname', value: 'name2', default:'foo2', type: 'Foo'}
     DB.set 'Foo', foo, (sres) ->
@@ -419,6 +436,7 @@ describe 'Spincycle Model Tests', ->
             done()
 
   it 'should have multiple cold array references to objects not yet in ostore, and get right amount of references in arrays of search results', (done)->
+    console.log '--------------------------------------------------------------------- cold array test start 2'
     foo = {id: '21008877', name: 'fooname', value: 'namexxxx', default:'foox', type: 'Foo'}
     foo2 = {id: '27778877', name: 'fooname', value: 'nameyyyy', default:'fooy', type: 'Foo'}
     DB.set 'Foo', foo, (sres) ->
@@ -526,6 +544,51 @@ describe 'Spincycle Model Tests', ->
               #console.dir newdbar
               expect(newdbar.theFoo.name).to.equal(dfoo.name)
               done()
+
+  it 'should be able to update sparse object with arrays', (done)->
+    new Foo().then (foo) ->
+      new Bar().then (bar)->
+        new VeryBar().then (vbar)->
+          vbar.foos.push foo
+          vbar.serialize()
+          msg1 =
+            type: 'VeryBar'
+            id: vbar.id
+            obj:
+              id: vbar.id
+              type: 'VeryBar'
+            user:
+              isAdmin: true
+            replyFunc: (ureply)->
+              #console.log 'get reply for verybar was'
+              #console.dir(ureply)
+              record = ureply.payload
+              record.bars.push bar.id
+              delete record.foos
+              msg2 =
+                obj: record
+                user:
+                  isAdmin: true
+                replyFunc: (ureply2)->
+                  console.log 'update reply for verybar was'
+                  console.dir ureply2
+                  msg3 =
+                    type: 'VeryBar'
+                    id: vbar.id
+                    obj:
+                      id: vbar.id
+                      type: 'VeryBar'
+                    user:
+                      isAdmin: true
+                    replyFunc: (ureply3)->
+                      console.log 'get again reply for verybar was'
+                      console.dir(ureply3)
+                      expect(ureply3.payload.foos.length).to.equal(1)
+                      done()
+                  messageRouter.objectManager._getObject(msg3)
+              #console.log '--- sparse test updating object'
+              messageRouter.objectManager._updateObject(msg2)
+          messageRouter.objectManager._getObject(msg1)
 
 
   it 'should be able to do a search on a property', (done)->
@@ -767,12 +830,12 @@ describe 'Spincycle Model Tests', ->
         foo.serialize().then ()->
           bar.foos.push foo
           bar.serialize().then ()->
-            #console.log '------------------------- initial bar object foos is '
-            #console.dir bar.foos
+            console.log '------------------------- initial bar object foos is '
+            console.dir bar.foos
 
             ClientEndpoints.registerEndpoint 'fooclient',(reply)->
-              #console.log '--__--__--__ object update __--__--__--'
-              #console.dir reply
+              console.log '--__--__--__ object update __--__--__--'
+              console.dir reply
               expect(reply.payload.foos.length).to.equal(0)
               done()
 

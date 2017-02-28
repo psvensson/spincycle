@@ -40,7 +40,7 @@
   ClientEndpoints = require('../lib/ClientEndpoints');
 
   describe('Spincycle Model Tests', function() {
-    var Bar, Baz, DFoo, DirectBar, Ezra, Foo, Fooznaz, HashBar, Quux, authMgr, f1record, f2record, f3record, f4record, f5record, httpMethod, messageRouter, postCreateState, record, record2;
+    var Bar, Baz, DFoo, DirectBar, Ezra, Foo, Fooznaz, HashBar, Quux, VeryBar, authMgr, f1record, f2record, f3record, f4record, f5record, httpMethod, messageRouter, postCreateState, record, record2;
     authMgr = void 0;
     messageRouter = void 0;
     httpMethod = void 0;
@@ -144,6 +144,7 @@
         }, {
           name: 'theFoo',
           value: 'theFoo',
+          "public": true,
           type: 'Foo'
         }, {
           name: 'foos',
@@ -275,6 +276,45 @@
       return DirectBar;
 
     })(SuperModel);
+    VeryBar = (function(superClass) {
+      extend(VeryBar, superClass);
+
+      VeryBar.type = 'VeryBar';
+
+      VeryBar.model = [
+        {
+          name: 'name',
+          "public": true,
+          value: 'name',
+          "default": 'directyohoo'
+        }, {
+          name: 'theFoo',
+          value: 'theFoo',
+          type: 'DFoo',
+          storedirectly: true
+        }, {
+          name: 'foos',
+          "public": true,
+          type: 'Foo',
+          array: true,
+          ids: 'foos'
+        }, {
+          name: 'bars',
+          "public": true,
+          type: 'Bar',
+          array: true,
+          ids: 'bars'
+        }
+      ];
+
+      function VeryBar(record1) {
+        this.record = record1 != null ? record1 : {};
+        return VeryBar.__super__.constructor.apply(this, arguments);
+      }
+
+      return VeryBar;
+
+    })(SuperModel);
     before(function(done) {
       authMgr = new AuthenticationManager();
       messageRouter = void 0;
@@ -288,9 +328,10 @@
           ResolveModule.modulecache['bar'] = Bar;
           ResolveModule.modulecache['dfoo'] = DFoo;
           ResolveModule.modulecache['directbar'] = DirectBar;
+          ResolveModule.modulecache['verybar'] = VeryBar;
           ResolveModule.modulecache['hashbar'] = HashBar;
           ResolveModule.modulecache['fooznaz'] = Fooznaz;
-          return DB.createDatabases(['foo', 'bar', 'dfoo', 'directbar', 'hashbar', 'fooznaz']).then(function() {
+          return DB.createDatabases(['foo', 'bar', 'dfoo', 'directbar', 'hashbar', 'fooznaz', 'verybar']).then(function() {
             console.log('++++++++++++++++++++++++++++++++++++spec dbs created');
             messageRouter.open();
             return done();
@@ -456,15 +497,13 @@
             var umsg;
             bar.theFoo = '12345';
             umsg = {
-              obj: bar,
+              obj: bar.toClient(),
               user: {
                 isAdmin: true,
                 email: 'foo@bar.com',
                 name: 'Mr. Xyzzy'
               },
               replyFunc: function(ureply) {
-                console.log('update reply was');
-                console.dir(ureply);
                 expect(ureply.status).to.equal('SUCCESS');
                 return done();
               }
@@ -647,6 +686,7 @@
     });
     it('should resolve multiple cold array references to objects not yet in ostore, only in db', function(done) {
       var foo, foo2;
+      console.log('--------------------------------------------------------------------- cold array test start');
       foo = {
         id: '11008877',
         name: 'fooname',
@@ -682,6 +722,7 @@
     });
     it('should have multiple cold array references to objects not yet in ostore, and get right amount of references in arrays of search results', function(done) {
       var foo, foo2;
+      console.log('--------------------------------------------------------------------- cold array test start 2');
       foo = {
         id: '21008877',
         name: 'fooname',
@@ -825,6 +866,65 @@
                 return done();
               });
             });
+          });
+        });
+      });
+    });
+    it('should be able to update sparse object with arrays', function(done) {
+      return new Foo().then(function(foo) {
+        return new Bar().then(function(bar) {
+          return new VeryBar().then(function(vbar) {
+            var msg1;
+            vbar.foos.push(foo);
+            vbar.serialize();
+            msg1 = {
+              type: 'VeryBar',
+              id: vbar.id,
+              obj: {
+                id: vbar.id,
+                type: 'VeryBar'
+              },
+              user: {
+                isAdmin: true
+              },
+              replyFunc: function(ureply) {
+                var msg2;
+                record = ureply.payload;
+                record.bars.push(bar.id);
+                delete record.foos;
+                msg2 = {
+                  obj: record,
+                  user: {
+                    isAdmin: true
+                  },
+                  replyFunc: function(ureply2) {
+                    var msg3;
+                    console.log('update reply for verybar was');
+                    console.dir(ureply2);
+                    msg3 = {
+                      type: 'VeryBar',
+                      id: vbar.id,
+                      obj: {
+                        id: vbar.id,
+                        type: 'VeryBar'
+                      },
+                      user: {
+                        isAdmin: true
+                      },
+                      replyFunc: function(ureply3) {
+                        console.log('get again reply for verybar was');
+                        console.dir(ureply3);
+                        expect(ureply3.payload.foos.length).to.equal(1);
+                        return done();
+                      }
+                    };
+                    return messageRouter.objectManager._getObject(msg3);
+                  }
+                };
+                return messageRouter.objectManager._updateObject(msg2);
+              }
+            };
+            return messageRouter.objectManager._getObject(msg1);
           });
         });
       });
@@ -1235,7 +1335,11 @@
             bar.foos.push(foo);
             return bar.serialize().then(function() {
               var brecord, msg, umsg;
+              console.log('------------------------- initial bar object foos is ');
+              console.dir(bar.foos);
               ClientEndpoints.registerEndpoint('fooclient', function(reply) {
+                console.log('--__--__--__ object update __--__--__--');
+                console.dir(reply);
                 expect(reply.payload.foos.length).to.equal(0);
                 return done();
               });
