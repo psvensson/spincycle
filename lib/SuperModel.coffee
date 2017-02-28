@@ -225,7 +225,7 @@ class SuperModel
               ids = []
               #console.log '============================== null resolveobj.ids for '+resolveobj.type+' ['+resolveobj.name+']'
               r.resolve()
-            else                                                                    # array or hashtable by array of ids
+            else    # array or hashtable by array of ids
               if typeof ids is 'string'
                 ids = [ids]
               if Array.isArray(ids)
@@ -241,7 +241,7 @@ class SuperModel
                 #console.log 'no ids for '+resolveobj.name+' so resolving undefined'
                 r.resolve(undefined)
               else if count == 0
-                #console.log 'resolving []'
+                console.log 'resolving [] for '+resolveobj.name+' since empty array in record'
                 @[resolveobj.name] = []
                 r.resolve([])
               else

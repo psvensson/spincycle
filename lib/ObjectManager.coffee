@@ -391,6 +391,7 @@ class ObjectManager
       console.dir robj
       q.resolve(false)
     else
+      obj.record = {}
       model.forEach (m)=>
         k = m.name
         v = robj[k]
