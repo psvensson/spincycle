@@ -212,10 +212,10 @@ class SuperModel
                 @[resolveobj.name] = @record[resolveobj.value] or resolveobj.default  # scalar
               r.resolve(@[resolveobj.name])
           else
-            #if resolveobj.name == 'foos' then console.log 'testing for arrays. current value of '+resolveobj.name+' is '+@[resolveobj.name]+' record is "'+@record[resolveobj.name]+'"'
+            console.log 'testing for arrays. current value of '+resolveobj.name+' is '+@[resolveobj.name]+' record is "'+@record[resolveobj.name]+'"'
             if resolveobj.array == true
               if (not @[resolveobj.name]) or (Array.isArray(@record[resolveobj.name]) and @record[resolveobj.name].length > 0)
-                if resolveobj.name == 'foos' then console.log '-- setting empty array'
+                console.log 'resolveobjids -- setting empty array for '+resolveobj.name+' since either the property is currently undefined or the array records contain at least one reference whichwill be added on resolving'
                 @[resolveobj.name] = []
             if ((resolveobj.hashtable == true) and (not @[resolveobj.name])) then @[resolveobj.name] = {}
             #if resolveobj.name == 'foos' then console.log 'foos is now '+@[resolveobj.name]
@@ -252,7 +252,7 @@ class SuperModel
                       #console.log '** storedirectly creating array or hash object immediately..'
                       @createObjectFromRecord(r, resolveobj, count, id)
                     else
-                      console.log 'SuperModel loadFromIds trying to get '+resolveobj.name+' with id "'+id+'"'
+                      #console.log 'SuperModel loadFromIds trying to get '+resolveobj.name+' with id "'+id+'"'
                       if (!id or id == ' ') and @[resolveobj.name]
                         console.log 'resolving existing array for '+resolveobj.name+' since this was empty'
                         #console.dir @[resolveobj.name]
@@ -261,8 +261,8 @@ class SuperModel
                         console.log 'calling resolveObj for id '+id
                         @resolveObj(resolveobj, id, r, count)
                   )(_id)
-              console.log 'resolveobjids '+resolveobj.name+' ('+(typeof ids)+') ids length are.. '+ids.length
-              console.dir ids
+              #console.log 'resolveobjids '+resolveobj.name+' ('+(typeof ids)+') ids length are.. '+ids.length
+              #console.dir ids
 
           #if debug then console.log '------- property '+resolveobj.name+' now set to '+@[resolveobj.name]
         )(robj)

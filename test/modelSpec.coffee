@@ -144,6 +144,7 @@ describe 'Spincycle Model Tests', ->
         {name: 'theFoo', value: 'theFoo', type: 'DFoo', storedirectly: true }
         {name: 'foos', public: true, type: 'Foo', array: true, ids: 'foos'}
         {name: 'bars', public: true, type: 'Bar', array: true, ids: 'bars'}
+        {name: 'dfoos', public: true, type: 'DFoo', array: true, ids: 'dfoos'}
       ]
     constructor: (@record={}) ->
       return super
@@ -547,48 +548,49 @@ describe 'Spincycle Model Tests', ->
 
   it 'should be able to update sparse object with arrays', (done)->
     new Foo().then (foo) ->
-      new Bar().then (bar)->
-        new VeryBar().then (vbar)->
-          vbar.foos.push foo
-          vbar.serialize()
-          msg1 =
-            type: 'VeryBar'
-            id: vbar.id
-            obj:
-              id: vbar.id
+      new DFoo().then (dfoo) ->
+        new Bar().then (bar)->
+          new VeryBar().then (vbar)->
+            vbar.foos.push foo
+            vbar.dfoos.push dfoo
+            vbar.serialize()
+            msg1 =
               type: 'VeryBar'
-            user:
-              isAdmin: true
-            replyFunc: (ureply)->
-              #console.log 'get reply for verybar was'
-              #console.dir(ureply)
-              record = ureply.payload
-              record.bars.push bar.id
-              delete record.foos
-              msg2 =
-                obj: record
-                user:
-                  isAdmin: true
-                replyFunc: (ureply2)->
-                  console.log 'update reply for verybar was'
-                  console.dir ureply2
-                  msg3 =
-                    type: 'VeryBar'
-                    id: vbar.id
-                    obj:
-                      id: vbar.id
+              id: vbar.id
+              obj:
+                id: vbar.id
+                type: 'VeryBar'
+              user:
+                isAdmin: true
+              replyFunc: (ureply)->
+                #console.log 'get reply for verybar was'
+                #console.dir(ureply)
+                record = {id:vbar.id, type:'VeryBar',bars:[]}
+                record.bars.push bar.id
+                msg2 =
+                  obj: record
+                  user:
+                    isAdmin: true
+                  replyFunc: (ureply2)->
+                    console.log 'update reply for verybar was'
+                    console.dir ureply2
+                    msg3 =
                       type: 'VeryBar'
-                    user:
-                      isAdmin: true
-                    replyFunc: (ureply3)->
-                      console.log 'get again reply for verybar was'
-                      console.dir(ureply3)
-                      expect(ureply3.payload.foos.length).to.equal(1)
-                      done()
-                  messageRouter.objectManager._getObject(msg3)
-              #console.log '--- sparse test updating object'
-              messageRouter.objectManager._updateObject(msg2)
-          messageRouter.objectManager._getObject(msg1)
+                      id: vbar.id
+                      obj:
+                        id: vbar.id
+                        type: 'VeryBar'
+                      user:
+                        isAdmin: true
+                      replyFunc: (ureply3)->
+                        console.log 'get again reply for verybar was'
+                        console.dir(ureply3)
+                        expect(ureply3.payload.foos.length).to.equal(1)
+                        done()
+                    messageRouter.objectManager._getObject(msg3)
+                #console.log '--- sparse test updating object'
+                messageRouter.objectManager._updateObject(msg2)
+            messageRouter.objectManager._getObject(msg1)
 
 
   it 'should be able to do a search on a property', (done)->

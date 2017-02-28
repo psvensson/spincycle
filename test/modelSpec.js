@@ -304,6 +304,12 @@
           type: 'Bar',
           array: true,
           ids: 'bars'
+        }, {
+          name: 'dfoos',
+          "public": true,
+          type: 'DFoo',
+          array: true,
+          ids: 'dfoos'
         }
       ];
 
@@ -872,59 +878,65 @@
     });
     it('should be able to update sparse object with arrays', function(done) {
       return new Foo().then(function(foo) {
-        return new Bar().then(function(bar) {
-          return new VeryBar().then(function(vbar) {
-            var msg1;
-            vbar.foos.push(foo);
-            vbar.serialize();
-            msg1 = {
-              type: 'VeryBar',
-              id: vbar.id,
-              obj: {
+        return new DFoo().then(function(dfoo) {
+          return new Bar().then(function(bar) {
+            return new VeryBar().then(function(vbar) {
+              var msg1;
+              vbar.foos.push(foo);
+              vbar.dfoos.push(dfoo);
+              vbar.serialize();
+              msg1 = {
+                type: 'VeryBar',
                 id: vbar.id,
-                type: 'VeryBar'
-              },
-              user: {
-                isAdmin: true
-              },
-              replyFunc: function(ureply) {
-                var msg2;
-                record = ureply.payload;
-                record.bars.push(bar.id);
-                delete record.foos;
-                msg2 = {
-                  obj: record,
-                  user: {
-                    isAdmin: true
-                  },
-                  replyFunc: function(ureply2) {
-                    var msg3;
-                    console.log('update reply for verybar was');
-                    console.dir(ureply2);
-                    msg3 = {
-                      type: 'VeryBar',
-                      id: vbar.id,
-                      obj: {
+                obj: {
+                  id: vbar.id,
+                  type: 'VeryBar'
+                },
+                user: {
+                  isAdmin: true
+                },
+                replyFunc: function(ureply) {
+                  var msg2;
+                  record = {
+                    id: vbar.id,
+                    type: 'VeryBar',
+                    bars: []
+                  };
+                  record.bars.push(bar.id);
+                  msg2 = {
+                    obj: record,
+                    user: {
+                      isAdmin: true
+                    },
+                    replyFunc: function(ureply2) {
+                      var msg3;
+                      console.log('update reply for verybar was');
+                      console.dir(ureply2);
+                      msg3 = {
+                        type: 'VeryBar',
                         id: vbar.id,
-                        type: 'VeryBar'
-                      },
-                      user: {
-                        isAdmin: true
-                      },
-                      replyFunc: function(ureply3) {
-                        console.log('get again reply for verybar was');
-                        console.dir(ureply3);
-                        expect(ureply3.payload.foos.length).to.equal(1);
-                        return done();
-                      }
-                    };
-                    return messageRouter.objectManager._getObject(msg3);
-                  }
-                };
-                return messageRouter.objectManager._updateObject(msg2);
-              }
-            };
-            return messageRouter.objectManager._getObject(msg1);
+                        obj: {
+                          id: vbar.id,
+                          type: 'VeryBar'
+                        },
+                        user: {
+                          isAdmin: true
+                        },
+                        replyFunc: function(ureply3) {
+                          console.log('get again reply for verybar was');
+                          console.dir(ureply3);
+                          expect(ureply3.payload.foos.length).to.equal(1);
+                          return done();
+                        }
+                      };
+                      return messageRouter.objectManager._getObject(msg3);
+                    }
+                  };
+                  return messageRouter.objectManager._updateObject(msg2);
+                }
+              };
+              return messageRouter.objectManager._getObject(msg1);
+            });
           });
         });
       });
