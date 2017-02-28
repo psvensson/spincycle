@@ -214,7 +214,7 @@ class SuperModel
           else
             #if resolveobj.name == 'foos' then console.log 'testing for arrays. current value of '+resolveobj.name+' is '+@[resolveobj.name]+' record is "'+@record[resolveobj.name]+'"'
             if resolveobj.array == true
-              if (not @[resolveobj.name])
+              if (not @[resolveobj.name]) or (Array.isArray(@record[resolveobj.name]) and @record[resolveobj.name].length > 0)
                 if resolveobj.name == 'foos' then console.log '-- setting empty array'
                 @[resolveobj.name] = []
             if ((resolveobj.hashtable == true) and (not @[resolveobj.name])) then @[resolveobj.name] = {}
@@ -252,16 +252,17 @@ class SuperModel
                       #console.log '** storedirectly creating array or hash object immediately..'
                       @createObjectFromRecord(r, resolveobj, count, id)
                     else
-                      #console.log 'SuperModel loadFromIds trying to get '+resolveobj.name+' with id "'+id+'"'
+                      console.log 'SuperModel loadFromIds trying to get '+resolveobj.name+' with id "'+id+'"'
                       if (!id or id == ' ') and @[resolveobj.name]
-                        #console.log 'resolving existing array for '+resolveobj.name+' since this was empty'
+                        console.log 'resolving existing array for '+resolveobj.name+' since this was empty'
                         #console.dir @[resolveobj.name]
                         r.resolve(@[resolveobj.name])
                       else
+                        console.log 'calling resolveObj for id '+id
                         @resolveObj(resolveobj, id, r, count)
                   )(_id)
-              #if debug then console.log 'resolveobjids '+resolveobj.name+' ('+(typeof ids)+') ids length are.. '+ids.length
-              #if debug then console.dir ids
+              console.log 'resolveobjids '+resolveobj.name+' ('+(typeof ids)+') ids length are.. '+ids.length
+              console.dir ids
 
           #if debug then console.log '------- property '+resolveobj.name+' now set to '+@[resolveobj.name]
         )(robj)
@@ -278,10 +279,11 @@ class SuperModel
     #console.dir id
     OMgr.getObject(id, resolveobj.type).then( (oo) =>
       if oo
-        console.log 'SuperModel found existing instance of '+resolveobj.name+' type '+resolveobj.type+' in OStore'
+        #console.log 'SuperModel found existing instance of '+resolveobj.name+' type '+resolveobj.type+' in OStore'
         @insertObj(resolveobj, oo)
         if count == 0
-          console.log 'SuperModel resolving '+resolveobj.name+' type '+resolveobj.type+' immediately'
+          #console.log 'SuperModel resolving '+resolveobj.name+' type '+resolveobj.type+' immediately'
+          #console.dir oo
           r.resolve(oo)
       else
         #console.log 'SuperModel did not find obj '+resolveobj.name+' ['+id+'] of type '+resolveobj.type+' in OStore. Getting from DB. typeof of id prop is '+(typeof id)

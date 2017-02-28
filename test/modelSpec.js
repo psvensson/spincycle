@@ -1372,6 +1372,56 @@
         });
       });
     });
+    it('should be able to update an array reference with one less object reference', function(done) {
+      return new Bar().then(function(bar) {
+        return new Foo().then(function(foo) {
+          return foo.serialize().then(function() {
+            return new Foo().then(function(foo2) {
+              return foo.serialize().then(function() {
+                bar.foos.push(foo);
+                bar.foos.push(foo2);
+                return bar.serialize().then(function() {
+                  var brecord, umsg;
+                  brecord = bar.toClient();
+                  brecord.name = '*** one less Doctored Bar object';
+                  brecord.foos = [foo2.id];
+                  umsg = {
+                    obj: brecord,
+                    user: {
+                      isAdmin: true
+                    },
+                    replyFunc: function(ureply) {
+                      var msg1;
+                      console.log('one less object update is ' + ureply);
+                      console.dir(ureply);
+                      msg1 = {
+                        type: 'Bar',
+                        id: bar.id,
+                        obj: {
+                          id: bar.id,
+                          type: 'Bar'
+                        },
+                        user: {
+                          isAdmin: true
+                        },
+                        replyFunc: function(ureply2) {
+                          console.log('one less after update _get is..');
+                          console.dir(ureply2);
+                          expect(ureply2.payload.foos.length).to.equal(1);
+                          return done();
+                        }
+                      };
+                      return messageRouter.objectManager._getObject(msg1);
+                    }
+                  };
+                  return messageRouter.objectManager._updateObject(umsg);
+                });
+              });
+            });
+          });
+        });
+      });
+    });
     it('should be able to get population change callbacks on create', function(done) {
       var msg;
       ClientEndpoints.registerEndpoint('updateclient', function(reply) {

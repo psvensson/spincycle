@@ -860,6 +860,43 @@ describe 'Spincycle Model Tests', ->
 
             messageRouter.objectManager._updateObject(umsg)
 
+  it 'should be able to update an array reference with one less object reference', (done)->
+    new Bar().then (bar) ->
+      new Foo().then (foo) ->
+        foo.serialize().then ()->
+          new Foo().then (foo2) ->
+            foo.serialize().then ()->
+              bar.foos.push foo
+              bar.foos.push foo2
+              bar.serialize().then ()->
+                #console.log '------------------------- initial bar object foos is '
+                #console.dir bar.foos
+                brecord = bar.toClient()
+                brecord.name = '*** one less Doctored Bar object'
+                brecord.foos = [foo2.id]
+                umsg =
+                  obj: brecord
+                  user:
+                    isAdmin: true
+                  replyFunc: (ureply)->
+                    console.log 'one less object update is '+ureply
+                    console.dir ureply
+                    msg1 =
+                      type: 'Bar'
+                      id: bar.id
+                      obj:
+                        id: bar.id
+                        type: 'Bar'
+                      user:
+                        isAdmin: true
+                      replyFunc: (ureply2)->
+                        console.log 'one less after update _get is..'
+                        console.dir ureply2
+                        expect(ureply2.payload.foos.length).to.equal(1)
+                        done()
+                    messageRouter.objectManager._getObject(msg1)
+                messageRouter.objectManager._updateObject(umsg)
+
   it 'should be able to get population change callbacks on create', (done)->
     ClientEndpoints.registerEndpoint 'updateclient',(reply)->
       #console.log '--__--__--__  update client got population change __--__--__--'

@@ -401,8 +401,8 @@ class ObjectManager
           if add
             console.log '---- setting obj prop '+k+' to -> '+v
             obj.record[k] = v
-      console.log 'record is now'
-      console.dir obj.record
+      #console.log 'record is now'
+      #console.dir obj.record
       obj.loadFromIds(obj.constructor.model).then () =>
         #console.log 'setting OStore '+obj.id+' to obj '+obj
         objStore.storeObject(obj)
