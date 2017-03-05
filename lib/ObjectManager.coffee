@@ -199,8 +199,8 @@ class ObjectManager
       msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: obj})
 
   _listObjects: (msg) =>
-    console.log 'listObjects called for type '+msg.type
-    console.dir msg
+    #console.log 'listObjects called for type '+msg.type
+    #console.dir msg
     if typeof msg.type != 'undefined'
       if msg.type.toLowerCase() in @getTypes()
         if @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user, msg.sessionId) == no
@@ -375,10 +375,10 @@ class ObjectManager
 
   persistUpdates: (obj, robj, force)=>
     q = defer()
-    console.log 'persistUpdates for record'
-    console.dir robj
-    console.log '..and old object'
-    console.dir obj
+    #console.log 'persistUpdates for record'
+    #console.dir robj
+    #console.log '..and old object'
+    #console.dir obj
     model = @getModelFor(obj.type)
     borked = false
     model.forEach (row)=>
@@ -400,7 +400,7 @@ class ObjectManager
           #if Array.isArray(v) and v.length == 0 then add = false
           if not v then add = false
           if add
-            console.log '---- setting obj prop '+k+' to -> '+v
+            #console.log '---- setting obj prop '+k+' to -> '+v
             obj.record[k] = v
       #console.log 'record is now'
       #console.dir obj.record

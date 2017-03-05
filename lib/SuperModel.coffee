@@ -212,7 +212,7 @@ class SuperModel
                 @[resolveobj.name] = @record[resolveobj.value] or resolveobj.default  # scalar
               r.resolve(@[resolveobj.name])
           else
-            console.log 'testing for arrays. current value of '+resolveobj.name+' is '+@[resolveobj.name]+' record is "'+@record[resolveobj.name]+'"'
+            #console.log 'testing for arrays. current value of '+resolveobj.name+' is '+@[resolveobj.name]+' record is "'+@record[resolveobj.name]+'"'
             if resolveobj.array == true
               if (not @[resolveobj.name]) or (Array.isArray(@record[resolveobj.name]) and @record[resolveobj.name].length > 0)
                 console.log 'resolveobjids -- setting empty array for '+resolveobj.name+' since either the property is currently undefined or the array records contain at least one reference whichwill be added on resolving'
@@ -258,7 +258,7 @@ class SuperModel
                         #console.dir @[resolveobj.name]
                         r.resolve(@[resolveobj.name])
                       else
-                        console.log 'calling resolveObj for id '+id
+                        #console.log 'calling resolveObj for id '+id
                         @resolveObj(resolveobj, id, r, count)
                   )(_id)
               #console.log 'resolveobjids '+resolveobj.name+' ('+(typeof ids)+') ids length are.. '+ids.length

@@ -233,7 +233,11 @@ class DB
       if not result
         console.log 'DB.find type '+type+', property '+property+', value '+value+' got back '+result
       else
-        @lru.set(result.id, result)
+        if not typeof result.id == 'string'
+          console.log '----------***************** DB.find error: trying to cache foudn result but id is not a string!!!'
+          console.dir result
+        else
+          @lru.set(result.id, result)
       q.resolve(result)
     return q
 
