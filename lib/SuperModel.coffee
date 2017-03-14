@@ -286,7 +286,7 @@ class SuperModel
           #console.dir oo
           r.resolve(oo)
       else
-        #console.log 'SuperModel did not find obj '+resolveobj.name+' ['+id+'] of type '+resolveobj.type+' in OStore. Getting from DB. typeof of id prop is '+(typeof id)
+        if debug then console.log 'SuperModel did not find obj '+resolveobj.name+' ['+id+'] of type '+resolveobj.type+' in OStore. Getting from DB. typeof of id prop is '+(typeof id)
         #console.dir resolveobj
         DB.get(resolveobj.type, [id]).then( (records) =>
           record = undefined
