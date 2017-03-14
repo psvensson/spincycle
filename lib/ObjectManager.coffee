@@ -255,6 +255,7 @@ class ObjectManager
     else
       rv = []
       _records.forEach (r) =>
+        if debug then console.log 'ObjectManager.parseList calling DB.get for id '+r.id
         DB.get(r.type, [r.id]).then (record) =>
          # if debug then console.log 'ObjectManager.parseList --- result of getting record '+r.type+' id '+r.id+' is '+record
           if record and record[0]
