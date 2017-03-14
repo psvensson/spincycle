@@ -164,7 +164,7 @@ class DB
     store.extend(type, id, field, def)
 
   @getFromStoreOrDB: (type, id) =>
-    #console.log 'DB.getFromStoreOrDb called for '+type+' id '+id
+    if debug then console.log 'DB.getFromStoreOrDb called for '+type+' id '+id
     q = defer()
     OStore.getObject(id, type).then (oo)=>
       if oo
@@ -184,6 +184,7 @@ class DB
 
   @getOrCreateObjectByRecord: (record) =>
     q = defer()
+    if debug then console.log 'getOrCreateObjectByRecord called for type '+record.type+' and id '+record.id
     OStore.getObject(record.id, record.type).then (oo)=>
       if debug then console.log 'DB.getOrCreateObjectByRecord OStore returns '+oo
       if oo
@@ -234,7 +235,7 @@ class DB
         console.log 'DB.find type '+type+', property '+property+', value '+value+' got back '+result
       else
         if not typeof result.id == 'string'
-          console.log '----------***************** DB.find error: trying to cache foudn result but id is not a string!!!'
+          console.log '----------***************** DB.find error: trying to cache found result but id is not a string!!!'
           console.dir result
         else
           @lru.set(result.id, result)

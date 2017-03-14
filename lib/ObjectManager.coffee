@@ -436,7 +436,7 @@ class ObjectManager
   #---------------------------------------------------------------------------------------------------------------------
 
   onRegisterForUpdatesOn: (msg) =>
-    if debug then console.dir msg
+    #if debug then console.dir msg
     if msg.obj or not msg.obj.id or not msg.obj.type
       if debug then console.log 'onRegisterForUpdatesOn  called for '+msg.obj.type+' '+msg.obj.id
       DB.getFromStoreOrDB(msg.obj.type, msg.obj.id).then( (obj) =>
@@ -461,7 +461,7 @@ class ObjectManager
             if debug then console.log 'listenerid '+listenerId+' added for updates on object '+obj.name+' ['+obj.id+']'
             msg.replyFunc({status: e.general.SUCCESS, info: e.gamemanager.REGISTER_UPDATES, payload: listenerId})
           else
-            msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.UPDATE_REGISTER_FAIL, payload: msg.obj.id })
+            msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'Not allowed to register for updates on that object', payload: msg.obj.id })
         else
           if debug then console.log 'Could not find object: '+msg.obj.type+' id '+msg.obj.id
           msg.replyFunc({status: e.general.NOT_ALLOWED, info: e.gamemanager.NO_SUCH_OBJECT, payload: msg.obj.id })
