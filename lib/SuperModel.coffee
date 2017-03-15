@@ -241,7 +241,7 @@ class SuperModel
                 #console.log 'no ids for '+resolveobj.name+' so resolving undefined'
                 r.resolve(undefined)
               else if count == 0
-                console.log 'resolving [] for '+resolveobj.name+' since empty array in record'
+                #console.log 'resolving [] for '+resolveobj.name+' since empty array in record'
                 @[resolveobj.name] = []
                 r.resolve([])
               else

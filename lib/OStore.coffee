@@ -92,7 +92,7 @@ class OStore
 
       OStore.objects[record.id] = obj
       if OStore.anyoneIsListening(obj.id) or force
-        console.log 'updateObj calling sendUpdates for '+record.id
+        #console.log 'updateObj calling sendUpdates for '+record.id
         if not changed then changed = force
         OStore.sendUpdatesFor(obj, changed, force)
     else
