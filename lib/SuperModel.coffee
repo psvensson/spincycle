@@ -277,7 +277,7 @@ class SuperModel
   resolveObj: (resolveobj, id, r, count) =>
     if typeof id != 'string'
       console.log '%%%%%%%%%%%%%%%%%%% ERROR: Supermodel.resolveObj given a non-string as id!! resolveObj was:'
-      console.dir resolveObj
+      console.dir resolveobj
       console.log 'id was:'
       console.dir id
       process.exit(-1)
