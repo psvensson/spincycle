@@ -28,10 +28,11 @@ class HttpMethod
       ip    = req.connection.remoteAddress
       port  = req.connection.remotePort
       cookies = cookie.parse(req.headers.cookie or '')
-      console.log 'Express request from '+ip+':'+port+' target is "'+req.query.target+'" cookies are '+req.headers.cookie
+
       #console.dir req.query
       target = HttpMethod.httproutes[req.query.target]
       if target
+        console.log 'Express request from '+ip+':'+port+' target is "'+req.query.target+'" cookies are '+req.headers.cookie
         message = { client: ip+':'+port, target: req.query.target, messageId: url_parts.messageId || uuid.v4(), sessionId: cookies.sid }
         for p, part of url_parts
           message[p] = part # TODO: Guard against hax0r dataz
