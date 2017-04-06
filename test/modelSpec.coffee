@@ -22,6 +22,7 @@ SpinCycle       = require('../lib/MessageRouter')
 ClientEndpoints  = require('../lib/ClientEndpoints')
 
 describe 'Spincycle Model Tests', ->
+  this.timeout(500000);
 
   authMgr = undefined
   messageRouter = undefined
@@ -59,11 +60,11 @@ describe 'Spincycle Model Tests', ->
 
   record2 =
     _rev: 77788877788899900099
-    id: 4711
+    id: '4711'
     name: 'xyzzy'
-    theFoo: 17
-    foos: [17]
-    footable: [17]
+    theFoo: '17'
+    foos: ['17']
+    footable: ['17']
 
   class Foo extends SuperModel
     @type = 'Foo'
@@ -186,19 +187,19 @@ describe 'Spincycle Model Tests', ->
   postCreateState = -1
 
   @record3 =
-    id:42
+    id:'42'
     name: 'xyzzy'
-    shoesize: 42
+    shoesize: '42'
 
   @record4=
-    id:667
+    id:'667'
     name: 'Neihgbor of the beast'
-    hatsize: 42
+    hatsize: '42'
 
   @record5=
-    id:9
+    id:'9'
     name: 'Neihgbor of the beast'
-    shirtsize: 42
+    shirtsize: '42'
 
 
   class Baz extends SuperModel
@@ -322,7 +323,7 @@ describe 'Spincycle Model Tests', ->
         bar.footable[foo.name] = foo
         foo.serialize().then ()->
           bar.serialize().then ()->
-            DB.get('Bar', [4711]).then (newbars) ->
+            DB.get('Bar', ['4711']).then (newbars) ->
               newbar = newbars[0]
               #console.dir newbar
               expect(newbar.footable).to.exist
@@ -335,11 +336,11 @@ describe 'Spincycle Model Tests', ->
   it 'should be able to use custom properties for hashtable keys', ()->
     record222 =
       _rev: 71299900099
-      id: 174711
+      id: '174711'
       type: 'Bar'
       name: 'BAR xyzzy'
-      theFoo: 17
-      foos: [17]
+      theFoo: '17'
+      foos: ['17']
     new HashBar(record222).then (bar) ->
       OStore.storeObject(bar)
       new Foo(f4record).then (foo) ->
@@ -347,7 +348,7 @@ describe 'Spincycle Model Tests', ->
         bar.footable[foo.id] = foo
         foo.serialize()
         bar.serialize()
-        DB.get('HashBar', [174711]).then (newbars) ->
+        DB.get('HashBar', ['174711']).then (newbars) ->
           newbar = newbars[0]
           new HashBar(newbar).then (nbobj) ->
             expect(nbobj.footable[foo.id]).to.equal(foo)
@@ -384,7 +385,7 @@ describe 'Spincycle Model Tests', ->
       new Bar(record2).then (bar) ->
         OStore.storeObject(bar)
         bar.serialize().then () ->
-          DB.get('Bar', [4711]).then (bar_records)->
+          DB.get('Bar', ['4711']).then (bar_records)->
             bar_record = bar_records[0]
             new Bar(bar_record).then (newbar)->
               same = false
@@ -764,7 +765,7 @@ describe 'Spincycle Model Tests', ->
       )(_x)
 
   it 'should get an error message when sending too many requests per second', (done)->
-    user = { name: 'foo', id:17}
+    user = { name: 'foo', id:'17'}
     count = 12
     failure = false
     for i in [0..12]

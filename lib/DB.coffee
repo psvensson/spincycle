@@ -8,7 +8,7 @@ OStore          = require('./OStore')
 #GDS            = require('./gds')
 #Roach          = require('./cockroach')
 Couch           = require('./CouchPersistence')
-Mongo           = require('./MongoPersistence')
+#Mongo           = require('./MongoPersistence')
 Rethink         = require('./RethinkPersistence')
 Google          = require('./GooglePersistence')
 
@@ -43,7 +43,7 @@ class DB
       if not name then @DataStore = new Rethink(DB.dburl, DB)
       #if not name then @DataStore = new Google(DB.dburl, DB)
       else if name == 'couchdb' then @DataStore = new Couch(DB.dburl)
-      else if name == 'mongodb' then @DataStore = new Mongo(DB.dburl, DB)
+      #else if name == 'mongodb' then @DataStore = new Mongo(DB.dburl, DB)
       else if name == 'rethinkdb' then @DataStore = new Rethink(DB.dburl, DB)
       else if name == 'google' then @DataStore = new Google(DB.dburl, DB)
       @DataStore.connect().then (ds)=>

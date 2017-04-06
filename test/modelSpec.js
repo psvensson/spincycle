@@ -41,6 +41,7 @@
 
   describe('Spincycle Model Tests', function() {
     var Bar, Baz, DFoo, DirectBar, Ezra, Foo, Fooznaz, HashBar, Quux, VeryBar, authMgr, f1record, f2record, f3record, f4record, f5record, httpMethod, messageRouter, postCreateState, record, record2;
+    this.timeout(500000);
     authMgr = void 0;
     messageRouter = void 0;
     httpMethod = void 0;
@@ -76,11 +77,11 @@
     };
     record2 = {
       _rev: 77788877788899900099,
-      id: 4711,
+      id: '4711',
       name: 'xyzzy',
-      theFoo: 17,
-      foos: [17],
-      footable: [17]
+      theFoo: '17',
+      foos: ['17'],
+      footable: ['17']
     };
     Foo = (function(superClass) {
       extend(Foo, superClass);
@@ -347,19 +348,19 @@
     });
     postCreateState = -1;
     this.record3 = {
-      id: 42,
+      id: '42',
       name: 'xyzzy',
-      shoesize: 42
+      shoesize: '42'
     };
     this.record4 = {
-      id: 667,
+      id: '667',
       name: 'Neihgbor of the beast',
-      hatsize: 42
+      hatsize: '42'
     };
     this.record5 = {
-      id: 9,
+      id: '9',
       name: 'Neihgbor of the beast',
-      shirtsize: 42
+      shirtsize: '42'
     };
     Baz = (function(superClass) {
       extend(Baz, superClass);
@@ -542,7 +543,7 @@
           bar.footable[foo.name] = foo;
           return foo.serialize().then(function() {
             return bar.serialize().then(function() {
-              return DB.get('Bar', [4711]).then(function(newbars) {
+              return DB.get('Bar', ['4711']).then(function(newbars) {
                 var newbar;
                 newbar = newbars[0];
                 expect(newbar.footable).to.exist;
@@ -557,11 +558,11 @@
       var record222;
       record222 = {
         _rev: 71299900099,
-        id: 174711,
+        id: '174711',
         type: 'Bar',
         name: 'BAR xyzzy',
-        theFoo: 17,
-        foos: [17]
+        theFoo: '17',
+        foos: ['17']
       };
       return new HashBar(record222).then(function(bar) {
         OStore.storeObject(bar);
@@ -570,7 +571,7 @@
           bar.footable[foo.id] = foo;
           foo.serialize();
           bar.serialize();
-          return DB.get('HashBar', [174711]).then(function(newbars) {
+          return DB.get('HashBar', ['174711']).then(function(newbars) {
             var newbar;
             newbar = newbars[0];
             return new HashBar(newbar).then(function(nbobj) {
@@ -622,7 +623,7 @@
         return new Bar(record2).then(function(bar) {
           OStore.storeObject(bar);
           return bar.serialize().then(function() {
-            return DB.get('Bar', [4711]).then(function(bar_records) {
+            return DB.get('Bar', ['4711']).then(function(bar_records) {
               var bar_record;
               bar_record = bar_records[0];
               return new Bar(bar_record).then(function(newbar) {
@@ -1258,7 +1259,7 @@
       var count, failure, i, j, msg, results, user;
       user = {
         name: 'foo',
-        id: 17
+        id: '17'
       };
       count = 12;
       failure = false;

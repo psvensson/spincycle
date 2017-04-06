@@ -88,6 +88,23 @@ class RethinkPersistence
     )
     return q
 
+  addIndexIfNotPresent:(table,type,prop)=>
+    q = defer()
+    table.indexList().run @connection,(err2, res2) =>
+      console.log '---- addindex check result for property '+prop+' on table '+type+' ---> '+res2
+      console.dir res2
+      found = false
+      res2.forEach (el) => if el == prop then found = true
+      if not found
+        console.log 'addIndexIfNotPresent adding multi index for property '+prop+' on table '+type
+        table.indexCreate(prop, {multi: true})
+        table.indexWait(prop).run @connection,(er2, re2) =>
+          console.log 'addIndexIfNotPresent waited done'
+          q.resolve()
+      else
+        q.resolve()
+    return q
+
   getDbFor: (_type) =>
     q = defer()
     #console.log 'getDbFor called for '+_type
@@ -193,37 +210,42 @@ class RethinkPersistence
     q = defer()
     type = _type.toLowerCase()
     @getDbFor(type).then (db)=>
-        # { sort: 'name', property: 'name', value: 'BolarsKolars' }
-      rr = db.orderBy(query.sort or 'name')
-      rv = @getValueForQuery('value', 'property', query)
-      if not rv.invalid
-        rr = rr.filter( (element)=>
-          if query.wildcard
-            element(query.property).match("^"+query.value)
-          else
-            element(query.property).eq(query.value)
-        )
-        if query.property2
-          rv2 = @getValueForQuery('value2', 'property2', query)
-          if not rv2.invalid
-            rr = rr.filter( (el)=>
-              if query.wildcard
-                el(query.property2).match(rv2.value)
-              else
-                el(query.property2).eq(rv2.value)
-            )
-        if query.limit then rr = rr.skip(query.skip or 0).limit(query.limit)
-        if debug then console.log 'Rethink findQuery running query...'
-        rr.run @connection, (err, cursor) ->
-          if err
-            console.log 'findQuery error: '+err
-            console.dir err
-          cursor.toArray (ce, result)=>
-            #console.log 'findQuery result is '
-            #console.log result
-            q.resolve result
-      else
-        q.resolve([])
+      # { sort: 'name', property: 'name', value: 'BolarsKolars' }
+      #console.log 'orderby = '+r.orderBy+' desc = '+r.desc
+      rr = r.db('spincycle').table(type)
+      sv = query.sort or 'name'
+      @addIndexIfNotPresent(rr, type, sv).then ()=>
+        #rr = rr.orderBy({index: r.desc(sv)})
+        rr = rr.orderBy(sv)
+        rv = @getValueForQuery('value', 'property', query)
+        if not rv.invalid
+          rr = rr.filter( (element)=>
+            if query.wildcard
+              element(query.property).match("^"+query.value)
+            else
+              element(query.property).eq(query.value)
+          )
+          if query.property2
+            rv2 = @getValueForQuery('value2', 'property2', query)
+            if not rv2.invalid
+              rr = rr.filter( (el)=>
+                if query.wildcard
+                  el(query.property2).match(rv2.value)
+                else
+                  el(query.property2).eq(rv2.value)
+              )
+          if query.limit then rr = rr.skip(query.skip or 0).limit(query.limit)
+          if debug then console.log 'Rethink findQuery running query...'
+          rr.run @connection, (err, cursor) ->
+            if err
+              console.log 'findQuery error: '+err
+              console.dir err
+            cursor.toArray (ce, result)=>
+              #console.log 'findQuery result is '
+              #console.log result
+              q.resolve result
+        else
+          q.resolve([])
     return q
 
   getValueForQuery: (val, prop, query)->
