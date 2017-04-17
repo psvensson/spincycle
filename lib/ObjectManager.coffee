@@ -116,7 +116,8 @@ class ObjectManager
     if msg.obj and msg.obj.type and msg.obj.id
       console.log 'delete got type '+msg.obj.type+', and id '+msg.obj.id
       if msg.obj.type.toLowerCase() in @getTypes()
-        objStore.getObject(msg.obj.id, msg.obj.type).then (obj) =>
+        #objStore.getObject(msg.obj.id, msg.obj.type).then (obj) =>
+        @getObjectPullThrough(msg.obj.id, msg.obj.type).then (obj) =>
           #console.log 'got object form objstore -> '+obj
           if obj
             if @messageRouter.authMgr.canUserWriteToThisObject(obj, msg.user, msg.obj, msg.sessionId)
