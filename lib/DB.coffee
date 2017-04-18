@@ -88,7 +88,7 @@ class DB
     proto = ResolveModule.modulecache[dbname]
     #console.log '+++++++++++++++++++++++++++++++++++++extendSchemaIfNeeded resolve '+dbname+' to '+proto
     #console.dir proto
-    if not proto
+    if not (proto and proto.model)
       console.log 'found undefined prototype!. modulecache is'
       console.dir ResolveModule.modulecache
       q.resolve()
