@@ -104,6 +104,8 @@ class DB
           lookup = {createdAt:true, modifiedAt:true, createdBy:true}
           for k,v of o
             lookup[k] = k
+          if debug then console.log 'going through model'
+          if debug then console.dir proto
           proto.model.forEach (property)=>
             #if debug then console.log 'checking property '+property.name+' and if it exist in lookup table -> '+lookup[property.name]
             #console.dir property
