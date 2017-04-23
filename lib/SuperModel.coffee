@@ -254,7 +254,7 @@ class SuperModel
                     else
                       #console.log 'SuperModel loadFromIds trying to get '+resolveobj.name+' with id "'+id+'"'
                       if (!id or id == ' ') and @[resolveobj.name]
-                        console.log 'resolving existing array for '+resolveobj.name+' since this was empty'
+                        #console.log 'resolving existing array for '+resolveobj.name+' since this was empty'
                         #console.dir @[resolveobj.name]
                         r.resolve(@[resolveobj.name])
                       else
