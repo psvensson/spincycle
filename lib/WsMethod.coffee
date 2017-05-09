@@ -37,7 +37,7 @@ class WsMethod
           #if debug then console.dir replydata
           socket.emit('message', replydata)
 
-        console.log 'got new message for '+data.target
+        if debug then console.log 'got new message for '+data.target
         fn = WsMethod.wsroutes[data.target]
         if fn then fn(data) else console.log '*********** Could not find registered target for '+data.target
 
