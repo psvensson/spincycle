@@ -236,7 +236,7 @@ class DB
       if debug then console.log 'DB.find found '+result
       if debug then console.dir result
       if not result
-        console.log 'DB.find type '+type+', property '+property+', value '+value+' got back '+result
+        #console.log 'DB.find type '+type+', property '+property+', value '+value+' got back '+result
       else
         if not typeof result.id == 'string'
           console.log '----------***************** DB.find error: trying to cache found result but id is not a string!!!'
