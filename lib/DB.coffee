@@ -233,6 +233,8 @@ class DB
   @find: (type, property, value) =>
     q = defer()
     @getDataStore().then (store) => store.find(type, property, value).then (result) =>
+      if debug then console.log 'DB.find found '+result
+      if debug then console.dir result
       if not result
         console.log 'DB.find type '+type+', property '+property+', value '+value+' got back '+result
       else
