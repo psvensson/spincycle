@@ -242,7 +242,10 @@ class DB
           console.log '----------***************** DB.find error: trying to cache found result but id is not a string!!!'
           console.dir result
         else
-          @lru.set(result.id, result)
+          if result.length
+            result.forEach (re) => @lru.set(re.id, re)
+          else
+            @lru.set(result.id, result)
       q.resolve(result)
     return q
 
