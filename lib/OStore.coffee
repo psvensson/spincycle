@@ -33,13 +33,14 @@ class OStore
     return rv
 
   @storeObject: (obj, sendUpdates = true) =>
+    if debug then console.log 'OStore.storeObject called for object '+obj.id
     if obj
       OStore.objects[obj.id] = obj
       OStore.types[obj.type] = obj.type
       objs = OStore.objectsByType[obj.type] or {}
       objs[obj.id] = obj
       OStore.objectsByType[obj.type] = objs
-      #console.log 'storeObject storing '+obj.id+' with type '+obj.type
+      if debug then console.log 'storeObject storing '+obj.id+' with type '+obj.type
       @sendUpdatesFor(obj, sendUpdates)
 
   @getObject: (id, type) =>
