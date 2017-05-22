@@ -144,7 +144,7 @@ class SuperModel
     q = defer()
     if debug then console.log 'SuperModel.serialize called'
     @_serializing = true
-    OMgr.storeObject()
+    OMgr.storeObject(@)
     delete updatedObj.record if updatedObj
     #OMgr.updateObj(updatedObj) if updatedObj
     record = @getRecord()
