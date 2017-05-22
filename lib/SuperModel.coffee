@@ -314,10 +314,10 @@ class SuperModel
     , error)
 
   createObjectFromRecord: (r, resolveobj, count, record)=>
-    if debug then console.log '################################## supermodel createObjectFromRecord called'
-    if debug then console.dir resolveobj
-    if debug then console.log 'record.....'
-    if debug then console.dir record
+    #if debug then console.log '################################## supermodel createObjectFromRecord called'
+    #if debug then console.dir resolveobj
+    #if debug then console.log 'record.....'
+    #if debug then console.dir record
     if (Array.isArray(record))
       throw(new Error('got array instead of record in supermodel createObjectFromRecord !!!'))
 
