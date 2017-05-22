@@ -108,7 +108,7 @@ class OStore
     rv
 
   @sendUpdatesFor: (obj, changed, force) =>
-    #console.log 'OStore.sendUpdatesFor called for obj '+obj.id+' type '+obj.type+' changed = '+changed+', force = '+force+', anyone is listening == '+OStore.anyoneIsListening(obj.id)
+    if debug then console.log 'OStore.sendUpdatesFor called for obj '+obj.id+' type '+obj.type+' changed = '+changed+', force = '+force+', anyone is listening == '+OStore.anyoneIsListening(obj.id)
     if (changed or force) and OStore.anyoneIsListening(obj.id)
       #console.dir obj
       #console.log 'adding obj to updateQueue..'
