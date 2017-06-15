@@ -90,6 +90,7 @@ class RethinkPersistence
 
   addIndexIfNotPresent:(table,type,prop)=>
     q = defer()
+    """
     table.indexList().run @connection,(err2, res2) =>
       console.log '---- addindex check result for property '+prop+' on table '+type+' ---> '+res2
       console.dir res2
@@ -103,6 +104,8 @@ class RethinkPersistence
           q.resolve()
       else
         q.resolve()
+    """
+    q.resolve()
     return q
 
   getDbFor: (_type) =>
