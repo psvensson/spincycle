@@ -213,7 +213,7 @@ class RethinkPersistence
     type = _type.toLowerCase()
     r.db('spincycle').table(type).filter(query).run @connection, (err, cursor) ->
       if debug then console.log 'filter cursor got back'
-      if denug then console.dir cursor
+      if debug then console.dir cursor
       if err
         console.log 'filter error: '+err
         console.dir err
