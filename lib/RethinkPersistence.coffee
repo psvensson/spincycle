@@ -211,14 +211,16 @@ class RethinkPersistence
     if not query.property then query.property = 'name'
     q = defer()
     type = _type.toLowerCase()
-    @getDbFor(type).then (db)=>
-      rr = r.db('spincycle').table(type)
-      rr.filter(query).run @connection, (err, cursor) ->
-        if err
-          console.log 'findQuery error: '+err
-          console.dir err
-        cursor.toArray (ce, result)=>
-          q.resolve result
+    r.db('spincycle').table(type)
+    rr.filter(query).run @connection, (err, cursor) ->
+      if debug then console.log 'filter cursor got back'
+      if denug then console.dir cursor
+      if err
+        console.log 'filter error: '+err
+        console.dir err
+      cursor.toArray (ce, result)=>
+        if debug then console.log 'Rethink filter got '+result.length+' results'
+        q.resolve result
     return q
 
   findQuery: (_type, query) =>
