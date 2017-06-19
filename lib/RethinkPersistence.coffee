@@ -211,8 +211,7 @@ class RethinkPersistence
     if not query.property then query.property = 'name'
     q = defer()
     type = _type.toLowerCase()
-    rr = r.db('spincycle').table(type)
-    rr.filter(query).run @connection, (err, cursor) ->
+    r.db('spincycle').table(type).filter(query).run @connection, (err, cursor) ->
       if debug then console.log 'filter cursor got back'
       if denug then console.dir cursor
       if err
