@@ -208,7 +208,6 @@ class RethinkPersistence
   filter:(_type, query)=>
     if debug then console.log 'Rethink filter called for type '+_type
     if debug then console.dir query
-    if not query.property then query.property = 'name'
     q = defer()
     type = _type.toLowerCase()
     @getDbFor(type).then (db)=>
