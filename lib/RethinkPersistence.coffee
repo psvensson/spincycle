@@ -90,7 +90,7 @@ class RethinkPersistence
 
   addIndexIfNotPresent:(table,type,prop)=>
     q = defer()
-    """
+
     table.indexList().run @connection,(err2, res2) =>
       console.log '---- addindex check result for property '+prop+' on table '+type+' ---> '+res2
       console.dir res2
@@ -104,7 +104,6 @@ class RethinkPersistence
           q.resolve()
       else
         q.resolve()
-    """
     q.resolve()
     return q
 
@@ -206,6 +205,23 @@ class RethinkPersistence
           q.resolve result
     return q
 
+  filter:(_type, query)=>
+    if debug then console.log 'Rethink filter called for type '+_type
+    if debug then console.dir query
+    if not query.property then query.property = 'name'
+    q = defer()
+    type = _type.toLowerCase()
+    @getDbFor(type).then (db)=>
+      rr = r.db('spincycle').table(type)
+      rr.filter(query).then (fres)=>
+        rr.run @connection, (err, cursor) ->
+          if err
+            console.log 'findQuery error: '+err
+            console.dir err
+          cursor.toArray (ce, result)=>
+            q.resolve result
+    return q
+
   findQuery: (_type, query) =>
     if debug then console.log 'Rethink findQuery called for type '+_type
     if debug then console.dir query
@@ -252,7 +268,7 @@ class RethinkPersistence
     return q
 
   getValueForQuery: (val, prop, query)->
-    #console.log 'getValueFor called with valname '+val+' and propname '+prop
+    if debug then console.log 'getValueFor called with valname '+val+' and propname '+prop
     rv = query[val] == 'undefined' or query[val].indexOf('[') > -1 or query[val] == 'null' or query[val].indexOf('bject') > -1
     #console.log 'rv = '+rv
     #console.log 'not rv and query.property ---> '+(not rv and query[prop] isnt undefined and query[prop] isnt null)

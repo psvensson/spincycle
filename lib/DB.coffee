@@ -278,6 +278,18 @@ class DB
       q.resolve(results)
     return q
 
+  @filter: (type, query) =>
+    q = defer()
+    @getDataStore().then (store)=> store.filter(type, query).then (results) =>
+      if results and results.length and results.length > 0
+        if debug then console.log ' DB.filter got back '
+        if debug then console.dir results
+        results.forEach (result) =>
+#console.dir result
+          if result then @lru.set(result.id, result)
+      q.resolve(results)
+    return q
+
   # search for wildcards for property as a string beginning with value..
   @search: (type, property, value) =>
     q = defer()
