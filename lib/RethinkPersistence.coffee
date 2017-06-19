@@ -213,13 +213,12 @@ class RethinkPersistence
     type = _type.toLowerCase()
     @getDbFor(type).then (db)=>
       rr = r.db('spincycle').table(type)
-      rr.filter(query).then (fres)=>
-        rr.run @connection, (err, cursor) ->
-          if err
-            console.log 'findQuery error: '+err
-            console.dir err
-          cursor.toArray (ce, result)=>
-            q.resolve result
+      rr.filter(query).run @connection, (err, cursor) ->
+        if err
+          console.log 'findQuery error: '+err
+          console.dir err
+        cursor.toArray (ce, result)=>
+          q.resolve result
     return q
 
   findQuery: (_type, query) =>
