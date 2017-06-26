@@ -319,7 +319,10 @@ class DB
     if not ids.length then ids = [ids]
     q = defer()
     id = ids[0]
-    if (typeof id == 'object')
+    if not id
+      console.log 'DB.get for type '+type+' was served an empty id!'
+      q.resolve()
+    else if (typeof id == 'object')
       console.log 'DB.get was served an object instead of an id!!!'
       console.dir id
       xyzzy
