@@ -143,8 +143,8 @@ class OStore
     #console.log 'listener id = '+listenerId
     list[listenerId] = cb
     OStore.listeners[id] = list
-    if debug then console.log 'listeners list is now'
-    if debug then console.dir OStore.listeners[id]
+    #if debug then console.log 'listeners list is now'
+    #if debug then console.dir OStore.listeners[id]
     #@getObject(id, type).then((result) ->
     #  cb(result)
     #, error)
