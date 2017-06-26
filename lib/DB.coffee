@@ -166,7 +166,7 @@ class DB
     store.extend(type, id, field, def)
 
   @getFromStoreOrDB: (type, id) =>
-    if debug then console.log 'DB.getFromStoreOrDb called for '+type+' id '+id
+    #if debug then console.log 'DB.getFromStoreOrDb called for '+type+' id '+id
     q = defer()
     OStore.getObject(id, type).then (oo)=>
       if oo
@@ -344,8 +344,8 @@ class DB
             else
               result = toarr(result)
               @lru.set(id, result)
-              console.log 'DB.get resolving '+result
-              console.dir result
+              if debug then console.log 'DB.get resolving '+result
+              if debug then console.dir result
             q.resolve(result)
             )
     return q

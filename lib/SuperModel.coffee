@@ -109,7 +109,7 @@ class SuperModel
           if v.storedirectly
             varr.push av._getRecord(av, av.constructor.model, av.record)
           else
-            if debug then console.log '====================== array prop id is '+av.id+' typeof '+(typeof av.id)
+            #if debug then console.log '====================== array prop id is '+av.id+' typeof '+(typeof av.id)
             if av.id then varr.push av.id
         rv[k] = varr
       else
