@@ -169,7 +169,7 @@ class ObjectManager
                   if @messageRouter.authMgr.filterOutgoing
                     @messageRouter.authMgr.filterOutgoing(tc, msg.user).then (ftc)=>
                       if ftc
-                        if debug then console.log '_getObject after filteroutgoing got '+msg.type+' returns '+JSON.stringify(ftc)
+                        if debug then console.log '_getObject for filteroutgoing  '+msg.type+' returns '+JSON.stringify(tc)
                         msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: ftc})
                       else
                         msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: obj.id, statuscode: 403})
@@ -200,7 +200,7 @@ class ObjectManager
       obj = {id: msg.obj.id, list: rv}
       msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: obj})
 
-   _listObjects: (msg) =>
+  _listObjects: (msg) =>
     #console.log 'listObjects called for type '+msg.type
     #console.dir msg
     if typeof msg.type != 'undefined'
