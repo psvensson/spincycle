@@ -131,14 +131,14 @@ class RethinkPersistence
 
   all: (_type, query, cb)=>
     type = _type.toLowerCase()
-    if debug then console.log '-Rethink.all called for '+type
+    #if debug then console.log '-Rethink.all called for '+type
     @getDbFor(type).then (db)=>
-      if debug then console.log 'all got query for db '+db
-      if debug then console.dir query
+      #if debug then console.log 'all got query for db '+db
+      #if debug then console.dir query
       rr = db
       if query
         rr = rr.orderBy(query.sort or 'name')
-        if debug then console.log 'skipping '+query.skip+' limiting '+query.limit
+        #if debug then console.log 'skipping '+query.skip+' limiting '+query.limit
         if query.skip then rr = rr.skip(parseInt(query.skip or 0))
         if query.limit then rr = rr.limit(parseInt(query.limit))
       rr.run @connection, (err, cursor) ->
@@ -147,7 +147,7 @@ class RethinkPersistence
           console.dir err
           throw err
         cursor.toArray (ce, result)=>
-          if debug then console.log 'all result is '+result.length+' records'
+          #if debug then console.log 'all result is '+result.length+' records'
           #if debug then console.dir result
           cb result
 

@@ -330,8 +330,8 @@ class DB
       #console.log 'DB.get id is '+id
       rv = @lru.get id
       if rv
-        #if debug then console.log 'DB found '+id+'  in lru: '+rv
-        #if debug then console.dir rv
+        if debug then console.log 'DB found '+id+'  in lru: '+rv
+        if debug then console.dir rv
         q.resolve(toarr(rv))
       else
         #console.log ' attempting to use datastore for type '+type+' and id '+id+' typeof = '+(typeof id)
@@ -344,7 +344,8 @@ class DB
             else
               result = toarr(result)
               @lru.set(id, result)
-              #console.log 'DB.get resolving '+result
+              console.log 'DB.get resolving '+result
+              console.dir result
             q.resolve(result)
             )
     return q
