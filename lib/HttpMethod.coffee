@@ -2,6 +2,7 @@ uuid            = require('node-uuid')
 url             = require('url')
 basicAuth       = require('basic-auth')
 cookie         = require('cookie')
+bodyParser = require('body-parser')
 
 debug = process.env["DEBUG"]
 
@@ -13,6 +14,7 @@ class HttpMethod
   constructor: (messageRouter, app, basePath) ->
     #console.log 'HttpMethod called for path '+basePath'
     @app = app
+    app.use(bodyParser.json())
     @restPath = '/rest/'
 
     doSend = (req, res, url_parts)->

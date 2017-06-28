@@ -179,7 +179,7 @@ describe 'Spincycle Model Tests', ->
         console.log '++++++++++++++++++++++++++++++++++++spec dbs created'
         messageRouter.open()
         done()
-
+    return false
 
 
   #-----------------------------------------------------------------------
@@ -899,6 +899,32 @@ describe 'Spincycle Model Tests', ->
                         done()
                     messageRouter.objectManager._getObject(msg1)
                 messageRouter.objectManager._updateObject(umsg)
+
+  it 'should be able to get an object with all array references of that of the object in db', (done)->
+    new Bar().then (bar) ->
+      new Foo().then (foo) ->
+        new Foo().then (foo2) ->
+          foo.serialize().then ()->
+            bar.foos.push foo
+            bar.foos.push foo2
+            bar.serialize().then ()->
+              console.log '------------------------- initial bar object foos is '
+              console.dir bar.foos
+
+              msg =
+                type: 'Bar'
+                obj:{id: bar.id, type: 'Bar'}
+                user:
+                  isAdmin: true
+                replyFunc: (reply)->
+                  console.log '--__--__--__ object get result __--__--__--'
+                  console.dir reply
+                  expect(reply.payload.foos.length).to.equal(2)
+                  done()
+
+              messageRouter.objectManager._getObject(msg)
+    return false
+
 
   it 'should be able to get population change callbacks on create', (done)->
     ClientEndpoints.registerEndpoint 'updateclient',(reply)->
