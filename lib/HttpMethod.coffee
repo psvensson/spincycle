@@ -54,7 +54,9 @@ class HttpMethod
       doSend(req, res, url_parts)
 
     app.post basePath, (req, res) ->
-      url_parts = req.body
+      url_parts = req.query
+      for k,v of req.body
+        url_parts[k] = v
       doSend(req, res, url_parts)
 
     """
