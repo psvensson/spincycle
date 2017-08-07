@@ -160,7 +160,7 @@ class RethinkPersistence
           console.log 'count err: '+err
           console.dir err
           throw err
-        console.log result
+        if debug then console.log result
         q.resolve result
     return q
 

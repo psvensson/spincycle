@@ -225,7 +225,7 @@ class ObjectManager
       msg.replyFunc({status: e.general.FAILURE, info: '_listObjects missing parameter', payload: null })
 
   _countObjects: (msg) =>
-    console.log 'countObjects called for type '+msg.type
+    #console.log 'countObjects called for type '+msg.type
     if typeof msg.type != 'undefined'
       if msg.type.toLowerCase() in @getTypes()
         if @messageRouter.authMgr.canUserListTheseObjects(msg.type, msg.user, msg.sessionId) == no
