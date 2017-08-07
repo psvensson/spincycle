@@ -104,7 +104,6 @@ class RethinkPersistence
           q.resolve()
       else
         q.resolve()
-    q.resolve()
     return q
 
   getDbFor: (_type) =>
