@@ -42,6 +42,7 @@ class HttpMethod
         #console.dir message
         message.replyFunc = (reply) ->
           if reply.statuscode then res.status(reply.statuscode)
+          if reply.status == 'FAILURE' then res.status(404)
           res.json(reply)
           if debug then console.log 'HttpMethod calling target '+target
         target(message)
