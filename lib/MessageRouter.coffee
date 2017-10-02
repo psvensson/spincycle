@@ -60,9 +60,9 @@ class MessageRouter
     DB.getDataStore(dbtype).then ()=>
       pjson = require('../package.json');
       @messagesPerSecond = msgPS or 100
-      console.log colors.blue.inverse('---------------------------------------------------------------------------------------')
-      console.log colors.blue.bold.inverse(' SpinCycle messageRouter constructor. Version - '+pjson.version+' messages per second limit = '+@messagesPerSecond+' ')
-      console.log colors.blue.inverse('---------------------------------------------------------------------------------------')
+      console.log colors.blue.inverse('-----------------------------------------------------------------------------------------------')
+      console.log colors.blue.bold.inverse(' SpinCycle messageRouter constructor. Version - '+pjson.version+' messages per user per second limit = '+@messagesPerSecond+' ')
+      console.log colors.blue.inverse('-----------------------------------------------------------------------------------------------')
       if @datadogOptions
         console.log 'datadog options are'
         console.dir @datadogOptions

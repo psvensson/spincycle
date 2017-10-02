@@ -276,11 +276,14 @@ class SuperModel
 
   resolveObj: (resolveobj, id, r, count) =>
     if typeof id != 'string'
-      console.log '%%%%%%%%%%%%%%%%%%% ERROR: Supermodel.resolveObj given a non-string as id!! resolveObj was:'
-      console.dir resolveobj
-      console.log 'id was:'
-      console.dir id
-      process.exit(-1)
+      if id.id
+        id = id.id
+      else
+        console.log '%%%%%%%%%%%%%%%%%%% ERROR: Supermodel.resolveObj given a non-string as id!! resolveObj was:'
+        console.dir resolveobj
+        console.log 'id was:'
+        console.dir id
+        process.exit(-1)
     #console.log '************************************* resolveObj called in '+@type+' for id '+id+' typeof '+(typeof id)
     #console.dir id
     OMgr.getObject(id, resolveobj.type).then( (oo) =>
