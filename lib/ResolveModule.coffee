@@ -46,6 +46,9 @@ class ResolveModule
             #if debug then console.log '-- no match for file '+origfile+' and name '+name
 
       finder.on 'end', () ->
+      finder.on 'error',()->
+      console.log 'SpinCycle ResolveModule: Filesystem finder ERROR for "'+name+'"
+      console.dir arguments
 
   createObjectFrom: (record) =>
     q = defer()

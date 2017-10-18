@@ -170,7 +170,7 @@ class ObjectManager
                     @messageRouter.authMgr.filterOutgoing(tc, msg.user).then (ftc)=>
                       if ftc
                         if debug then console.log '_getObject for filteroutgoing  '+msg.type+' returns '+JSON.stringify(tc)
-                        msg.replyFunc({status: e.general.SUCCESS, info: 'get object', payload: ftc})
+                        msg.replyFunc({status: e.general.SUCCESS, info: 'update object', payload: ftc})
                       else
                         msg.replyFunc({status: e.general.NOT_ALLOWED, info: 'not allowed to read from that object', payload: obj.id, statuscode: 403})
                   else
