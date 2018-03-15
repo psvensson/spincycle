@@ -10,7 +10,6 @@ OStore          = require('./OStore')
 Couch           = require('./CouchPersistence')
 #Mongo           = require('./MongoPersistence')
 Rethink         = require('./RethinkPersistence')
-Google          = require('./GooglePersistence')
 
 ResolveModule   = require('./ResolveModule')
 
@@ -45,7 +44,6 @@ class DB
       else if name == 'couchdb' then @DataStore = new Couch(DB.dburl)
       #else if name == 'mongodb' then @DataStore = new Mongo(DB.dburl, DB)
       else if name == 'rethinkdb' then @DataStore = new Rethink(DB.dburl, DB)
-      else if name == 'google' then @DataStore = new Google(DB.dburl, DB)
       @DataStore.connect().then (ds)=>
         #console.log 'DB got back datastore for '+name
         @getOrCreateObjectByRecord({id:11122333444, type:'SpinMeta'}).then (meta)=>
