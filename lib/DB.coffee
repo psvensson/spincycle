@@ -19,7 +19,7 @@ debug = process.env["DEBUG"]
 
 class DB
 
-  @dburl: 'localhost'
+  @dburl: process.env.DBURL || 'localhost'
   @lru: LRU()
   @lrudiff: LRU()
   @dbname : ''
