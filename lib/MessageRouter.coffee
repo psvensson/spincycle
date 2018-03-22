@@ -80,6 +80,7 @@ class MessageRouter
       @objectManager = new ObjectManager(@)
       @objectManager.setup()
       if @authMgr.setup then @authMgr.setup(@)
+      @DB = DB
       @setup()
       q.resolve(@)
 

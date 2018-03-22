@@ -11,6 +11,7 @@ class RethinkPersistence
   mport = process.env['RETHINKDB_PORT_28015_TCP_PORT'] or '28015'
 
   constructor: (@dburl, @DB) ->
+    console.log 'RethinkPersistence::constructor dburl = '+@dburl
     @connection = undefined
     @dbs = []
 
