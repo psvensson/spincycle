@@ -242,7 +242,7 @@ class DB
         else
           if result.length
             result.forEach (re) => @lru.set(re.id, re)
-          else
+          else if result.id
             @lru.set(result.id, result)
       q.resolve(result)
     return q
