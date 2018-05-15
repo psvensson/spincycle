@@ -34,6 +34,7 @@ class MessageRouter
   @WsMethod = WsMethod
   @RedisMethod = RedisMethod
   @DB = DB
+  @SpinMeta = SpinMeta
   @EventManager = EventManager
   @SuperModel = SuperModel
   @ObjectManager = ObjectManager
