@@ -65,8 +65,10 @@ class DB
       promises = []
       dblist.forEach (dbname) =>
         console.log 'attempting to get table for '+dbname
-        if not (dbname in @meta.knownModels)
-          @meta.knownModels.push dbname
+        models = @meta.knownModels or []
+        if not (dbname in models)
+          models.push dbname
+          @meta.knownModels = models
           @meta.serialize()
         db = store.getDbFor(dbname)
         promises.push db
