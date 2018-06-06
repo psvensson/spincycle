@@ -234,8 +234,8 @@ class RethinkPersistence
       rr = r.db('spincycle').table(type)
       sv = query.sort or 'name'
       @addIndexIfNotPresent(rr, type, sv).then ()=>
-        #rr = rr.orderBy({index: r.desc(sv)})
-        rr = rr.orderBy(sv)
+        rr = rr.orderBy(r.desc(sv))
+        #rr = rr.orderBy(sv)
         rv = @getValueForQuery('value', 'property', query)
         if not rv.invalid
           rr = rr.filter( (element)=>
