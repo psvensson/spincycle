@@ -234,7 +234,7 @@ class RethinkPersistence
       rr = r.db('spincycle').table(type)
       sv = query.sort or 'name'
       @addIndexIfNotPresent(rr, type, sv).then ()=>
-        rr = rr.orderBy(r.desc(sv))
+        #rr = rr.orderBy(r.desc(sv))
         #rr = rr.orderBy(sv)
         rv = @getValueForQuery('value', 'property', query)
         if not rv.invalid
@@ -254,7 +254,7 @@ class RethinkPersistence
                   el(query.property2).eq(rv2.value)
               )
           if query.limit then rr = rr.skip(query.skip or 0).limit(query.limit)
-          if query.orderBy then rr = rr.orderBy(query.orderBy)
+          if query.orderBy then rr = rr.orderBy(r.desc(query.orderBy))
           if debug then console.log 'Rethink findQuery running query...'
           rr.run @connection, (err, cursor) ->
             if err
