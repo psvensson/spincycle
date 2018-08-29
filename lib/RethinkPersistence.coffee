@@ -260,10 +260,12 @@ class RethinkPersistence
             if err
               console.log 'findQuery error: '+err
               console.dir err
-            cursor.toArray (ce, result)=>
-              #console.log 'findQuery result is '
-              #console.log result
-              q.resolve result
+              resolve []
+            else
+              cursor.toArray (ce, result)=>
+                #console.log 'findQuery result is '
+                #console.log result
+                q.resolve result
         else
           q.resolve([])
     return q
